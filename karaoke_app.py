@@ -107,7 +107,7 @@ class KaraokeApp(Gtk.Window):
         self.podcast_toggle.connect("notify::active", self.on_podcast_toggle)
         
         toggle_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
-        toggle_box.pack_start(Gtk.Label(label="<span font='10' color='#71717a'>Chế độ Livestream / MC (Giọng ấm, tắt Vang)</span>", use_markup=True), False, False, 0)
+        toggle_box.pack_start(Gtk.Label(label="<span font='10' color='#71717a'>Chế độ: Hát / Podcast</span>", use_markup=True), False, False, 0)
         toggle_box.pack_start(self.podcast_toggle, False, False, 0)
         vbox.pack_start(toggle_box, False, False, 0)
         
@@ -312,8 +312,8 @@ class KaraokeApp(Gtk.Window):
         with open(GENRE_FILE, "w") as f:
             json.dump(data, f)
             
-        status = "BẬT" if switch.get_active() else "TẮT"
-        self.status_lbl.set_markup(f"<span font='9' color='#00ff00'>Chế độ Livestream / Podcast: {status}</span>")
+        mode_text = "Podcast" if switch.get_active() else "Hát"
+        self.status_lbl.set_markup(f"<span font='9' color='#00ff00'>Chế độ: {mode_text}</span>")
 if __name__ == '__main__':
     win = KaraokeApp()
     win.connect("destroy", Gtk.main_quit)
