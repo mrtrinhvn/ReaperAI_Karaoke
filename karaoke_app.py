@@ -106,10 +106,18 @@ class KaraokeApp(Gtk.Window):
         self.podcast_toggle.set_active(False)
         self.podcast_toggle.connect("notify::active", self.on_podcast_toggle)
         
-        toggle_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
-        toggle_box.pack_start(Gtk.Label(label="<span font='10' color='#71717a'>Chế độ: Hát / Podcast</span>", use_markup=True), False, False, 0)
+        toggle_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=15)
+        toggle_box.set_halign(Gtk.Align.CENTER)
+        
+        self.lbl_hat = Gtk.Label()
+        self.lbl_podcast = Gtk.Label()
+        
+        toggle_box.pack_start(self.lbl_hat, False, False, 0)
         toggle_box.pack_start(self.podcast_toggle, False, False, 0)
-        vbox.pack_start(toggle_box, False, False, 0)
+        toggle_box.pack_start(self.lbl_podcast, False, False, 0)
+        vbox.pack_start(toggle_box, False, False, 10)
+        
+        self.update_mode_labels(False) # Khởi tạo màu sắc ban đầu
         
         self.status_lbl = Gtk.Label(label="<span font='9' color='#71717a'>Sẵn sàng.</span>", use_markup=True)
         vbox.pack_start(self.status_lbl, False, False, 0)
@@ -303,17 +311,27 @@ class KaraokeApp(Gtk.Window):
         with open(GENRE_FILE, "w") as f:
             json.dump(data, f)
             
+    def update_mode_labels(self, is_podcast):
+        if is_podcast:
+            self.lbl_hat.set_markup("<span font='11' weight='bold' color='#71717a'>HÁT</span>")
+            self.lbl_podcast.set_markup("<span font='11' weight='bold' color='#2ecc71'>🎙️ PODCAST</span>")
+        else:
+            self.lbl_hat.set_markup("<span font='11' weight='bold' color='#2ecc71'>🎵 HÁT</span>")
+            self.lbl_podcast.set_markup("<span font='11' weight='bold' color='#71717a'>PODCAST</span>")
+
     def on_podcast_toggle(self, switch, gparam):
+        is_podcast = switch.get_active()
         try:
             with open(GENRE_FILE, "r") as f: data = json.load(f)
         except: data = {}
-        data["force_podcast"] = switch.get_active()
+        data["force_podcast"] = is_podcast
         data["timestamp"] = time.time()
         with open(GENRE_FILE, "w") as f:
             json.dump(data, f)
             
-        mode_text = "Podcast" if switch.get_active() else "Hát"
-        self.status_lbl.set_markup(f"<span font='9' color='#00ff00'>Chế độ: {mode_text}</span>")
+        self.update_mode_labels(is_podcast)
+        # Reset lại status về Sẵn sàng để xóa đi dòng chữ báo trạng thái dài dòng
+        self.status_lbl.set_markup("<span font='9' color='#71717a'>Sẵn sàng.</span>")
 if __name__ == '__main__':
     win = KaraokeApp()
     win.connect("destroy", Gtk.main_quit)
