@@ -1,0 +1,9 @@
+{
+  "version": "2.0",
+  "total_skills": 0,
+  "total_agents": 0,
+  "installed_packs": [],
+  "usage": "AI: Read this registry FIRST at session start. Match user request against triggers/descriptions. Only open matched SKILL.md or agent .md files. DO NOT read all files — this saves ~94% tokens.",
+  "skills": [],
+  "agents": []
+}

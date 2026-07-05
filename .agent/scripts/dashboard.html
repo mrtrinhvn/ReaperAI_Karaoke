@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AG-KIT Dashboard</title>
+<style>
+  :root {
+    --bg: #0a0e17; --surface: #111827; --surface2: #1e293b;
+    --border: #334155; --text: #e2e8f0; --text2: #94a3b8;
+    --accent: #38bdf8; --accent2: #818cf8; --green: #34d399;
+    --orange: #fb923c; --pink: #f472b6; --red: #f87171;
+    --radius: 12px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg); color: var(--text);
+    min-height: 100vh;
+  }
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  /* Header */
+  .header {
+    background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 24px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .header h1 {
+    font-size: 20px; font-weight: 700;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .header .subtitle { color: var(--text2); font-size: 13px; }
+
+  /* Tabs */
+  .tabs {
+    display: flex; gap: 4px; padding: 12px 24px;
+    background: var(--surface); border-bottom: 1px solid var(--border);
+  }
+  .tab {
+    padding: 8px 20px; border-radius: 8px; cursor: pointer;
+    font-size: 13px; font-weight: 500; color: var(--text2);
+    border: 1px solid transparent; transition: all 0.2s;
+  }
+  .tab:hover { color: var(--text); background: var(--surface2); }
+  .tab.active {
+    color: var(--accent); background: rgba(56,189,248,0.1);
+    border-color: rgba(56,189,248,0.3);
+  }
+
+  /* Stats Grid */
+  .stats-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px; padding: 20px 24px;
+  }
+  .stat-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 16px;
+    transition: transform 0.2s, border-color 0.2s;
+  }
+  .stat-card:hover { transform: translateY(-2px); border-color: var(--accent); }
+  .stat-card .label { font-size: 11px; text-transform: uppercase; color: var(--text2); letter-spacing: 1px; }
+  .stat-card .value { font-size: 28px; font-weight: 700; margin-top: 4px; font-family: 'JetBrains Mono'; }
+  .stat-card .value.blue { color: var(--accent); }
+  .stat-card .value.purple { color: var(--accent2); }
+  .stat-card .value.green { color: var(--green); }
+  .stat-card .value.orange { color: var(--orange); }
+  .stat-card .value.pink { color: var(--pink); }
+
+  /* Content panels */
+  .panel { display: none; padding: 20px 24px; }
+  .panel.active { display: block; }
+
+  /* Graph Container */
+  #graph-container {
+    width: 100%; height: calc(100vh - 260px);
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); overflow: hidden; position: relative;
+  }
+  #graph-container svg { width: 100%; height: 100%; }
+
+  /* Tables */
+  .data-table {
+    width: 100%; border-collapse: collapse;
+    background: var(--surface); border-radius: var(--radius);
+    overflow: hidden; border: 1px solid var(--border);
+  }
+  .data-table th {
+    background: var(--surface2); padding: 10px 14px;
+    text-align: left; font-size: 11px; text-transform: uppercase;
+    color: var(--text2); letter-spacing: 1px; font-weight: 600;
+  }
+  .data-table td {
+    padding: 10px 14px; border-top: 1px solid var(--border);
+    font-size: 13px; font-family: 'JetBrains Mono', monospace;
+  }
+  .data-table tr:hover td { background: rgba(56,189,248,0.05); }
+
+  /* Badges */
+  .badge {
+    display: inline-block; padding: 2px 8px; border-radius: 4px;
+    font-size: 11px; font-weight: 600;
+  }
+  .badge-function { background: rgba(56,189,248,0.15); color: var(--accent); }
+  .badge-class { background: rgba(129,140,248,0.15); color: var(--accent2); }
+  .badge-method { background: rgba(52,211,153,0.15); color: var(--green); }
+  .badge-interface { background: rgba(251,146,60,0.15); color: var(--orange); }
+  .badge-type { background: rgba(244,114,182,0.15); color: var(--pink); }
+  .badge-route { background: rgba(56,189,248,0.2); color: var(--accent); }
+
+  /* Memory Cards */
+  .memory-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 16px; margin-bottom: 10px;
+    transition: border-color 0.2s;
+  }
+  .memory-card:hover { border-color: var(--accent2); }
+  .memory-card .meta { display: flex; gap: 12px; font-size: 11px; color: var(--text2); margin-bottom: 8px; }
+  .memory-card .content { font-size: 13px; line-height: 1.6; }
+  .energy-bar {
+    height: 3px; border-radius: 2px; margin-top: 8px;
+    background: var(--surface2);
+  }
+  .energy-bar .fill { height: 100%; border-radius: 2px; background: linear-gradient(90deg, var(--accent), var(--green)); }
+
+  /* Charts */
+  .chart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
+  .chart-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 16px;
+  }
+  .chart-card h3 { font-size: 13px; color: var(--text2); margin-bottom: 12px; }
+  .bar-chart .bar-row { display: flex; align-items: center; margin-bottom: 6px; }
+  .bar-chart .bar-label { width: 100px; font-size: 12px; color: var(--text2); }
+  .bar-chart .bar-track { flex: 1; height: 20px; background: var(--surface2); border-radius: 4px; overflow: hidden; }
+  .bar-chart .bar-fill { height: 100%; border-radius: 4px; display: flex; align-items: center; padding-left: 8px; font-size: 11px; font-weight: 600; }
+
+  .loading { text-align: center; padding: 60px; color: var(--text2); }
+  .loading::after { content: ''; display: inline-block; width: 20px; height: 20px; border: 2px solid var(--accent); border-top-color: transparent; border-radius: 50%; animation: spin 0.8s linear infinite; margin-left: 8px; vertical-align: middle; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Tooltip */
+  .tooltip {
+    position: absolute; background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px 14px; font-size: 12px;
+    pointer-events: none; z-index: 100; max-width: 300px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  }
+  .tooltip .tt-name { font-weight: 600; color: var(--accent); }
+  .tooltip .tt-meta { color: var(--text2); margin-top: 4px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <h1>🧠 AG-KIT Dashboard</h1>
+    <div class="subtitle" id="project-name">Loading...</div>
+  </div>
+  <div style="font-size: 12px; color: var(--text2);" id="last-update"></div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" data-tab="overview">📊 Overview</div>
+  <div class="tab" data-tab="graph">🕸️ Knowledge Graph</div>
+  <div class="tab" data-tab="files">📁 Files</div>
+  <div class="tab" data-tab="routes">🛣️ Routes</div>
+  <div class="tab" data-tab="memory">🧠 Memory</div>
+</div>
+
+<div id="stats-area"></div>
+
+<!-- Overview -->
+<div class="panel active" id="panel-overview">
+  <div class="chart-grid" id="charts-area">
+    <div class="loading">Loading data</div>
+  </div>
+</div>
+
+<!-- Graph -->
+<div class="panel" id="panel-graph">
+  <div id="graph-container"><div class="loading">Building graph</div></div>
+</div>
+
+<!-- Files -->
+<div class="panel" id="panel-files">
+  <div class="loading" id="files-loading">Loading files</div>
+  <div id="files-content"></div>
+</div>
+
+<!-- Routes -->
+<div class="panel" id="panel-routes">
+  <div class="loading" id="routes-loading">Loading routes</div>
+  <div id="routes-content"></div>
+</div>
+
+<!-- Memory -->
+<div class="panel" id="panel-memory">
+  <div class="loading" id="memory-loading">Loading memory</div>
+  <div id="memory-content"></div>
+</div>
+
+<div class="tooltip" id="tooltip" style="display:none"></div>
+
+<script>
+const API = '';  // Same origin
+const COLORS = {
+  function: '#38bdf8', method: '#34d399', class: '#818cf8',
+  interface: '#fb923c', type: '#f472b6', unknown: '#64748b'
+};
+
+// Tab switching
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('panel-' + tab.dataset.tab).classList.add('active');
+    // Lazy load
+    if (tab.dataset.tab === 'graph' && !window._graphLoaded) loadGraph();
+    if (tab.dataset.tab === 'files' && !window._filesLoaded) loadFiles();
+    if (tab.dataset.tab === 'routes' && !window._routesLoaded) loadRoutes();
+    if (tab.dataset.tab === 'memory' && !window._memoryLoaded) loadMemory();
+  });
+});
+
+// Fetch helper
+async function api(endpoint) {
+  const r = await fetch(API + '/api/' + endpoint);
+  return r.json();
+}
+
+// Overview
+async function loadOverview() {
+  const data = await api('overview');
+  document.getElementById('project-name').textContent =
+    `${data.symbols} symbols · ${data.edges} edges · ${data.routes} routes · ${data.memory_nodes} memories`;
+  document.getElementById('last-update').textContent = new Date().toLocaleTimeString();
+
+  // Stats cards
+  document.getElementById('stats-area').innerHTML = `
+    <div class="stats-grid">
+      <div class="stat-card"><div class="label">Symbols</div><div class="value blue">${data.symbols}</div></div>
+      <div class="stat-card"><div class="label">Edges</div><div class="value purple">${data.edges}</div></div>
+      <div class="stat-card"><div class="label">Routes</div><div class="value green">${data.routes}</div></div>
+      <div class="stat-card"><div class="label">Memory</div><div class="value orange">${data.memory_nodes}</div></div>
+      <div class="stat-card"><div class="label">Vectors</div><div class="value pink">${data.memory_vectors}</div></div>
+    </div>`;
+
+  // Charts
+  const maxKind = Math.max(...data.symbol_kinds.map(k => k.count));
+  const kindBars = data.symbol_kinds.map(k => `
+    <div class="bar-row">
+      <div class="bar-label">${k.kind}</div>
+      <div class="bar-track">
+        <div class="bar-fill" style="width:${(k.count/maxKind*100)}%;background:${COLORS[k.kind]||COLORS.unknown}">${k.count}</div>
+      </div>
+    </div>`).join('');
+
+  const maxLayer = Math.max(...data.layers.map(l => l.count));
+  const layerBars = data.layers.map((l, i) => {
+    const colors = ['#38bdf8','#818cf8','#34d399','#fb923c','#f472b6','#64748b'];
+    return `<div class="bar-row">
+      <div class="bar-label">${l.layer}</div>
+      <div class="bar-track">
+        <div class="bar-fill" style="width:${(l.count/maxLayer*100)}%;background:${colors[i%colors.length]}">${l.count}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('charts-area').innerHTML = `
+    <div class="chart-card"><h3>Symbol Types</h3><div class="bar-chart">${kindBars}</div></div>
+    <div class="chart-card"><h3>Architecture Layers</h3><div class="bar-chart">${layerBars}</div></div>`;
+}
+
+// Force-directed graph (simple canvas-based)
+async function loadGraph() {
+  window._graphLoaded = true;
+  const data = await api('graph?limit=300');
+  const container = document.getElementById('graph-container');
+  const W = container.clientWidth, H = container.clientHeight;
+
+  container.innerHTML = '';
+  const canvas = document.createElement('canvas');
+  canvas.width = W; canvas.height = H;
+  container.appendChild(canvas);
+  const ctx = canvas.getContext('2d');
+
+  // Build node map
+  const nodeMap = {};
+  const nodes = data.nodes.map((n, i) => {
+    const angle = (i / data.nodes.length) * Math.PI * 2;
+    const r = Math.min(W, H) * 0.35;
+    const node = {
+      ...n, x: W/2 + Math.cos(angle) * r * (0.5 + Math.random() * 0.5),
+      y: H/2 + Math.sin(angle) * r * (0.5 + Math.random() * 0.5),
+      vx: 0, vy: 0, radius: n.kind === 'class' ? 6 : n.kind === 'function' ? 4 : 3
+    };
+    nodeMap[n.id] = node;
+    return node;
+  });
+
+  const links = data.links.filter(l => nodeMap[l.source] && nodeMap[l.target]);
+
+  // Simple force simulation
+  function simulate() {
+    // Repulsion
+    for (let i = 0; i < nodes.length; i++) {
+      for (let j = i + 1; j < nodes.length; j++) {
+        let dx = nodes[j].x - nodes[i].x;
+        let dy = nodes[j].y - nodes[i].y;
+        let dist = Math.sqrt(dx * dx + dy * dy) || 1;
+        let force = 800 / (dist * dist);
+        nodes[i].vx -= dx / dist * force;
+        nodes[i].vy -= dy / dist * force;
+        nodes[j].vx += dx / dist * force;
+        nodes[j].vy += dy / dist * force;
+      }
+    }
+    // Attraction (links)
+    links.forEach(l => {
+      const s = nodeMap[l.source], t = nodeMap[l.target];
+      let dx = t.x - s.x, dy = t.y - s.y;
+      let dist = Math.sqrt(dx * dx + dy * dy) || 1;
+      let force = (dist - 80) * 0.01;
+      s.vx += dx / dist * force;
+      s.vy += dy / dist * force;
+      t.vx -= dx / dist * force;
+      t.vy -= dy / dist * force;
+    });
+    // Center gravity
+    nodes.forEach(n => {
+      n.vx += (W / 2 - n.x) * 0.001;
+      n.vy += (H / 2 - n.y) * 0.001;
+      n.vx *= 0.9; n.vy *= 0.9;
+      n.x += n.vx; n.y += n.vy;
+      n.x = Math.max(20, Math.min(W - 20, n.x));
+      n.y = Math.max(20, Math.min(H - 20, n.y));
+    });
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    // Links
+    ctx.strokeStyle = 'rgba(100,116,139,0.15)';
+    ctx.lineWidth = 0.5;
+    links.forEach(l => {
+      const s = nodeMap[l.source], t = nodeMap[l.target];
+      ctx.beginPath();
+      ctx.moveTo(s.x, s.y);
+      ctx.lineTo(t.x, t.y);
+      ctx.stroke();
+    });
+    // Nodes
+    nodes.forEach(n => {
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, n.radius, 0, Math.PI * 2);
+      ctx.fillStyle = COLORS[n.kind] || COLORS.unknown;
+      ctx.fill();
+    });
+    // Labels for classes
+    ctx.font = '10px Inter';
+    ctx.fillStyle = 'rgba(226,232,240,0.7)';
+    nodes.filter(n => n.kind === 'class').forEach(n => {
+      ctx.fillText(n.name, n.x + 8, n.y + 3);
+    });
+  }
+
+  // Animate
+  let frame = 0;
+  function tick() {
+    simulate();
+    draw();
+    frame++;
+    if (frame < 200) requestAnimationFrame(tick);
+  }
+  tick();
+
+  // Tooltip on hover
+  canvas.addEventListener('mousemove', e => {
+    const rect = canvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+    const hit = nodes.find(n => Math.hypot(n.x - mx, n.y - my) < n.radius + 4);
+    const tip = document.getElementById('tooltip');
+    if (hit) {
+      tip.style.display = 'block';
+      tip.style.left = (e.clientX + 12) + 'px';
+      tip.style.top = (e.clientY - 10) + 'px';
+      tip.innerHTML = `<div class="tt-name">${hit.name}</div><div class="tt-meta">${hit.kind} · ${hit.file}:${hit.line}</div>`;
+    } else {
+      tip.style.display = 'none';
+    }
+  });
+}
+
+// Files tab
+async function loadFiles() {
+  window._filesLoaded = true;
+  const data = await api('files');
+  document.getElementById('files-loading').style.display = 'none';
+  document.getElementById('files-content').innerHTML = `
+    <table class="data-table">
+      <thead><tr><th>File</th><th>Symbols</th><th>Types</th></tr></thead>
+      <tbody>${data.map(f => `
+        <tr>
+          <td>${f.file_path}</td>
+          <td>${f.symbols}</td>
+          <td>${(f.kinds||'').split(',').map(k => `<span class="badge badge-${k.trim()}">${k.trim()}</span>`).join(' ')}</td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
+}
+
+// Routes tab
+async function loadRoutes() {
+  window._routesLoaded = true;
+  const data = await api('routes');
+  document.getElementById('routes-loading').style.display = 'none';
+  document.getElementById('routes-content').innerHTML = `
+    <table class="data-table">
+      <thead><tr><th>Method</th><th>Path</th><th>Framework</th><th>File</th></tr></thead>
+      <tbody>${data.map(r => `
+        <tr>
+          <td><span class="badge badge-route">${r.method||'GET'}</span></td>
+          <td>${r.path}</td>
+          <td>${r.framework||''}</td>
+          <td style="color:var(--text2)">${r.file_path||''}</td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
+}
+
+// Memory tab
+async function loadMemory() {
+  window._memoryLoaded = true;
+  const data = await api('memory');
+  document.getElementById('memory-loading').style.display = 'none';
+  document.getElementById('memory-content').innerHTML = data.map(n => `
+    <div class="memory-card">
+      <div class="meta">
+        <span class="badge badge-${n.kind||n.category}">${n.category}</span>
+        <span>⚡ ${n.energy}</span>
+        <span>${n.tier}</span>
+        <span>${n.created_at || ''}</span>
+      </div>
+      <div class="content">${n.content}</div>
+      <div class="energy-bar"><div class="fill" style="width:${n.energy}%"></div></div>
+    </div>`).join('');
+}
+
+// Init
+loadOverview();
+</script>
+</body>
+</html>

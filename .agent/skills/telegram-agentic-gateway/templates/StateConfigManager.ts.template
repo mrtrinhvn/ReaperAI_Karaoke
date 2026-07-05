@@ -1,0 +1,53 @@
+import fs from 'fs';
+import path from 'path';
+
+export interface GuardConfig {
+  route_mode: 'local' | 'cloud';
+  active_model: string;
+}
+
+export class StateConfigManager {
+  private configPath: string;
+
+  constructor() {
+    this.configPath = path.resolve(process.cwd(), '.agent/state/guard_config.json');
+  }
+
+  /**
+   * Đọc trạng thái Model hiện tại
+   */
+  public getState(): GuardConfig {
+    try {
+      if (fs.existsSync(this.configPath)) {
+        const data = fs.readFileSync(this.configPath, 'utf8');
+        return JSON.parse(data) as GuardConfig;
+      }
+    } catch (err) {
+      console.error("[StateConfigManager] Error reading config:", err);
+    }
+    // Fallback an toàn mặc định
+    return {
+      route_mode: 'cloud',
+      active_model: 'gemini-1.5-pro'
+    };
+  }
+
+  /**
+   * Cập nhật trạng thái cấu hình khi User thao tác trên UI/Telegram
+   */
+  public updateState(updates: Partial<GuardConfig>): GuardConfig {
+    const currentState = this.getState();
+    const newState = { ...currentState, ...updates };
+    
+    try {
+      // Đảm bảo thư mục tồn tại
+      fs.mkdirSync(path.dirname(this.configPath), { recursive: true });
+      fs.writeFileSync(this.configPath, JSON.stringify(newState, null, 2), 'utf8');
+      console.log(`[StateConfigManager] Updated State: route_mode=${newState.route_mode}, model=${newState.active_model}`);
+    } catch (err) {
+      console.error("[StateConfigManager] Error writing config:", err);
+    }
+    
+    return newState;
+  }
+}

@@ -1,0 +1,102 @@
+import { CdpService } from './CdpService.js';
+
+export interface MonitorResult {
+  response: string;
+  completed: boolean;
+  error?: string;
+}
+
+export class ResponseMonitor {
+  private cdp: CdpService;
+  private pollIntervalMs = 2000;
+  private maxWaitMs = 86400000; // 24 hours (Infinite)
+
+  constructor(cdp: CdpService) {
+    this.cdp = cdp;
+  }
+
+  /**
+   * Wait for AI to finish generating and return the full response.
+   * Calls onProgress for each intermediate state.
+   * Calls onStatus for thinking/status updates.
+   */
+  async waitForResponse(
+    onProgress?: (partial: string) => void,
+    onStatus?: (status: string) => void
+  ): Promise<MonitorResult> {
+    const startTime = Date.now();
+    let lastResponse = '';
+    let staleCount = 0;
+    let statusUpdateCount = 0;
+
+    // Initial wait
+    let lastKnownStatus = 'Khởi tạo tác vụ... (Initializing)';
+    if (onStatus) onStatus(lastKnownStatus);
+    await this.sleep(1500);
+
+    while (Date.now() - startTime < this.maxWaitMs) {
+      const generating = await this.cdp.isGenerating();
+      const currentResponse = await this.cdp.extractLastResponse();
+
+      // Update status every cycle, the callback will debounce it
+      if (onStatus) {
+        const liveStatus = await this.cdp.extractAgentStatus();
+        if (liveStatus && !liveStatus.includes('Đang xử lý')) {
+           lastKnownStatus = liveStatus;
+        }
+        // Luôn gửi trạng thái sống động cuối cùng (VD: Thought for 3s, Running command...)
+        onStatus(lastKnownStatus);
+      }
+      statusUpdateCount++;
+
+      // Detect new content
+      if (currentResponse && currentResponse !== lastResponse) {
+        lastResponse = currentResponse;
+        staleCount = 0;
+        if (onProgress) onProgress(this.truncate(currentResponse, 4000));
+      } else {
+        staleCount++;
+      }
+
+      // AI finished: not generating + response stable for 3 polls
+      if (!generating && lastResponse && staleCount >= 2) {
+        return { response: lastResponse, completed: true };
+      }
+
+      // Timeout safety: if stuck generating but no new text for 60 polls (120 seconds)
+      if (generating && staleCount >= 60 && lastResponse && lastResponse.length > 20) {
+        return { response: lastResponse, completed: true };
+      }
+
+      // If NOT generating but stuck with some UI artifact that wouldn't parse well, timeout sooner
+      if (!generating && staleCount >= 10 && lastResponse) {
+        return { response: lastResponse, completed: true };
+      }
+
+      // If NOT generating and still NO response after 15 polls (30 seconds), it probably failed or returned empty
+      if (!generating && staleCount >= 15 && !lastResponse) {
+        return { 
+          response: "❌ Phản hồi đã hoàn tất nhưng bot không trích xuất được nội dung (Rỗng).", 
+          completed: true 
+        };
+      }
+
+      await this.sleep(this.pollIntervalMs);
+    }
+
+    return {
+      response: lastResponse || '⏰ Quá thời gian chờ (15 phút). Đặc vụ có thể đang chạy một quá trình quá tải hoặc IDE đã mất kết nối.',
+      completed: false,
+      error: 'Timeout waiting for IDE response',
+    };
+  }
+
+  private truncate(text: string, maxLen: number): string {
+    if (text.length <= maxLen) return text;
+    return text.substring(0, maxLen) + '\n\n... (truncated)';
+  }
+
+  private sleep(ms: number): Promise<void> {
+    return new Promise(r => setTimeout(r, ms));
+  }
+}

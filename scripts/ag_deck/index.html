@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌌 Gravity Deck | Elite OS</title>
+    <style>
+        :root { --bg: #0a0a0c; --card: #16161a; --text: #e0e0e0; --accent: #00f2ff; }
+        body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; width: 90vw; max-width: 600px; }
+        .tile { background: var(--card); border: 1px solid #333; aspect-ratio: 1/1; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; }
+        .tile:hover { border-color: var(--accent); transform: scale(1.05); box-shadow: 0 0 20px rgba(0, 242, 255, 0.2); }
+        .tile .icon { font-size: 2rem; margin-bottom: 8px; }
+        .tile .label { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+        .header { margin-bottom: 2rem; text-align: center; }
+        .status-bar { background: #1a1a20; padding: 10px 20px; border-radius: 30px; font-size: 0.8rem; margin-bottom: 2rem; border: 1px solid #333; }
+        .online { color: #00ff88; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🌌 GRAVITY DECK</h1>
+        <div class="status-bar">🧠 <span id="model">Gemini 3.1</span> | <span class="online">● ONLINE</span></div>
+    </div>
+    <div class="grid">
+        <!-- Row 1: Neural -->
+        <div class="tile" onclick="cmd('model:gemini')"><div class="icon">🛰️</div><div class="label">Gemini</div></div>
+        <div class="tile" onclick="cmd('model:claude')"><div class="icon">🧬</div><div class="label">Claude</div></div>
+        <div class="tile" onclick="cmd('model:ollama')"><div class="icon">💻</div><div class="label">Ollama</div></div>
+        <div class="tile" onclick="cmd('mode:cycle')"><div class="icon">🔄</div><div class="label">Cycle</div></div>
+        <!-- Row 2: Agent -->
+        <div class="tile" onclick="cmd('agent:fix')"><div class="icon">👨‍💻</div><div class="label">Fix Bug</div></div>
+        <div class="tile" onclick="cmd('agent:test')"><div class="icon">🧪</div><div class="label">Gen Test</div></div>
+        <div class="tile" onclick="cmd('agent:doc')"><div class="icon">📝</div><div class="label">Docs</div></div>
+        <div class="tile" onclick="cmd('agent:sec')"><div class="icon">🛡️</div><div class="label">Security</div></div>
+        <!-- Row 3: IDE -->
+        <div class="tile" onclick="cmd('ide:snap')"><div class="icon">📸</div><div class="label">Snap</div></div>
+        <div class="tile" onclick="cmd('ide:stop')"><div class="icon">🛑</div><div class="label">Stop</div></div>
+        <div class="tile" onclick="cmd('ide:heal')"><div class="icon">🩹</div><div class="label">Heal</div></div>
+        <div class="tile" onclick="cmd('ide:clear')"><div class="icon">🧹</div><div class="label">Clear</div></div>
+        <!-- Row 4: Meta -->
+        <div class="tile" onclick="cmd('meta:freeze')"><div class="icon">🧊</div><div class="label">Freeze</div></div>
+        <div class="tile" onclick="cmd('meta:turbo')"><div class="icon">🔥</div><div class="label">Turbo</div></div>
+        <div class="tile" onclick="cmd('meta:config')"><div class="icon">⚙️</div><div class="label">Config</div></div>
+        <div class="tile" onclick="window.close()"><div class="icon">🚪</div><div class="label">Exit</div></div>
+    </div>
+    <script>
+        function cmd(action) {
+            console.log('Executing Elite Macro:', action);
+            fetch('http://localhost:9656/action', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action })
+            }).then(r => r.json()).then(d => console.log('Response:', d));
+        }
+    </script>
+</body>
+</html>

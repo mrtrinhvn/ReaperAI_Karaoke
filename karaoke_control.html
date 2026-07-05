@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎤 AI Karaoke Pro — Control Panel</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0a0f;
+  --surface: rgba(255,255,255,0.04);
+  --surface-hover: rgba(255,255,255,0.08);
+  --border: rgba(255,255,255,0.08);
+  --text: #e4e4e7;
+  --text-dim: #71717a;
+  --accent: #a78bfa;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Animated background */
+body::before {
+  content: '';
+  position: fixed;
+  top: -50%; left: -50%;
+  width: 200%; height: 200%;
+  background: radial-gradient(ellipse at 20% 50%, rgba(120,80,220,0.08) 0%, transparent 50%),
+              radial-gradient(ellipse at 80% 20%, rgba(220,80,120,0.06) 0%, transparent 50%),
+              radial-gradient(ellipse at 50% 80%, rgba(80,180,220,0.05) 0%, transparent 50%);
+  animation: bgShift 20s ease-in-out infinite;
+  z-index: -1;
+}
+@keyframes bgShift {
+  0%, 100% { transform: translate(0,0); }
+  33% { transform: translate(-2%,1%); }
+  66% { transform: translate(1%,-2%); }
+}
+
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 32px 20px;
+}
+
+/* Header */
+.header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+.header h1 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #a78bfa, #f472b6, #fb923c);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 8px;
+}
+.header p {
+  color: var(--text-dim);
+  font-size: 0.95rem;
+}
+
+/* Status bar */
+.status-bar {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+}
+.status-item {
+  flex: 1;
+  min-width: 140px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px 20px;
+  backdrop-filter: blur(10px);
+}
+.status-item .label {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+.status-item .value {
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+.status-item .value.singing { color: #4ade80; }
+.status-item .value.silent { color: #71717a; }
+
+/* Section title */
+.section-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: var(--text-dim);
+}
+
+/* Genre grid */
+.genre-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+  margin-bottom: 40px;
+}
+
+.genre-card {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 24px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+}
+.genre-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  border-radius: 18px 18px 0 0;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.genre-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(255,255,255,0.15);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+}
+.genre-card:hover::before { opacity: 1; }
+.genre-card.active {
+  border-color: rgba(255,255,255,0.2);
+  box-shadow: 0 0 0 1px rgba(167,139,250,0.3), 0 20px 40px rgba(0,0,0,0.3);
+}
+.genre-card.active::before { opacity: 1; }
+.genre-card.active::after {
+  content: '✓';
+  position: absolute;
+  top: 16px; right: 16px;
+  width: 28px; height: 28px;
+  background: var(--accent);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 700; color: white;
+}
+
+.genre-emoji {
+  font-size: 2.5rem;
+  margin-bottom: 12px;
+  display: block;
+}
+.genre-name {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.genre-desc {
+  font-size: 0.82rem;
+  color: var(--text-dim);
+  line-height: 1.5;
+  margin-bottom: 16px;
+}
+.genre-tags {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.tag {
+  font-size: 0.7rem;
+  padding: 3px 10px;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.06);
+  color: var(--text-dim);
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+/* BPM slider */
+.bpm-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 24px;
+  margin-bottom: 32px;
+  backdrop-filter: blur(10px);
+}
+.bpm-row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.bpm-display {
+  font-size: 2.4rem;
+  font-weight: 800;
+  min-width: 100px;
+  text-align: center;
+  background: linear-gradient(135deg, #a78bfa, #f472b6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.bpm-slider {
+  flex: 1;
+  -webkit-appearance: none;
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(255,255,255,0.1);
+  outline: none;
+}
+.bpm-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(167,139,250,0.4);
+}
+.bpm-label {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Preset detail panel */
+.detail-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 24px;
+  backdrop-filter: blur(10px);
+}
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+.detail-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: rgba(255,255,255,0.03);
+  border-radius: 8px;
+  font-size: 0.82rem;
+}
+.detail-item .dk { color: var(--text-dim); }
+.detail-item .dv { font-weight: 600; font-variant-numeric: tabular-nums; }
+
+/* Toast */
+.toast {
+  position: fixed;
+  bottom: 30px; left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: rgba(16,185,129,0.9);
+  color: white;
+  padding: 14px 28px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  backdrop-filter: blur(10px);
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 100;
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+
+/* Responsive */
+@media (max-width: 600px) {
+  .genre-grid { grid-template-columns: 1fr; }
+  .header h1 { font-size: 1.6rem; }
+  .status-bar { flex-direction: column; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <h1>🎤 AI Karaoke Pro</h1>
+    <p>Chọn thể loại nhạc để AI tự động tinh chỉnh âm thanh phù hợp</p>
+  </div>
+
+  <div class="status-bar" id="statusBar">
+    <div class="status-item">
+      <div class="label">Thể loại</div>
+      <div class="value" id="stGenre">—</div>
+    </div>
+    <div class="status-item">
+      <div class="label">BPM</div>
+      <div class="value" id="stBpm">120</div>
+    </div>
+    <div class="status-item">
+      <div class="label">Trạng thái</div>
+      <div class="value" id="stSinging">—</div>
+    </div>
+    <div class="status-item">
+      <div class="label">Level</div>
+      <div class="value" id="stLevel">—</div>
+    </div>
+  </div>
+
+  <div class="section-title">🎵 Chọn thể loại</div>
+  <div class="genre-grid" id="genreGrid"></div>
+
+  <div class="bpm-section">
+    <div class="bpm-label">Tempo (BPM)</div>
+    <div class="bpm-row">
+      <div class="bpm-display" id="bpmDisplay">120</div>
+      <input type="range" class="bpm-slider" id="bpmSlider" min="60" max="180" value="120" step="1">
+    </div>
+  </div>
+
+  <div class="detail-panel">
+    <div class="section-title">🎛️ Preset hiện tại</div>
+    <div class="detail-grid" id="detailGrid"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let presets = {};
+let currentGenre = 'nhac_tre';
+
+async function loadPresets() {
+  const res = await fetch('/api/presets');
+  presets = await res.json();
+  renderGenres();
+  loadStatus();
+}
+
+function renderGenres() {
+  const grid = document.getElementById('genreGrid');
+  grid.innerHTML = '';
+  for (const [key, p] of Object.entries(presets)) {
+    const card = document.createElement('div');
+    card.className = 'genre-card' + (key === currentGenre ? ' active' : '');
+    card.style.setProperty('--card-gradient', p.gradient);
+    card.innerHTML = `
+      <style>.genre-card[data-genre="${key}"]::before { background: ${p.gradient}; }</style>
+      <span class="genre-emoji">${p.emoji}</span>
+      <div class="genre-name">${p.name}</div>
+      <div class="genre-desc">${p.desc}</div>
+      <div class="genre-tags">
+        <span class="tag">Reverb ${p.reverb_wet > 0.28 ? 'Nhiều' : p.reverb_wet > 0.18 ? 'Vừa' : 'Ít'}</span>
+        <span class="tag">Nén ${p.comp_ratio > 0.32 ? 'Mạnh' : p.comp_ratio > 0.22 ? 'Vừa' : 'Nhẹ'}</span>
+        <span class="tag">BPM ~${p.bpm_suggest}</span>
+      </div>
+    `;
+    card.setAttribute('data-genre', key);
+    card.onclick = () => selectGenre(key);
+    grid.appendChild(card);
+  }
+}
+
+async function selectGenre(genre) {
+  currentGenre = genre;
+  const res = await fetch('/api/genre', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({genre})
+  });
+  const data = await res.json();
+  if (data.ok) {
+    renderGenres();
+    updateDetails(presets[genre]);
+    document.getElementById('bpmSlider').value = presets[genre].bpm_suggest;
+    document.getElementById('bpmDisplay').textContent = presets[genre].bpm_suggest;
+    showToast(`✅ Đã chuyển sang: ${presets[genre].name}`);
+  }
+}
+
+function updateDetails(p) {
+  const grid = document.getElementById('detailGrid');
+  const items = [
+    ['EQ Mud Cut', `${p.eq_mud_cut} dB`],
+    ['EQ Presence', `+${p.eq_presence_boost} dB`],
+    ['EQ Air', `+${p.eq_air_boost} dB`],
+    ['Comp Ratio', `${(p.comp_ratio * 10).toFixed(1)}:1`],
+    ['Delay', `${p.delay_fraction === 0.75 ? 'Dotted 1/8' : p.delay_fraction === 0.5 ? '1/8 note' : '1/16 note'}`],
+    ['Delay Vol', `${(p.delay_volume * 100).toFixed(0)}%`],
+    ['Delay Feedback', `${(p.delay_feedback * 100).toFixed(0)}%`],
+    ['Reverb Room', `${(p.reverb_room * 100).toFixed(0)}%`],
+    ['Reverb Wet', `${(p.reverb_wet * 100).toFixed(0)}%`],
+    ['Dampening', `${(p.reverb_damp * 100).toFixed(0)}%`],
+    ['Chorus Mix', `${(p.chorus_mix * 100).toFixed(0)}%`],
+    ['Ducking', `${(p.duck_intensity * 100).toFixed(0)}%`],
+  ];
+  grid.innerHTML = items.map(([k,v]) =>
+    `<div class="detail-item"><span class="dk">${k}</span><span class="dv">${v}</span></div>`
+  ).join('');
+}
+
+const bpmSlider = document.getElementById('bpmSlider');
+const bpmDisplay = document.getElementById('bpmDisplay');
+let bpmTimeout = null;
+bpmSlider.oninput = () => {
+  bpmDisplay.textContent = bpmSlider.value;
+  clearTimeout(bpmTimeout);
+  bpmTimeout = setTimeout(() => {
+    fetch('/api/bpm', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({bpm: parseInt(bpmSlider.value)})
+    });
+  }, 300);
+};
+
+async function loadStatus() {
+  try {
+    const res = await fetch('/api/status');
+    const s = await res.json();
+    document.getElementById('stBpm').textContent = s.bpm?.toFixed(0) || '—';
+    const p = presets[s.genre];
+    document.getElementById('stGenre').textContent = p ? `${p.emoji} ${p.name}` : s.genre;
+    if (s.genre && s.genre !== currentGenre) {
+      currentGenre = s.genre;
+      renderGenres();
+      if (p) updateDetails(p);
+    }
+
+    const sing = document.getElementById('stSinging');
+    if (s.is_singing) {
+      sing.textContent = '🎵 Đang hát';
+      sing.className = 'value singing';
+    } else {
+      sing.textContent = '🔇 Im lặng';
+      sing.className = 'value silent';
+    }
+    const lv = document.getElementById('stLevel');
+    const db = s.rms_db || -60;
+    lv.textContent = db > -60 ? `${db.toFixed(0)} dB` : '—';
+  } catch(e) {}
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// Init
+loadPresets();
+setInterval(loadStatus, 1500);
+</script>
+</body>
+</html>

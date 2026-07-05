@@ -1,0 +1,50 @@
+#!/bin/bash
+# start.sh - Hệ thống Quản trị Khởi động (Agentic Port Fusion)
+
+# 1. Load config
+if [ -f .env ]; then
+    source .env
+else
+    echo "❌ Lỗi: Không tìm thấy file .env. Vui lòng tạo dựa trên .env.example"
+    exit 1
+fi
+
+PORT=${IDE_PORT:-9555}
+PROJ=${PROJECT_NAME:-"UnknownProject"}
+
+echo "🔍 Đang kiểm tra IDE cho [$PROJ] tại cổng $PORT..."
+
+open_ide() {
+    if command -v antigravity &> /dev/null; then
+        antigravity --remote-debugging-port=$PORT . &
+    elif command -v cursor &> /dev/null; then
+        cursor --remote-debugging-port=$PORT . &
+    elif command -v code &> /dev/null; then
+        code --remote-debugging-port=$PORT . &
+    else
+        echo "❌ Lỗi: Không tìm thấy lệnh 'antigravity', 'cursor' hoặc 'code'."
+        echo "👉 Hãy tự mở IDE bằng tay cho thư mục này."
+    fi
+}
+
+# 2. Logic Hợp thể & Mở mới linh hoạt
+if nc -z 127.0.0.1 $PORT &>/dev/null; then
+    # Cổng đã mở, thám thính xem bên trong có dự án của mình không (lọc theo JSON Title/Url)
+    if curl -s --max-time 2 http://127.0.0.1:$PORT/json/list | grep -i "\"title\":.*$PROJ" &>/dev/null; then
+        echo "✅ [HỢP THỂ]: Cổng $PORT đang mở và Workspace [$PROJ] đang được hiển thị. Trực tiếp cắm ngầm Bot vào màn hình này..."
+    else
+        echo "⚠️ [GỌI CỬA]: Cổng $PORT có IDE đang chạy, nhưng chưa mở màn hình cho [$PROJ]. Đang ra lệnh mở thêm giao diện cho dự án này..."
+        open_ide
+        echo "⏳ Đang đợi màn hình phụ tải xong..."
+        sleep 4
+    fi
+else
+    echo "⚠️ [MỞ MỚI TỪ ĐẦU]: Cổng CDP $PORT hoàn toàn trống. Đang phóng cỗ máy IDE chuyên biệt..."
+    open_ide
+    echo "⏳ Đang đợi rễ CDP bám rễ..."
+    sleep 4
+fi
+
+# 3. Khởi động Giao diện & Agent (Receptionist)
+echo "🚀 Đang đánh thức bộ não Agentic Gateway..."
+bash .agent/scripts/receptionist_up.sh

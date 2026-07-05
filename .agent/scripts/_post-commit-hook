@@ -1,0 +1,8 @@
+#!/bin/bash
+# post-commit hook — Auto-rebuild project brain silently after every commit
+# Install: cp .agent/scripts/_post-commit-hook .git/hooks/post-commit && chmod +x .git/hooks/post-commit
+SCRIPT="$(git rev-parse --show-toplevel)/.agent/scripts/brain_builder.py"
+if [ -f "$SCRIPT" ]; then
+    python3 "$SCRIPT" --quick > /dev/null 2>&1 &
+fi
+exit 0

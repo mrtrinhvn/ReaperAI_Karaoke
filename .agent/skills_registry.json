@@ -1,0 +1,402 @@
+{
+  "v": "2.3.0",
+  "skills": [
+    {
+      "n": "ag-kit-core",
+      "d": "Bản Hiến Pháp - Hệ Thống Ràng Buộc Sống Còn & Quản Lý Ký Ức (Core Memory). Mọ...",
+      "p": "P0"
+    },
+    {
+      "n": "agent-reach",
+      "d": "Siêu kỹ năng kết nối Internet: Thu thập dữ liệu từ Web, Youtube, Twitter, Red...",
+      "p": "P2"
+    },
+    {
+      "n": "api-patterns",
+      "d": "API design principles and decision-making. REST vs GraphQL vs tRPC selection,...",
+      "p": "P2"
+    },
+    {
+      "n": "api-security-best-practices",
+      "d": "API security rules: auth, validation, rate limiting, OWASP Top 10 compliance.",
+      "p": "P2"
+    },
+    {
+      "n": "app-builder",
+      "d": "Main application building orchestrator. Creates full-stack applications from ...",
+      "p": "P2"
+    },
+    {
+      "n": "architecture",
+      "d": "Architectural decision-making framework. Requirements analysis, trade-off eva...",
+      "p": "P2"
+    },
+    {
+      "n": "async-python-patterns",
+      "d": "Comprehensive guidance for implementing asynchronous Python applications usin...",
+      "p": "P2"
+    },
+    {
+      "n": "bash-linux",
+      "d": "Bash/Linux terminal rules. Critical commands, error handling, AI Anti-Hang pr...",
+      "p": "P2"
+    },
+    {
+      "n": "batch-operations",
+      "d": "Apply operations across multiple files simultaneously. Pattern-based bulk mod...",
+      "p": "P2"
+    },
+    {
+      "n": "behavioral-modes",
+      "d": "AI operational modes. Auto-detect from request keywords. Adapt behavior, not ...",
+      "p": "P2"
+    },
+    {
+      "n": "brainstorming",
+      "d": "Socratic questioning protocol + user communication. MANDATORY for complex req...",
+      "p": "P2"
+    },
+    {
+      "n": "business-ops",
+      "d": "Skill Quản trị Vận Hành. Đọc soát Hợp đồng (Legal), Phân tích Kế toán (Financ...",
+      "p": "P2"
+    },
+    {
+      "n": "clean-code",
+      "d": "Trọng số bắt buộc khi viết logic code. Ghi đè mọi thói quen lập trình mặc định.",
+      "p": "P0"
+    },
+    {
+      "n": "cli-generator",
+      "d": "Meta-skill enabling the Agent to automatically convert local software, reposi...",
+      "p": "P2"
+    },
+    {
+      "n": "code-review-checklist",
+      "d": "Code review guidelines covering code quality, security, and best practices.",
+      "p": "P2"
+    },
+    {
+      "n": "codeact-executor",
+      "d": "Autonomous script execution for complex problem solving (Code-as-Action).",
+      "p": "P2"
+    },
+    {
+      "n": "cognitive-session",
+      "d": "Quản lý Session Context cho cả App Code (file-based isolation) và AI Agent (c...",
+      "p": "P2"
+    },
+    {
+      "n": "context-compression",
+      "d": "Manage and compress conversation context in long sessions. Detect when contex...",
+      "p": "P2"
+    },
+    {
+      "n": "coordinator-mode",
+      "d": "Advanced multi-agent orchestration with parallel workers, synthesis protocols...",
+      "p": "P2"
+    },
+    {
+      "n": "data-science",
+      "d": "Skill khoa học dữ liệu. Tập trung vào Data Analysis, Visualization, Insights ...",
+      "p": "P1"
+    },
+    {
+      "n": "database-design",
+      "d": "Database design principles and decision-making. Schema design, indexing strat...",
+      "p": "P2"
+    },
+    {
+      "n": "deployment-procedures",
+      "d": "Production deployment decision rules. Platform selection, rollback strategy, ...",
+      "p": "P2"
+    },
+    {
+      "n": "documentation-templates",
+      "d": "Documentation structure rules. README, API docs, ADR, AI-friendly docs.",
+      "p": "P2"
+    },
+    {
+      "n": "fastapi-pro",
+      "d": "Build high-performance async APIs with FastAPI, SQLAlchemy 2.0, and Pydantic ...",
+      "p": "P2"
+    },
+    {
+      "n": "frontend-design",
+      "d": "Progressive Design Intelligence cho UI/UX. 3 cấp độ tự động leo thang: L1 (in...",
+      "p": "P1"
+    },
+    {
+      "n": "geo-fundamentals",
+      "d": "Generative Engine Optimization for AI search engines (ChatGPT, Claude, Perple...",
+      "p": "P2"
+    },
+    {
+      "n": "i18n-localization",
+      "d": "Internationalization and localization patterns. Detecting hardcoded strings, ...",
+      "p": "P2"
+    },
+    {
+      "n": "intelligent-routing",
+      "d": "Cơ chế Ủy quyền Tổ Đàn (Hive Mind Delegation). Tự động gọi mcp_ollama-bridge ...",
+      "p": "P0"
+    },
+    {
+      "n": "knowledge-management",
+      "d": "Systems thinking and knowledge retention protocol. MANDATORY for maintaining ...",
+      "p": "P2"
+    },
+    {
+      "n": "lint-and-validate",
+      "d": "Automatic quality control, linting, and static analysis procedures. Use after...",
+      "p": "P2"
+    },
+    {
+      "n": "mcp-builder",
+      "d": "MCP (Model Context Protocol) server building principles. Tool design, resourc...",
+      "p": "P2"
+    },
+    {
+      "n": "mobile-design",
+      "d": "Mobile-first design rules for iOS/Android. Touch, performance, platform conve...",
+      "p": "P2"
+    },
+    {
+      "n": "nextjs-react-expert",
+      "d": "React & Next.js performance optimization rules. 57 rules from Vercel Engineer...",
+      "p": "P2"
+    },
+    {
+      "n": "nodejs-best-practices",
+      "d": "Node.js decision-making rules. Framework selection, architecture patterns, se...",
+      "p": "P2"
+    },
+    {
+      "n": "parallel-agents",
+      "d": "Multi-agent orchestration patterns. Use when multiple independent tasks can r...",
+      "p": "P2"
+    },
+    {
+      "n": "performance-profiling",
+      "d": "Performance profiling principles. Measurement, analysis, and optimization tec...",
+      "p": "P2"
+    },
+    {
+      "n": "plan-writing",
+      "d": "Structured task planning with clear breakdowns, dependencies, and verificatio...",
+      "p": "P2"
+    },
+    {
+      "n": "powershell-windows",
+      "d": "PowerShell Windows patterns. Critical pitfalls, operator syntax, error handling.",
+      "p": "P2"
+    },
+    {
+      "n": "product-management",
+      "d": "Skill nhập vai Product Manager. Viết PRD (Product Requirement Doc), lên Lộ tr...",
+      "p": "P1"
+    },
+    {
+      "n": "python-patterns",
+      "d": "Python Ecosystem Hard Rules cho nền tảng Backend.",
+      "p": "P0"
+    },
+    {
+      "n": "python-performance-optimization",
+      "d": "Profile and optimize Python code using cProfile, memory profilers, and perfor...",
+      "p": "P2"
+    },
+    {
+      "n": "semantic-search",
+      "d": "AI embedding-based conceptual code search. Find code by meaning (e.g., 'how i...",
+      "p": "P2"
+    },
+    {
+      "n": "seo-fundamentals",
+      "d": "SEO fundamentals, E-E-A-T, Core Web Vitals, and Google algorithm principles.",
+      "p": "P2"
+    },
+    {
+      "n": "server-management",
+      "d": "Server management principles and decision-making. Process management, monitor...",
+      "p": "P2"
+    },
+    {
+      "n": "simplify-code",
+      "d": "Reduce complexity of over-engineered code. Identify unnecessary abstractions,...",
+      "p": "P2"
+    },
+    {
+      "n": "skillify",
+      "d": "Auto-create new skills from repetitive workflows. When you notice yourself do...",
+      "p": "P2"
+    },
+    {
+      "n": "sql-optimization-patterns",
+      "d": "Transform slow database queries into lightning-fast operations through system...",
+      "p": "P2"
+    },
+    {
+      "n": "stealth-browser",
+      "d": "CloakBrowser integration — stealth Chromium that passes every bot detection t...",
+      "p": "P2"
+    },
+    {
+      "n": "systematic-debugging",
+      "d": "4-phase systematic debugging methodology with root cause analysis and evidenc...",
+      "p": "P2"
+    },
+    {
+      "n": "tailwind-patterns",
+      "d": "Tailwind CSS v4 decision rules. CSS-first config, container queries, design t...",
+      "p": "P2"
+    },
+    {
+      "n": "tdd-workflow",
+      "d": "Test-Driven Development workflow principles. RED-GREEN-REFACTOR cycle.",
+      "p": "P2"
+    },
+    {
+      "n": "telegram-agentic-gateway",
+      "d": "Tiêu chuẩn Giao tiếp Telegram (Telegram Gateway) cho các Agentic Projects. Cu...",
+      "p": "P2"
+    },
+    {
+      "n": "testing-patterns",
+      "d": "Testing patterns and principles. Unit, integration, mocking strategies.",
+      "p": "P2"
+    },
+    {
+      "n": "verify-changes",
+      "d": "Prove code works by running it, not just checking it exists. Verification thr...",
+      "p": "P2"
+    },
+    {
+      "n": "vfs-assistant",
+      "d": "Virtual File System (VFS) for token-efficient code analysis. Knowledge Graph ...",
+      "p": "P2"
+    },
+    {
+      "n": "vulnerability-scanner",
+      "d": "Security vulnerability analysis. OWASP 2025, supply chain, attack surface map...",
+      "p": "P2"
+    },
+    {
+      "n": "web-design-guidelines",
+      "d": "Review UI code for Web Interface Guidelines compliance. Use when asked to \"re...",
+      "p": "P2"
+    },
+    {
+      "n": "webapp-testing",
+      "d": "Web application testing principles. E2E, Playwright, deep audit strategies.",
+      "p": "P2"
+    }
+  ],
+  "agents": [
+    {
+      "n": "backend-specialist",
+      "d": "Expert backend architect for Node.js, Python, and modern serverless/edge syst...",
+      "s": "clean-code, nodejs-best-practices, python-patterns, api-patterns, database-design, mcp-builder, lint-and-validate, powershell-windows, bash-linux"
+    },
+    {
+      "n": "brain-surgeon",
+      "d": "Neural refactoring and feature engineering for trading systems. Quantitative ...",
+      "s": "brain-surgery, clean-code"
+    },
+    {
+      "n": "code-archaeologist",
+      "d": "Expert in legacy code, refactoring, and understanding undocumented systems. U...",
+      "s": "clean-code, simplify-code, code-review-checklist"
+    },
+    {
+      "n": "database-architect",
+      "d": "Expert database architect for schema design, query optimization, migrations, ...",
+      "s": "clean-code, database-design"
+    },
+    {
+      "n": "debugger",
+      "d": "Expert in systematic debugging, root cause analysis, and crash investigation....",
+      "s": "clean-code, systematic-debugging"
+    },
+    {
+      "n": "devops-engineer",
+      "d": "Expert in deployment, server management, CI/CD, and production operations. CR...",
+      "s": "clean-code, deployment-procedures, server-management, powershell-windows, bash-linux"
+    },
+    {
+      "n": "documentation-writer",
+      "d": "Expert in technical documentation. Use ONLY when user explicitly requests doc...",
+      "s": "clean-code, documentation-templates"
+    },
+    {
+      "n": "explorer-agent",
+      "d": "Advanced codebase discovery, deep architectural analysis, and proactive resea...",
+      "s": "clean-code, architecture, plan-writing, brainstorming, systematic-debugging"
+    },
+    {
+      "n": "frontend-specialist",
+      "d": "Senior Frontend Architect who builds maintainable React/Next.js systems with ...",
+      "s": "clean-code, nextjs-react-expert, web-design-guidelines, tailwind-patterns, frontend-design, lint-and-validate"
+    },
+    {
+      "n": "game-developer",
+      "d": "Game development across all platforms (PC, Web, Mobile, VR/AR). Use when buil...",
+      "s": "clean-code, game-development, game-development/pc-games, game-development/web-games, game-development/mobile-games, game-development/game-design, game-development/multiplayer, game-development/vr-ar, game-development/2d-games, game-development/3d-games, game-development/game-art, game-development/game-audio"
+    },
+    {
+      "n": "mobile-developer",
+      "d": "Expert in React Native and Flutter mobile development. Use for cross-platform...",
+      "s": "clean-code, mobile-design"
+    },
+    {
+      "n": "orchestrator",
+      "d": "Multi-agent coordination and task orchestration. Use when a task requires mul...",
+      "s": "clean-code, parallel-agents, behavioral-modes, plan-writing, brainstorming, architecture, lint-and-validate, powershell-windows, bash-linux"
+    },
+    {
+      "n": "penetration-tester",
+      "d": "Expert in offensive security, penetration testing, red team operations, and v...",
+      "s": "clean-code, vulnerability-scanner, red-team-tactics, api-patterns"
+    },
+    {
+      "n": "performance-optimizer",
+      "d": "Expert in performance optimization, profiling, Core Web Vitals, and bundle op...",
+      "s": "clean-code, performance-profiling"
+    },
+    {
+      "n": "product-manager",
+      "d": "Expert in product requirements, user stories, and acceptance criteria. Use fo...",
+      "s": "plan-writing, brainstorming, clean-code"
+    },
+    {
+      "n": "product-owner",
+      "d": "Strategic facilitator bridging business needs and technical execution. Expert...",
+      "s": "plan-writing, brainstorming, clean-code"
+    },
+    {
+      "n": "project-planner",
+      "d": "Smart project planning agent. Breaks down user requests into tasks, plans fil...",
+      "s": "clean-code, app-builder, plan-writing, brainstorming"
+    },
+    {
+      "n": "qa-automation-engineer",
+      "d": "Specialist in test automation infrastructure and E2E testing. Focuses on Play...",
+      "s": "webapp-testing, testing-patterns, web-design-guidelines, clean-code, lint-and-validate"
+    },
+    {
+      "n": "security-auditor",
+      "d": "Elite cybersecurity expert. Think like an attacker, defend like an expert. OW...",
+      "s": "clean-code, vulnerability-scanner, red-team-tactics, api-patterns"
+    },
+    {
+      "n": "seo-specialist",
+      "d": "SEO and GEO (Generative Engine Optimization) expert. Handles SEO audits, Core...",
+      "s": "clean-code, seo-fundamentals, geo-fundamentals"
+    },
+    {
+      "n": "test-engineer",
+      "d": "Expert in testing, TDD, and test automation. Use for writing tests, improving...",
+      "s": "clean-code, testing-patterns, tdd-workflow, webapp-testing, code-review-checklist, lint-and-validate"
+    }
+  ]
+}
