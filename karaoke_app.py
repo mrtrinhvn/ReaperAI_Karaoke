@@ -580,8 +580,17 @@ class KaraokeApp(Gtk.Window):
                         subprocess.run(["pw-link", bp, reaper_dest], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
                         
                     # Disconnect from non-REAPER, non-AI destinations to prevent double audio (echo) through speakers
+                    # Also disconnect from REAPER:in1 and REAPER:in2 (Vocal tracks) to prevent music leaking into Vocal channel!
                     for dest in bp_conns:
-                        if "REAPER" not in dest and "beat_ai" not in dest.lower() and "pw-record" not in dest.lower() and "beat_ai_key" not in dest.lower():
+                        should_disconnect = False
+                        if "REAPER" not in dest:
+                            if "beat_ai" not in dest.lower() and "pw-record" not in dest.lower() and "beat_ai_key" not in dest.lower():
+                                should_disconnect = True
+                        else:
+                            if dest in ["REAPER:in1", "REAPER:in2"]:
+                                should_disconnect = True
+                        
+                        if should_disconnect:
                             subprocess.run(["pw-link", "-d", bp, dest], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
                             
             if has_beat:
@@ -1059,6 +1068,13 @@ if __name__ == '__main__':
     GLib.set_prgname('karaoke-ai-panel')
     GLib.set_application_name('Karaoke AI Panel')
     win = KaraokeApp()
-    win.connect("destroy", Gtk.main_quit)
+    def on_destroy(widget):
+        Gtk.main_quit()
+        try:
+            import signal
+            os.kill(0, signal.SIGINT)
+        except:
+            pass
+    win.connect("destroy", on_destroy)
     win.show_all()
     Gtk.main()
