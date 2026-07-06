@@ -16,6 +16,15 @@ echo "   (Passive Mode — Không xáo trộn routing)"
 echo "═══════════════════════════════════════════"
 echo ""
 
+# Clean up any orphaned/zombie background AI processes from previous runs
+echo "🧹 Đang dọn dẹp các tiến trình AI chạy ẩn từ lần trước..."
+pkill -f "realtime_vocal_ai.py"
+pkill -f "realtime_bpm_ai.py"
+pkill -f "realtime_key_ai.py"
+pkill -f "realtime_master_ai.py"
+pkill -f "karaoke_app.py"
+sleep 0.5
+
 # Step 1: Check REAPER is running
 if ! pgrep -x reaper > /dev/null 2>&1; then
     echo "❌ REAPER chưa mở! Hãy mở REAPER trước."
