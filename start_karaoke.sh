@@ -23,6 +23,7 @@ pkill -f "realtime_bpm_ai.py"
 pkill -f "realtime_key_ai.py"
 pkill -f "realtime_master_ai.py"
 pkill -f "karaoke_app.py"
+killall -9 pw-record pw-play 2>/dev/null || true
 sleep 0.5
 
 # Step 1: Check REAPER is running
@@ -92,6 +93,7 @@ cleanup() {
     kill $BPM_PID 2>/dev/null
     kill $KEY_PID 2>/dev/null
     kill $MASTER_PID 2>/dev/null
+    killall -9 pw-record pw-play 2>/dev/null || true
     echo "   ✅ Ứng dụng nổi và AI đã dừng"
     echo "   ✅ Kết nối qpwgraph không bị ảnh hưởng"
 }
