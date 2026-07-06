@@ -138,8 +138,21 @@ class KaraokeApp(Gtk.Window):
         self.add(vbox)
 
         # Header
+        header_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        
         lbl = Gtk.Label(label="<span font='16' weight='bold' color='#a78bfa'>🎤 Chọn Thể Loại</span>", use_markup=True)
-        vbox.pack_start(lbl, False, False, 0)
+        lbl.set_hexpand(True)
+        lbl.set_halign(Gtk.Align.START)
+        header_box.pack_start(lbl, True, True, 0)
+        
+        settings_btn = Gtk.Button()
+        settings_btn.get_style_context().add_class("settings-btn")
+        settings_lbl = Gtk.Label(label="<span font='14'>⚙️</span>", use_markup=True)
+        settings_btn.add(settings_lbl)
+        settings_btn.connect("clicked", self.on_settings_clicked)
+        header_box.pack_start(settings_btn, False, False, 0)
+        
+        vbox.pack_start(header_box, False, False, 0)
         
         # Lưới các nút bấm
         flowbox = Gtk.FlowBox()
@@ -403,6 +416,86 @@ class KaraokeApp(Gtk.Window):
                             connections[current_src] = []
                         connections[current_src].append(dest)
                         
+            # Load selected sound devices
+            sel_in = ""
+            sel_out = ""
+            try:
+                with open(GENRE_FILE, "r") as f:
+                    data = json.load(f)
+                    sel_in = data.get("selected_input", "")
+                    sel_out = data.get("selected_output", "")
+            except: pass
+
+            # Tìm các cổng của Mic_AI recorder
+            mic_ai_ports = []
+            try:
+                res_i = subprocess.run(["pw-link", "-i"], capture_output=True, text=True, timeout=0.5)
+                for line in res_i.stdout.splitlines():
+                    line = line.strip()
+                    if "mic_ai" in line.lower() or "pw-record" in line.lower() or "pw-cat" in line.lower():
+                        if not any(x in line.lower() for x in ["beat_ai", "beat_ai_key", "master_ai"]):
+                            mic_ai_ports.append(line)
+            except: pass
+
+            # Tự động kết nối & duy trì thiết bị đầu vào (Mic)
+            if sel_in:
+                capture_ports = []
+                try:
+                    res_o = subprocess.run(["pw-link", "-o"], capture_output=True, text=True, timeout=0.5)
+                    capture_ports = [l.strip() for l in res_o.stdout.splitlines() if l.startswith(f"{sel_in}:")]
+                except: pass
+                
+                if capture_ports:
+                    target_map = {}
+                    if len(capture_ports) == 1:
+                        target_map[capture_ports[0]] = ["REAPER:in1", "REAPER:in2"] + mic_ai_ports
+                    else:
+                        target_map[capture_ports[0]] = ["REAPER:in1"] + mic_ai_ports
+                        target_map[capture_ports[1]] = ["REAPER:in2"]
+                        
+                    for src_port, dests in target_map.items():
+                        active_conns = connections.get(src_port, [])
+                        for target_dest in dests:
+                            if target_dest not in active_conns:
+                                subprocess.run(["pw-link", src_port, target_dest], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                                
+                # Ngắt kết nối của các thiết bị đầu vào khác đang nối tới REAPER và mic_ai_ports
+                for src_port, active_conns in list(connections.items()):
+                    if src_port.startswith("alsa_input.") and not src_port.startswith(f"{sel_in}:"):
+                        for dest in active_conns:
+                            if dest in ["REAPER:in1", "REAPER:in2"] or dest in mic_ai_ports:
+                                subprocess.run(["pw-link", "-d", src_port, dest], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+            # Tự động kết nối & duy trì thiết bị đầu ra (Speaker / Interface Out)
+            if sel_out:
+                playback_ports = []
+                try:
+                    res_play = subprocess.run(["pw-link", "-i"], capture_output=True, text=True, timeout=0.5)
+                    playback_ports = [l.strip() for l in res_play.stdout.splitlines() if l.startswith(f"{sel_out}:")]
+                except: pass
+                
+                if playback_ports:
+                    target_map = {}
+                    if len(playback_ports) == 1:
+                        target_map["REAPER:out1"] = [playback_ports[0]]
+                        target_map["REAPER:out2"] = [playback_ports[0]]
+                    else:
+                        target_map["REAPER:out1"] = [playback_ports[0]]
+                        target_map["REAPER:out2"] = [playback_ports[1]]
+                        
+                    for src_port, dests in target_map.items():
+                        active_conns = connections.get(src_port, [])
+                        for target_dest in dests:
+                            if target_dest not in active_conns:
+                                subprocess.run(["pw-link", src_port, target_dest], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                                
+                # Ngắt kết nối của REAPER tới các thiết bị đầu ra khác
+                for src_port, active_conns in list(connections.items()):
+                    if src_port in ["REAPER:out1", "REAPER:out2"]:
+                        for dest in active_conns:
+                            if dest.startswith("alsa_output.") and not dest.startswith(f"{sel_out}:"):
+                                subprocess.run(["pw-link", "-d", src_port, dest], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
             # Analyze connection states for UI indicators
             for src, dests in connections.items():
                 src_lower = src.lower()
@@ -412,9 +505,17 @@ class KaraokeApp(Gtk.Window):
                         if "chrome" in src_lower or "firefox" in src_lower or "brave" in src_lower or "opera" in src_lower or "edge" in src_lower:
                             has_beat = True
                         if "alsa_input" in src_lower and "capture" in src_lower:
-                            has_mic = True
+                            if sel_in:
+                                if sel_in in src:
+                                    has_mic = True
+                            else:
+                                has_mic = True
                         if "reaper" in src_lower and "out" in src_lower:
-                            has_master = True
+                            if sel_out:
+                                if sel_out in dest:
+                                    has_master = True
+                            else:
+                                has_master = True
             
             # Auto-route and isolate Browser to REAPER (prevent dual playback to system speakers)
             browser_ports = []
@@ -500,6 +601,20 @@ class KaraokeApp(Gtk.Window):
             background-color: #2e2e3e;
             border-color: #38bdf8;
             color: #ffffff;
+        }
+        .settings-btn {
+            background-color: transparent;
+            border: none;
+            color: #a78bfa;
+            padding: 4px;
+            transition: all 0.2s ease;
+        }
+        .settings-btn:hover {
+            color: #c084fc;
+        }
+        .settings-dialog {
+            background-color: #121218;
+            color: #cbd5e1;
         }
         """
         provider = Gtk.CssProvider()
@@ -641,6 +756,162 @@ class KaraokeApp(Gtk.Window):
             GLib.timeout_add(3000, lambda: self.status_lbl.set_markup("<span font='9' color='#71717a'>Sẵn sàng.</span>") or False)
         else:
             self.status_lbl.set_markup(f"<span font='9' color='#e74c3c'>⚠️ Lỗi: Không thấy file {filename}</span>")
+
+    def get_audio_interfaces(self):
+        import subprocess
+        inputs = []
+        outputs = []
+        
+        # Scan inputs (from pw-link -o)
+        try:
+            res = subprocess.run(["pw-link", "-o"], capture_output=True, text=True, timeout=1.0)
+            for line in res.stdout.splitlines():
+                line = line.strip()
+                if line.startswith("alsa_input."):
+                    dev_id = line.split(":")[0]
+                    if dev_id not in inputs:
+                        inputs.append(dev_id)
+        except: pass
+            
+        # Scan outputs (from pw-link -i)
+        try:
+            res = subprocess.run(["pw-link", "-i"], capture_output=True, text=True, timeout=1.0)
+            for line in res.stdout.splitlines():
+                line = line.strip()
+                if line.startswith("alsa_output."):
+                    dev_id = line.split(":")[0]
+                    if dev_id not in outputs:
+                        outputs.append(dev_id)
+        except: pass
+            
+        return inputs, outputs
+
+    def get_device_friendly_name(self, dev_id):
+        # Remove prefix
+        clean = dev_id
+        for prefix in ["alsa_input.", "alsa_output."]:
+            if clean.startswith(prefix):
+                clean = clean[len(prefix):]
+                
+        # Simplify known hardware strings
+        clean = clean.replace("usb-", "").replace("pci-", "")
+        parts = clean.replace(".", "_").replace("-", "_").split("_")
+        
+        filtered_parts = []
+        for p in parts:
+            if not p: continue
+            if len(p) > 6 and any(c.isdigit() for c in p):
+                continue
+            if p.lower() in ["analog", "stereo", "hdmi", "digital", "sound", "devices", "capture", "playback"]:
+                continue
+            filtered_parts.append(p.capitalize())
+            
+        name = " ".join(filtered_parts)
+        if not name:
+            name = "Thiết bị mặc định"
+            
+        suffix = ""
+        if "analog-stereo" in dev_id:
+            suffix = " (Analog Stereo)"
+        elif "hdmi-stereo" in dev_id:
+            suffix = " (HDMI)"
+            
+        if dev_id.startswith("alsa_input"):
+            return f"🎙️ {name}{suffix}"
+        else:
+            return f"🔊 {name}{suffix}"
+
+    def on_settings_clicked(self, widget):
+        dialog = Gtk.Dialog(
+            title="Cấu Hình Thiết Bị Âm Thanh", 
+            parent=self, 
+            flags=0,
+            buttons=(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK)
+        )
+        dialog.set_default_size(320, 200)
+        dialog.get_style_context().add_class("settings-dialog")
+        
+        content_area = dialog.get_content_area()
+        content_area.set_spacing(15)
+        content_area.set_border_width(15)
+        
+        inputs, outputs = self.get_audio_interfaces()
+        
+        grid = Gtk.Grid()
+        grid.set_column_spacing(10)
+        grid.set_row_spacing(15)
+        
+        # Input device
+        lbl_in = Gtk.Label(label="<b>🎙️ Thiết bị Mic vào:</b>", use_markup=True)
+        lbl_in.set_halign(Gtk.Align.START)
+        grid.attach(lbl_in, 0, 0, 1, 1)
+        
+        combo_in = Gtk.ComboBoxText()
+        combo_in.append_text("Không thay đổi (Giữ nguyên)")
+        active_in_idx = 0
+        
+        saved_in = ""
+        saved_out = ""
+        try:
+            with open(GENRE_FILE, "r") as f:
+                data = json.load(f)
+                saved_in = data.get("selected_input", "")
+                saved_out = data.get("selected_output", "")
+        except: pass
+        
+        for idx, dev in enumerate(inputs, 1):
+            friendly = self.get_device_friendly_name(dev)
+            combo_in.append_text(friendly)
+            if dev == saved_in:
+                active_in_idx = idx
+                
+        combo_in.set_active(active_in_idx)
+        grid.attach(combo_in, 1, 0, 1, 1)
+        
+        # Output device
+        lbl_out = Gtk.Label(label="<b>🔊 Thiết bị Loa ra:</b>", use_markup=True)
+        lbl_out.set_halign(Gtk.Align.START)
+        grid.attach(lbl_out, 0, 1, 1, 1)
+        
+        combo_out = Gtk.ComboBoxText()
+        combo_out.append_text("Không thay đổi (Giữ nguyên)")
+        active_out_idx = 0
+        
+        for idx, dev in enumerate(outputs, 1):
+            friendly = self.get_device_friendly_name(dev)
+            combo_out.append_text(friendly)
+            if dev == saved_out:
+                active_out_idx = idx
+                
+        combo_out.set_active(active_out_idx)
+        grid.attach(combo_out, 1, 1, 1, 1)
+        
+        content_area.add(grid)
+        dialog.show_all()
+        
+        response = dialog.run()
+        if response == Gtk.ResponseType.OK:
+            sel_in_idx = combo_in.get_active()
+            sel_out_idx = combo_out.get_active()
+            
+            new_in = inputs[sel_in_idx - 1] if sel_in_idx > 0 else ""
+            new_out = outputs[sel_out_idx - 1] if sel_out_idx > 0 else ""
+            
+            try:
+                with open(GENRE_FILE, "r") as f: data = json.load(f)
+            except: data = {}
+            
+            data["selected_input"] = new_in
+            data["selected_output"] = new_out
+            data["timestamp"] = time.time()
+            with open(GENRE_FILE, "w") as f:
+                json.dump(data, f)
+                
+            self.check_audio_connections()
+            self.status_lbl.set_markup("<span font='9' color='#2ecc71'>Đã áp dụng cấu hình thiết bị âm thanh!</span>")
+            GLib.timeout_add(3000, lambda: self.status_lbl.set_markup("<span font='9' color='#71717a'>Sẵn sàng.</span>") or False)
+            
+        dialog.destroy()
 
 def create_desktop_launcher():
     try:
