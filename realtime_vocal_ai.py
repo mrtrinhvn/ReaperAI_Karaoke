@@ -590,7 +590,7 @@ def main():
     # → Không gây xáo trộn bất kỳ kết nối nào trên qpwgraph
     cmd = [
         "pw-record",
-        "-P", "node.description='AI Vocal Analyzer (MIC)'",
+        "-P", "node.name=Mic_AI node.description='AI Vocal Analyzer (MIC)' media.name=Mic_AI",
         "--rate", str(SAMPLE_RATE),
         "--channels", str(CHANNELS),
         "--format", "s16",
@@ -627,29 +627,28 @@ def main():
             proc.terminate()
             cmd_fallback = [
                 "pw-record",
+                "-P", "node.name=Mic_AI node.description='AI Vocal Analyzer (MIC)' media.name=Mic_AI",
                 "--rate", str(SAMPLE_RATE),
                 "--channels", str(CHANNELS),
                 "--format", "s16",
                 "--latency", "2048",
+                "--target", "0",
                 "-",
             ]
-            if args.target:
-                cmd_fallback.insert(-1, "--target")
-                cmd_fallback.insert(-1, args.target)
             proc = subprocess.Popen(cmd_fallback, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
     else:
         # Không có MixPre-6 → dùng cách cũ với target chỉ định hoặc default
         proc.terminate()
         cmd_fallback = [
             "pw-record",
+            "-P", "node.name=Mic_AI node.description='AI Vocal Analyzer (MIC)' media.name=Mic_AI",
             "--rate", str(SAMPLE_RATE),
             "--channels", str(CHANNELS),
             "--format", "s16",
             "--latency", "2048",
+            "--target", "0",
+            "-",
         ]
-        if args.target:
-            cmd_fallback += ["--target", args.target]
-        cmd_fallback.append("-")
         proc = subprocess.Popen(cmd_fallback, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
 
     print()

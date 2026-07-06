@@ -67,7 +67,7 @@ def main():
     env["PIPEWIRE_CLIENT_NAME"] = NODE_NAME
     
     proc = subprocess.Popen(
-        ["pw-record", "--target", "auto", "--latency=512", "--rate=48000", "--channels=1", "--format=f32", "-"],
+        ["pw-record", "-P", "node.name=Master_AI node.description=Master_AI media.name=Master_AI", "--target", "0", "--latency=512", "--rate=48000", "--channels=1", "--format=f32", "-"],
         stdout=subprocess.PIPE,
         stderr=subprocess.DEVNULL,
         env=env
