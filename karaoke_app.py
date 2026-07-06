@@ -486,6 +486,14 @@ class KaraokeApp(Gtk.Window):
                             if dest in ["REAPER:in1", "REAPER:in2"] or dest in mic_ai_ports:
                                 subprocess.run(["pw-link", "-d", src_port, dest], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
+            # Ngắt kết nối trực tiếp từ Microphone tới bất kỳ loa/đầu ra nào (alsa_input.* -> alsa_output.*)
+            # để tránh rú rít (feedback loop) và hiện tượng trễ âm kép
+            for src_port, active_conns in list(connections.items()):
+                if src_port.startswith("alsa_input."):
+                    for dest in active_conns:
+                        if dest.startswith("alsa_output."):
+                            subprocess.run(["pw-link", "-d", src_port, dest], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
             # Tự động kết nối & duy trì thiết bị đầu ra (Speaker / Interface Out)
             if active_out:
                 playback_ports = []
