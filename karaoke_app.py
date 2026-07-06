@@ -426,6 +426,28 @@ class KaraokeApp(Gtk.Window):
                     sel_out = data.get("selected_output", "")
             except: pass
 
+            # Scan available interfaces
+            inputs, outputs = self.get_audio_interfaces()
+            default_in, default_out = self.get_default_pipewire_nodes()
+
+            # Resolve active input device with fallback
+            active_in = ""
+            if sel_in and sel_in in inputs:
+                active_in = sel_in
+            elif default_in and default_in in inputs:
+                active_in = default_in
+            elif inputs:
+                active_in = inputs[0]
+
+            # Resolve active output device with fallback
+            active_out = ""
+            if sel_out and sel_out in outputs:
+                active_out = sel_out
+            elif default_out and default_out in outputs:
+                active_out = default_out
+            elif outputs:
+                active_out = outputs[0]
+
             # Tìm các cổng của Mic_AI recorder
             mic_ai_ports = []
             try:
@@ -438,11 +460,11 @@ class KaraokeApp(Gtk.Window):
             except: pass
 
             # Tự động kết nối & duy trì thiết bị đầu vào (Mic)
-            if sel_in:
+            if active_in:
                 capture_ports = []
                 try:
                     res_o = subprocess.run(["pw-link", "-o"], capture_output=True, text=True, timeout=0.5)
-                    capture_ports = [l.strip() for l in res_o.stdout.splitlines() if l.startswith(f"{sel_in}:")]
+                    capture_ports = [l.strip() for l in res_o.stdout.splitlines() if l.startswith(f"{active_in}:")]
                 except: pass
                 
                 if capture_ports:
@@ -461,17 +483,17 @@ class KaraokeApp(Gtk.Window):
                                 
                 # Ngắt kết nối của các thiết bị đầu vào khác đang nối tới REAPER và mic_ai_ports
                 for src_port, active_conns in list(connections.items()):
-                    if src_port.startswith("alsa_input.") and not src_port.startswith(f"{sel_in}:"):
+                    if src_port.startswith("alsa_input.") and not src_port.startswith(f"{active_in}:"):
                         for dest in active_conns:
                             if dest in ["REAPER:in1", "REAPER:in2"] or dest in mic_ai_ports:
                                 subprocess.run(["pw-link", "-d", src_port, dest], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
             # Tự động kết nối & duy trì thiết bị đầu ra (Speaker / Interface Out)
-            if sel_out:
+            if active_out:
                 playback_ports = []
                 try:
                     res_play = subprocess.run(["pw-link", "-i"], capture_output=True, text=True, timeout=0.5)
-                    playback_ports = [l.strip() for l in res_play.stdout.splitlines() if l.startswith(f"{sel_out}:")]
+                    playback_ports = [l.strip() for l in res_play.stdout.splitlines() if l.startswith(f"{active_out}:")]
                 except: pass
                 
                 if playback_ports:
@@ -493,7 +515,7 @@ class KaraokeApp(Gtk.Window):
                 for src_port, active_conns in list(connections.items()):
                     if src_port in ["REAPER:out1", "REAPER:out2"]:
                         for dest in active_conns:
-                            if dest.startswith("alsa_output.") and not dest.startswith(f"{sel_out}:"):
+                            if dest.startswith("alsa_output.") and not dest.startswith(f"{active_out}:"):
                                 subprocess.run(["pw-link", "-d", src_port, dest], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
             # Analyze connection states for UI indicators
@@ -505,14 +527,14 @@ class KaraokeApp(Gtk.Window):
                         if "chrome" in src_lower or "firefox" in src_lower or "brave" in src_lower or "opera" in src_lower or "edge" in src_lower:
                             has_beat = True
                         if "alsa_input" in src_lower and "capture" in src_lower:
-                            if sel_in:
-                                if sel_in in src:
+                            if active_in:
+                                if active_in in src:
                                     has_mic = True
                             else:
                                 has_mic = True
                         if "reaper" in src_lower and "out" in src_lower:
-                            if sel_out:
-                                if sel_out in dest:
+                            if active_out:
+                                if active_out in dest:
                                     has_master = True
                             else:
                                 has_master = True
@@ -543,19 +565,24 @@ class KaraokeApp(Gtk.Window):
             else:
                 self.beat_conn_lbl.set_markup("<span font='9' color='#e74c3c'>🎵 Nhạc: Chưa có web</span>")
                 
-            if has_mic:
-                self.mic_conn_lbl.set_markup("<span font='9' color='#2ecc71'>🎤 Mic: Đã nối</span>")
+            if has_mic and active_in:
+                friendly_mic = self.get_device_friendly_name(active_in)
+                friendly_mic = friendly_mic.replace("🎙️", "").strip()
+                self.mic_conn_lbl.set_markup(f"<span font='9' color='#2ecc71'>🎤 Mic: {friendly_mic}</span>")
             else:
                 self.mic_conn_lbl.set_markup("<span font='9' color='#e74c3c'>🎤 Mic: Chưa nối AI</span>")
                 
-            if has_master:
-                # Kiểm tra trạng thái Master Clip
-                master_status = "Đã nối"
+            if has_master and active_out:
+                friendly_out = self.get_device_friendly_name(active_out)
+                friendly_out = friendly_out.replace("🔊", "").strip()
+                
+                # Check Master status
+                master_status = friendly_out
                 master_color = "#2ecc71"
                 try:
                     with open("/tmp/ai_karaoke_master_status.txt", "r") as f:
                         if "OVERLOAD" in f.read():
-                            master_status = "QUÁ TẢI!"
+                            master_status = f"{friendly_out} (QUÁ TẢI!)"
                             master_color = "#e74c3c"
                 except: pass
                 self.master_conn_lbl.set_markup(f"<span font='9' color='{master_color}'>🎧 Master: {master_status}</span>")
@@ -785,6 +812,67 @@ class KaraokeApp(Gtk.Window):
         except: pass
             
         return inputs, outputs
+
+    def get_default_pipewire_nodes(self):
+        import subprocess
+        import re
+        
+        default_input = ""
+        default_output = ""
+        
+        try:
+            res = subprocess.run(["wpctl", "status"], capture_output=True, text=True, timeout=1.0)
+            lines = res.stdout.splitlines()
+            
+            in_sources_section = False
+            in_sinks_section = False
+            
+            default_in_id = ""
+            default_out_id = ""
+            
+            for line in lines:
+                line_strip = line.strip()
+                if "Sinks:" in line:
+                    in_sinks_section = True
+                    in_sources_section = False
+                elif "Sources:" in line:
+                    in_sources_section = True
+                    in_sinks_section = False
+                elif line_strip.startswith("Sink endpoints:") or line_strip.startswith("Source endpoints:") or line_strip.startswith("Streams:"):
+                    in_sinks_section = False
+                    in_sources_section = False
+                    
+                if in_sinks_section and "*" in line:
+                    match = re.search(r'\*\s+(\d+)\.', line)
+                    if match:
+                        default_out_id = match.group(1)
+                        
+                if in_sources_section and "*" in line:
+                    match = re.search(r'\*\s+(\d+)\.', line)
+                    if match:
+                        default_in_id = match.group(1)
+                        
+            if default_in_id:
+                res_inspect = subprocess.run(["wpctl", "inspect", default_in_id], capture_output=True, text=True, timeout=1.0)
+                for l in res_inspect.stdout.splitlines():
+                    if "node.name" in l:
+                        m = re.search(r'node\.name\s*=\s*"([^"]+)"', l)
+                        if m:
+                            default_input = m.group(1)
+                            break
+                            
+            if default_out_id:
+                res_inspect = subprocess.run(["wpctl", "inspect", default_out_id], capture_output=True, text=True, timeout=1.0)
+                for l in res_inspect.stdout.splitlines():
+                    if "node.name" in l:
+                        m = re.search(r'node\.name\s*=\s*"([^"]+)"', l)
+                        if m:
+                            default_output = m.group(1)
+                            break
+        except Exception as e:
+            print(f"Error querying default devices: {e}")
+            
+        return default_input, default_output
 
     def get_device_friendly_name(self, dev_id):
         # Remove prefix
