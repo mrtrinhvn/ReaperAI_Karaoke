@@ -4,13 +4,39 @@
 ======================================================
 Ứng dụng nổi (Always on top) để chọn thể loại khi đang hát.
 """
-import gi, json, os, time
+import gi, json, os, time, subprocess
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk, GLib
 
 GENRE_FILE = "/tmp/ai_karaoke_genre.json"
 BPM_FILE = "/tmp/ai_karaoke_bpm.txt"
 KEY_FILE = "/tmp/ai_karaoke_key.json"
+
+# --- CẤU HÌNH CỔNG REAPER ---
+# Mặc định: Vocal dùng in1/in2, Nhạc nền dùng in3/in4
+REAPER_VOCAL_IN_L = "REAPER:in1"
+REAPER_VOCAL_IN_R = "REAPER:in2"
+REAPER_MUSIC_IN_L = "REAPER:in3"
+REAPER_MUSIC_IN_R = "REAPER:in4"
+
+# Thử đọc cấu hình từ file .env nếu có
+try:
+    env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env")
+    if os.path.exists(env_path):
+        with open(env_path, "r") as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith("#"):
+                    if "=" in line:
+                        k, v = line.split("=", 1)
+                        k = k.strip()
+                        v = v.strip().strip('"').strip("'")
+                        if k == "REAPER_VOCAL_IN_L": REAPER_VOCAL_IN_L = v
+                        elif k == "REAPER_VOCAL_IN_R": REAPER_VOCAL_IN_R = v
+                        elif k == "REAPER_MUSIC_IN_L": REAPER_MUSIC_IN_L = v
+                        elif k == "REAPER_MUSIC_IN_R": REAPER_MUSIC_IN_R = v
+except Exception as e:
+    print(f"Lỗi đọc cấu hình cổng từ .env: {e}")
 
 PRESETS = {
     "bolero": {
@@ -461,10 +487,10 @@ class KaraokeApp(Gtk.Window):
                 if capture_ports:
                     target_map = {}
                     if len(capture_ports) == 1:
-                        target_map[capture_ports[0]] = ["REAPER:in1", "REAPER:in2"] + mic_ai_ports
+                        target_map[capture_ports[0]] = [REAPER_VOCAL_IN_L, REAPER_VOCAL_IN_R] + mic_ai_ports
                     else:
-                        target_map[capture_ports[0]] = ["REAPER:in1"] + mic_ai_ports
-                        target_map[capture_ports[1]] = ["REAPER:in2"]
+                        target_map[capture_ports[0]] = [REAPER_VOCAL_IN_L] + mic_ai_ports
+                        target_map[capture_ports[1]] = [REAPER_VOCAL_IN_R]
                         
                     for src_port, dests in target_map.items():
                         active_conns = connections.get(src_port, [])
@@ -476,14 +502,14 @@ class KaraokeApp(Gtk.Window):
                 for src_port, active_conns in list(connections.items()):
                     if src_port.startswith("alsa_input.") and not src_port.startswith(f"{active_in}:"):
                         for dest in active_conns:
-                            if dest in ["REAPER:in1", "REAPER:in2"] or dest in mic_ai_ports:
+                            if dest in [REAPER_VOCAL_IN_L, REAPER_VOCAL_IN_R] or dest in mic_ai_ports:
                                 subprocess.run(["pw-link", "-d", src_port, dest], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             else:
                 # Ngắt kết nối hoàn toàn của REAPER và mic_ai_ports khỏi TẤT CẢ các thiết bị đầu vào alsa_input.
                 for src_port, active_conns in list(connections.items()):
                     if src_port.startswith("alsa_input."):
                         for dest in active_conns:
-                            if dest in ["REAPER:in1", "REAPER:in2"] or dest in mic_ai_ports:
+                            if dest in [REAPER_VOCAL_IN_L, REAPER_VOCAL_IN_R] or dest in mic_ai_ports:
                                 subprocess.run(["pw-link", "-d", src_port, dest], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
             # Ngắt kết nối trực tiếp từ Microphone tới bất kỳ loa/đầu ra nào (alsa_input.* -> alsa_output.*)
@@ -572,7 +598,7 @@ class KaraokeApp(Gtk.Window):
             if browser_ports:
                 browser_ports.sort()
                 for idx, bp in enumerate(browser_ports):
-                    reaper_dest = "REAPER:in3" if (idx % 2 == 0) else "REAPER:in4"
+                    reaper_dest = REAPER_MUSIC_IN_L if (idx % 2 == 0) else REAPER_MUSIC_IN_R
                     bp_conns = connections.get(bp, [])
                     
                     # Connect to REAPER if missing
@@ -587,7 +613,7 @@ class KaraokeApp(Gtk.Window):
                             if "beat_ai" not in dest.lower() and "pw-record" not in dest.lower() and "beat_ai_key" not in dest.lower():
                                 should_disconnect = True
                         else:
-                            if dest in ["REAPER:in1", "REAPER:in2"]:
+                            if dest in [REAPER_VOCAL_IN_L, REAPER_VOCAL_IN_R]:
                                 should_disconnect = True
                         
                         if should_disconnect:
@@ -806,8 +832,8 @@ class KaraokeApp(Gtk.Window):
                         matching_ports = [l.strip() for l in lines if node_name in l]
                         if matching_ports:
                             for port in matching_ports:
-                                subprocess.run(["pw-link", port, "REAPER:in3"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-                                subprocess.run(["pw-link", port, "REAPER:in4"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                                subprocess.run(["pw-link", port, REAPER_MUSIC_IN_L], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                                subprocess.run(["pw-link", port, REAPER_MUSIC_IN_R], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
                             break
                     except:
                         pass

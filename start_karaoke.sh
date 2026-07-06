@@ -10,6 +10,21 @@
 
 DIR="$(cd "$(dirname "$0")" && pwd)"
 
+# Thử đọc .env để cấu hình cổng nhạc nền của REAPER
+REAPER_MUSIC_IN_L="REAPER:in3"
+REAPER_MUSIC_IN_R="REAPER:in4"
+if [ -f "$DIR/.env" ]; then
+    while IFS= read -r line || [ -n "$line" ]; do
+        # Bỏ qua dòng comment và dòng trống
+        if [[ ! "$line" =~ ^# ]] && [[ "$line" =~ = ]]; then
+            key=$(echo "$line" | cut -d'=' -f1 | tr -d '[:space:]')
+            val=$(echo "$line" | cut -d'=' -f2- | tr -d '[:space:]' | tr -d '"' | tr -d "'")
+            if [ "$key" = "REAPER_MUSIC_IN_L" ]; then REAPER_MUSIC_IN_L="$val"; fi
+            if [ "$key" = "REAPER_MUSIC_IN_R" ]; then REAPER_MUSIC_IN_R="$val"; fi
+        fi
+    done < "$DIR/.env"
+fi
+
 echo "🎤 ═══════════════════════════════════════"
 echo "   AI KARAOKE PRO v4 — Launcher"
 echo "   (Passive Mode — Không xáo trộn routing)"
@@ -56,8 +71,8 @@ if [ -n "$BROWSER_FL" ]; then
         echo
         if [[ $REPLY =~ ^[Yy]$ ]]; then
             BROWSER_FR=$(pw-link -o 2>/dev/null | grep -iE "(firefox|chrom|brave|opera|edge|vivaldi)" | head -2 | tail -1)
-            pw-link "$BROWSER_FL" "REAPER:in3" 2>/dev/null && echo "   ✅ Browser FL → REAPER:in3"
-            [ -n "$BROWSER_FR" ] && pw-link "$BROWSER_FR" "REAPER:in4" 2>/dev/null && echo "   ✅ Browser FR → REAPER:in4"
+            pw-link "$BROWSER_FL" "$REAPER_MUSIC_IN_L" 2>/dev/null && echo "   ✅ Browser FL → $REAPER_MUSIC_IN_L"
+            [ -n "$BROWSER_FR" ] && pw-link "$BROWSER_FR" "$REAPER_MUSIC_IN_R" 2>/dev/null && echo "   ✅ Browser FR → $REAPER_MUSIC_IN_R"
         else
             echo "   → Bỏ qua. Kết nối giữ nguyên."
         fi
