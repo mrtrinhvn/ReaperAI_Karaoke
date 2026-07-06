@@ -32,6 +32,15 @@ class KaraokeApp(Gtk.Window):
         # Giữ nó cố định trên mọi workspaces
         self.stick()
         
+        # Thiết lập biểu tượng (Icon) cho cửa sổ và Taskbar
+        dir_path = os.path.dirname(os.path.realpath(__file__))
+        icon_path = os.path.join(dir_path, "karaoke_icon.png")
+        if os.path.exists(icon_path):
+            try:
+                self.set_icon_from_file(icon_path)
+            except Exception as e:
+                print(f"Không thể nạp icon: {e}")
+        
         # Tạo CSS tuỳ chỉnh (màu tối, bo góc)
         self.setup_css()
 
