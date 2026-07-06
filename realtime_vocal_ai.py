@@ -44,6 +44,7 @@ EQ_MAP = {
 # ── State ──
 running = True
 history = deque(maxlen=60)  # ~18 seconds of analysis history
+pitch_history = deque(maxlen=10) # ~300ms window of pitch tracking
 current_adjustments = {}
 current_bpm = 120.0
 current_genre = {}  # Genre preset from UI
@@ -236,6 +237,46 @@ def generate_eq_adjustments(band_data, rms_db, sensitivity=1.0):
     vocal_adj["reverb_damp"] = tempo["reverb_damp"]
     vocal_adj["reverb_width"] = tempo["reverb_width"]
     vocal_adj["tempo_note"] = f"[{genre_name}] BPM={current_bpm:.0f} Delay={tempo['delay_ms']:.0f}ms ({tempo['delay_type']})"
+    
+    vocal_adj["autotune_enabled"] = current_genre.get("autotune_enabled", True)
+    vocal_adj["saturation_amount"] = float(current_genre.get("saturation_amount", 0.0))
+
+    # ── ADAPTIVE AUTOTUNE (FLEX-TUNE & PENTATONIC) ──
+    genre_key = current_genre.get("genre", "nhac_tre")
+    scale_type = "Standard"
+    autotune_depth = 0.5  # default baseline
+    
+    # Calculate pitch stability
+    with lock:
+        active_pitches = [p for p in list(pitch_history) if p > 50]
+        
+    if len(active_pitches) >= 4:
+        # Convert Hz to MIDI notes for standard deviation calculation
+        midi_notes = [69 + 12 * np.log2(hz / 440.0) for hz in active_pitches]
+        pitch_std = np.std(midi_notes)
+        
+        # Flex-Tune logic: if pitch standard deviation is high (singer is sliding/vibrato),
+        # reduce autotune depth so it doesn't yank the voice.
+        if pitch_std > 1.0:     # high fluctuation -> slide / vibrato / transition
+            autotune_depth = 0.05
+        elif pitch_std < 0.3:   # extremely stable -> holding a note
+            autotune_depth = 0.8
+        else:                   # moderate transition
+            autotune_depth = 0.4
+    else:
+        autotune_depth = 0.0  # quiet or unstable
+        
+    # Genre-based limits & Scale types
+    if genre_key == "dan_ca":
+        scale_type = "Pentatonic"
+        # Always limit autotune depth for traditional music to keep it natural
+        autotune_depth = min(autotune_depth, 0.25)
+    elif genre_key == "bolero":
+        # Bolero has lots of slides, restrict depth
+        autotune_depth = min(autotune_depth, 0.45)
+        
+    vocal_adj["autotune_depth"] = float(autotune_depth)
+    vocal_adj["scale_type"] = scale_type
 
     # ── GENRE COMP SETTINGS ──
     if "comp_ratio" in current_genre:
@@ -649,6 +690,10 @@ def main():
             snapshot = {"bands": bands, "rms_db": rms_db, "pitch_hz": pitch_hz, "t": time.time()}
             with lock:
                 history.append(snapshot)
+                if pitch_hz > 50:
+                    pitch_history.append(pitch_hz)
+                else:
+                    pitch_history.append(0)
 
             now = time.time()
             if now - last_render > 0.2:

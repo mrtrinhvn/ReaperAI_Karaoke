@@ -10,21 +10,22 @@ from gi.repository import Gtk, Gdk, GLib
 
 GENRE_FILE = "/tmp/ai_karaoke_genre.json"
 BPM_FILE = "/tmp/ai_karaoke_bpm.txt"
+KEY_FILE = "/tmp/ai_karaoke_key.json"
 
 PRESETS = {
-    "bolero": {"name": "Bolero", "emoji": "🌹", "bpm_suggest": 85, "color": "#e74c3c", "delay_fraction": 0.5, "delay_volume": 0.18, "delay_feedback": 0.15, "reverb_room": 0.65, "reverb_wet": 0.38, "reverb_damp": 0.50, "reverb_width": 0.80, "chorus_mix": 0.15, "comp_ratio": 0.20, "comp_thresh": 0.55, "duck_intensity": 0.8},
-    "dan_ca": {"name": "Dân ca", "emoji": "🎋", "bpm_suggest": 100, "color": "#27ae60", "delay_fraction": 0.5, "delay_volume": 0.15, "delay_feedback": 0.10, "reverb_room": 0.40, "reverb_wet": 0.35, "reverb_damp": 0.60, "reverb_width": 0.65, "chorus_mix": 0.10, "comp_ratio": 0.22, "comp_thresh": 0.52, "duck_intensity": 0.6},
-    "nhac_tre": {"name": "Nhạc trẻ", "emoji": "🎤", "bpm_suggest": 120, "color": "#9b59b6", "delay_fraction": 0.5, "delay_volume": 0.16, "delay_feedback": 0.12, "reverb_room": 0.45, "reverb_wet": 0.32, "reverb_damp": 0.55, "reverb_width": 0.75, "chorus_mix": 0.10, "comp_ratio": 0.30, "comp_thresh": 0.48, "duck_intensity": 1.0},
-    "ballad": {"name": "Ballad", "emoji": "💫", "bpm_suggest": 75, "color": "#2980b9", "delay_fraction": 0.5, "delay_volume": 0.20, "delay_feedback": 0.18, "reverb_room": 0.70, "reverb_wet": 0.42, "reverb_damp": 0.45, "reverb_width": 0.85, "chorus_mix": 0.15, "comp_ratio": 0.18, "comp_thresh": 0.55, "duck_intensity": 0.9},
-    "rap": {"name": "Rap", "emoji": "🎧", "bpm_suggest": 95, "color": "#e67e22", "delay_fraction": 0.25, "delay_volume": 0.08, "delay_feedback": 0.0, "reverb_room": 0.20, "reverb_wet": 0.15, "reverb_damp": 0.70, "reverb_width": 0.50, "chorus_mix": 0.0, "comp_ratio": 0.40, "comp_thresh": 0.42, "duck_intensity": 1.2},
-    "dance": {"name": "Dance", "emoji": "🪩", "bpm_suggest": 128, "color": "#1abc9c", "delay_fraction": 0.5, "delay_volume": 0.12, "delay_feedback": 0.0, "reverb_room": 0.25, "reverb_wet": 0.22, "reverb_damp": 0.65, "reverb_width": 0.70, "chorus_mix": 0.15, "comp_ratio": 0.35, "comp_thresh": 0.45, "duck_intensity": 1.0},
+    "bolero": {"name": "Bolero", "emoji": "🌹", "bpm_suggest": 85, "color": "#e74c3c", "delay_fraction": 0.5, "delay_volume": 0.18, "delay_feedback": 0.15, "reverb_room": 0.65, "reverb_wet": 0.38, "reverb_damp": 0.50, "reverb_width": 0.80, "chorus_mix": 0.15, "comp_ratio": 0.20, "comp_thresh": 0.55, "duck_intensity": 0.8, "saturation_amount": 0.15},
+    "dan_ca": {"name": "Dân ca / Ca cổ", "emoji": "🎋", "bpm_suggest": 100, "color": "#27ae60", "delay_fraction": 0.5, "delay_volume": 0.15, "delay_feedback": 0.10, "reverb_room": 0.40, "reverb_wet": 0.35, "reverb_damp": 0.60, "reverb_width": 0.65, "chorus_mix": 0.10, "comp_ratio": 0.22, "comp_thresh": 0.52, "duck_intensity": 0.6, "saturation_amount": 0.08},
+    "nhac_tre": {"name": "Nhạc trẻ", "emoji": "🎤", "bpm_suggest": 120, "color": "#9b59b6", "delay_fraction": 0.5, "delay_volume": 0.16, "delay_feedback": 0.12, "reverb_room": 0.45, "reverb_wet": 0.32, "reverb_damp": 0.55, "reverb_width": 0.75, "chorus_mix": 0.10, "comp_ratio": 0.30, "comp_thresh": 0.48, "duck_intensity": 1.0, "saturation_amount": 0.20},
+    "ballad": {"name": "Ballad", "emoji": "💫", "bpm_suggest": 75, "color": "#2980b9", "delay_fraction": 0.5, "delay_volume": 0.20, "delay_feedback": 0.18, "reverb_room": 0.70, "reverb_wet": 0.42, "reverb_damp": 0.45, "reverb_width": 0.85, "chorus_mix": 0.15, "comp_ratio": 0.18, "comp_thresh": 0.55, "duck_intensity": 0.9, "saturation_amount": 0.25},
+    "rap": {"name": "Rap", "emoji": "🎧", "bpm_suggest": 95, "color": "#e67e22", "delay_fraction": 0.25, "delay_volume": 0.08, "delay_feedback": 0.0, "reverb_room": 0.20, "reverb_wet": 0.15, "reverb_damp": 0.70, "reverb_width": 0.50, "chorus_mix": 0.0, "comp_ratio": 0.40, "comp_thresh": 0.42, "duck_intensity": 1.2, "saturation_amount": 0.35},
+    "dance": {"name": "Dance", "emoji": "🪩", "bpm_suggest": 128, "color": "#1abc9c", "delay_fraction": 0.5, "delay_volume": 0.12, "delay_feedback": 0.0, "reverb_room": 0.25, "reverb_wet": 0.22, "reverb_damp": 0.65, "reverb_width": 0.70, "chorus_mix": 0.15, "comp_ratio": 0.35, "comp_thresh": 0.45, "duck_intensity": 1.0, "saturation_amount": 0.30},
 }
 
 class KaraokeApp(Gtk.Window):
     def __init__(self):
         super().__init__(title="Karaoke AI Panel")
         self.set_border_width(10)
-        self.set_default_size(300, 400)
+        self.set_default_size(320, 640)
         
         # Thiết lập: Luôn nổi trên cùng (Always on Top)
         self.set_keep_above(True)
@@ -93,6 +94,23 @@ class KaraokeApp(Gtk.Window):
         
         vbox.pack_start(bpm_box, False, False, 0)
         
+        # Tone & AutoTune Section
+        tone_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        tone_box.set_halign(Gtk.Align.CENTER)
+        
+        self.tone_lbl = Gtk.Label(label="<span font='11' weight='bold' color='#f39c12'>Tone: ---</span>", use_markup=True)
+        tone_box.pack_start(self.tone_lbl, False, False, 10)
+        
+        at_lbl = Gtk.Label(label="<span font='10'>Auto-Tune</span>", use_markup=True)
+        tone_box.pack_start(at_lbl, False, False, 0)
+        
+        self.autotune_toggle = Gtk.Switch()
+        self.autotune_toggle.set_active(True)
+        self.autotune_toggle.connect("notify::active", self.on_autotune_toggle)
+        tone_box.pack_start(self.autotune_toggle, False, False, 0)
+        
+        vbox.pack_start(tone_box, False, False, 0)
+        
         # Nút Phân tích giọng (Auto-Calibration)
         analyze_btn = Gtk.Button()
         analyze_btn.get_style_context().add_class("analyze-btn")
@@ -119,8 +137,37 @@ class KaraokeApp(Gtk.Window):
         
         self.update_mode_labels(False) # Khởi tạo màu sắc ban đầu
         
+        # ═══ SOUNDBOARD SECTION (Livestream SFX) ═══
+        sfx_title = Gtk.Label(label="<span font='10' weight='bold' color='#38bdf8'>🔊 Hiệu Ứng Âm Thanh Livestream</span>", use_markup=True)
+        vbox.pack_start(sfx_title, False, False, 5)
+
+        sfx_flow = Gtk.FlowBox()
+        sfx_flow.set_valign(Gtk.Align.START)
+        sfx_flow.set_max_children_per_line(3)
+        sfx_flow.set_selection_mode(Gtk.SelectionMode.NONE)
+        sfx_flow.set_row_spacing(8)
+        sfx_flow.set_column_spacing(8)
+        vbox.pack_start(sfx_flow, False, False, 0)
+
+        sfx_list = [
+            ("Laughter 😆", "laughter.wav"),
+            ("Applause 👏", "applause.wav"),
+            ("Surprise 😮", "surprise.wav"),
+            ("Booing 👎", "boo.wav"),
+            ("ThumbsUp 👍", "thumbs_up.wav"),
+            ("Airhorn 📣", "airhorn.wav")
+        ]
+
+        for label, filename in sfx_list:
+            btn = Gtk.Button()
+            btn.get_style_context().add_class("sfx-btn")
+            btn_lbl = Gtk.Label(label=f"<span font='9' weight='bold'>{label}</span>", use_markup=True)
+            btn.add(btn_lbl)
+            btn.connect("clicked", self.play_sfx, filename)
+            sfx_flow.insert(btn, -1)
+            
         self.status_lbl = Gtk.Label(label="<span font='9' color='#71717a'>Sẵn sàng.</span>", use_markup=True)
-        vbox.pack_start(self.status_lbl, False, False, 0)
+        vbox.pack_start(self.status_lbl, False, False, 5)
         
         # Audio Connection Status
         conn_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=20)
@@ -143,6 +190,10 @@ class KaraokeApp(Gtk.Window):
         
         # Bắt đầu luồng kiểm tra BPM file tự động
         GLib.timeout_add(1000, self.check_bpm_file)
+        
+        # Khởi chạy kiểm tra Tone file định kỳ
+        self.last_key_timestamp = 0
+        GLib.timeout_add(500, self.check_key_file)
 
     def on_slider_press(self, widget, event):
         self.user_sliding = True
@@ -168,6 +219,18 @@ class KaraokeApp(Gtk.Window):
         except: pass
         return True
 
+    def check_key_file(self):
+        try:
+            with open(KEY_FILE, "r") as f:
+                data = json.load(f)
+                if "timestamp" in data and data["timestamp"] > self.last_key_timestamp:
+                    self.last_key_timestamp = data["timestamp"]
+                    note = data.get("root_name", "---")
+                    scale = data.get("scale", "")
+                    self.tone_lbl.set_markup(f"<span font='11' weight='bold' color='#f39c12'>Tone: {note} {scale}</span>")
+        except: pass
+        return True
+
     def check_audio_connections(self):
         try:
             import subprocess
@@ -178,19 +241,52 @@ class KaraokeApp(Gtk.Window):
             has_mic = False
             has_master = False
             
+            # Map of ports and their connections
+            connections = {}
             current_src = ""
             for line in lines:
                 if not line.startswith(" ") and not line.startswith("\t"):
-                    current_src = line.lower()
+                    current_src = line.strip()
                 else:
-                    line_lower = line.lower()
-                    if "pw-record" in line_lower or "beat_ai" in line_lower or "mic_ai" in line_lower or "master_ai" in line_lower:
-                        if "chrome" in current_src or "firefox" in current_src:
+                    dest = line.replace("|->", "").replace("|<-", "").strip()
+                    if current_src:
+                        if current_src not in connections:
+                            connections[current_src] = []
+                        connections[current_src].append(dest)
+                        
+            # Analyze connection states for UI indicators
+            for src, dests in connections.items():
+                src_lower = src.lower()
+                for dest in dests:
+                    dest_lower = dest.lower()
+                    if "pw-record" in dest_lower or "beat_ai" in dest_lower or "mic_ai" in dest_lower or "master_ai" in dest_lower:
+                        if "chrome" in src_lower or "firefox" in src_lower or "brave" in src_lower or "opera" in src_lower or "edge" in src_lower:
                             has_beat = True
-                        if "alsa_input" in current_src and "capture" in current_src:
+                        if "alsa_input" in src_lower and "capture" in src_lower:
                             has_mic = True
-                        if "reaper" in current_src and "out" in current_src:
+                        if "reaper" in src_lower and "out" in src_lower:
                             has_master = True
+            
+            # Auto-route and isolate Browser to REAPER (prevent dual playback to system speakers)
+            browser_ports = []
+            for port in connections.keys():
+                if any(x in port.lower() for x in ["firefox", "chrom", "brave", "opera", "edge", "vivaldi"]):
+                    browser_ports.append(port)
+                    
+            if browser_ports:
+                browser_ports.sort()
+                for idx, bp in enumerate(browser_ports):
+                    reaper_dest = "REAPER:in3" if (idx % 2 == 0) else "REAPER:in4"
+                    bp_conns = connections.get(bp, [])
+                    
+                    # Connect to REAPER if missing
+                    if reaper_dest not in bp_conns:
+                        subprocess.run(["pw-link", bp, reaper_dest], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                        
+                    # Disconnect from non-REAPER, non-AI destinations to prevent double audio (echo) through speakers
+                    for dest in bp_conns:
+                        if "REAPER" not in dest and "beat_ai" not in dest.lower() and "pw-record" not in dest.lower() and "beat_ai_key" not in dest.lower():
+                            subprocess.run(["pw-link", "-d", bp, dest], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
                             
             if has_beat:
                 self.beat_conn_lbl.set_markup("<span font='9' color='#2ecc71'>🎵 Nhạc: Đã nối</span>")
@@ -243,6 +339,19 @@ class KaraokeApp(Gtk.Window):
             transition: all 0.2s ease;
         }
         .analyze-btn:hover { background-color: #d35400; }
+        .sfx-btn {
+            background-color: #1a1a24;
+            border-radius: 10px;
+            border: 1px solid #2d2d3d;
+            padding: 8px;
+            color: #cbd5e1;
+            transition: all 0.2s ease;
+        }
+        .sfx-btn:hover {
+            background-color: #2e2e3e;
+            border-color: #38bdf8;
+            color: #ffffff;
+        }
         """
         provider = Gtk.CssProvider()
         provider.load_from_data(css)
@@ -284,6 +393,15 @@ class KaraokeApp(Gtk.Window):
         else:
             data["bpm_override"] = p["bpm_suggest"]
             
+        if "autotune_enabled" in old_data:
+            data["autotune_enabled"] = old_data["autotune_enabled"]
+            # Restore toggle state without triggering event
+            self.autotune_toggle.handler_block_by_func(self.on_autotune_toggle)
+            self.autotune_toggle.set_active(old_data["autotune_enabled"])
+            self.autotune_toggle.handler_unblock_by_func(self.on_autotune_toggle)
+        else:
+            data["autotune_enabled"] = True
+            
         try:
             with open(GENRE_FILE, "w") as f:
                 json.dump(data, f)
@@ -319,6 +437,16 @@ class KaraokeApp(Gtk.Window):
             self.lbl_hat.set_markup("<span font='11' weight='bold' color='#2ecc71'>🎵 HÁT</span>")
             self.lbl_podcast.set_markup("<span font='11' weight='bold' color='#71717a'>PODCAST</span>")
 
+    def on_autotune_toggle(self, switch, gparam):
+        is_active = switch.get_active()
+        try:
+            with open(GENRE_FILE, "r") as f: data = json.load(f)
+        except: data = {}
+        data["autotune_enabled"] = is_active
+        data["timestamp"] = time.time()
+        with open(GENRE_FILE, "w") as f:
+            json.dump(data, f)
+
     def on_podcast_toggle(self, switch, gparam):
         is_podcast = switch.get_active()
         try:
@@ -332,6 +460,39 @@ class KaraokeApp(Gtk.Window):
         self.update_mode_labels(is_podcast)
         # Reset lại status về Sẵn sàng để xóa đi dòng chữ báo trạng thái dài dòng
         self.status_lbl.set_markup("<span font='9' color='#71717a'>Sẵn sàng.</span>")
+
+    def play_sfx(self, widget, filename):
+        import subprocess
+        import threading
+        dir_path = os.path.dirname(os.path.realpath(__file__))
+        filepath = os.path.join(dir_path, "sounds", filename)
+        if os.path.exists(filepath):
+            node_name = f"sfx_play_{int(time.time() * 1000)}"
+            cmd = ["pw-play", "-P", f"{{ node.name = {node_name} }}", "--target", "0", filepath]
+            subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            
+            def link_thread():
+                start_time = time.time()
+                while time.time() - start_time < 1.0:
+                    try:
+                        res = subprocess.run(["pw-link", "-o"], capture_output=True, text=True, timeout=0.5)
+                        lines = res.stdout.splitlines()
+                        matching_ports = [l.strip() for l in lines if node_name in l]
+                        if matching_ports:
+                            for port in matching_ports:
+                                subprocess.run(["pw-link", port, "REAPER:in3"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                                subprocess.run(["pw-link", port, "REAPER:in4"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                            break
+                    except:
+                        pass
+                    time.sleep(0.02)
+            
+            threading.Thread(target=link_thread, daemon=True).start()
+            self.status_lbl.set_markup(f"<span font='9' color='#38bdf8'>🔊 Đang phát hiệu ứng: {filename}</span>")
+            GLib.timeout_add(3000, lambda: self.status_lbl.set_markup("<span font='9' color='#71717a'>Sẵn sàng.</span>") or False)
+        else:
+            self.status_lbl.set_markup(f"<span font='9' color='#e74c3c'>⚠️ Lỗi: Không thấy file {filename}</span>")
+
 if __name__ == '__main__':
     win = KaraokeApp()
     win.connect("destroy", Gtk.main_quit)

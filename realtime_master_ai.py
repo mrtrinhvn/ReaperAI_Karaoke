@@ -3,7 +3,6 @@ import time
 import subprocess
 import threading
 import numpy as np
-import pyaudio
 
 # Pipewire Node name
 NODE_NAME = "Master_AI"

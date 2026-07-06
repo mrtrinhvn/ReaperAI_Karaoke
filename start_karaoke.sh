@@ -81,6 +81,7 @@ cleanup() {
     echo "🛑 Đang dừng tất cả..."
     kill $PANEL_PID 2>/dev/null
     kill $BPM_PID 2>/dev/null
+    kill $KEY_PID 2>/dev/null
     kill $MASTER_PID 2>/dev/null
     echo "   ✅ Ứng dụng nổi và AI đã dừng"
     echo "   ✅ Kết nối qpwgraph không bị ảnh hưởng"
@@ -90,6 +91,10 @@ trap cleanup EXIT
 echo "🎵 Khởi động AI BPM Detector (Auto-Detect)..."
 python3 "$DIR/realtime_bpm_ai.py" &
 BPM_PID=$!
+
+echo "🎹 Khởi động AI Key Detector (Tone/Scale)..."
+python3 "$DIR/realtime_key_ai.py" &
+KEY_PID=$!
 
 echo "🎧 Khởi động AI Master Monitor (Clipping Detect)..."
 python3 "$DIR/realtime_master_ai.py" &
