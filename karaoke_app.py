@@ -543,21 +543,25 @@ class KaraokeApp(Gtk.Window):
                 src_lower = src.lower()
                 for dest in dests:
                     dest_lower = dest.lower()
-                    if "pw-record" in dest_lower or "beat_ai" in dest_lower or "mic_ai" in dest_lower or "master_ai" in dest_lower:
-                        if "chrome" in src_lower or "firefox" in src_lower or "brave" in src_lower or "opera" in src_lower or "edge" in src_lower:
+                    
+                    # 1. Nhạc (Beat): Browser connected to REAPER or Beat_AI
+                    if any(x in src_lower for x in ["chrome", "firefox", "brave", "opera", "edge", "vivaldi"]):
+                        if "reaper" in dest_lower or "beat_ai" in dest_lower:
                             has_beat = True
-                        if "alsa_input" in src_lower and "capture" in src_lower:
-                            if active_in:
-                                if active_in in src:
-                                    has_mic = True
-                            else:
+                            
+                    # 2. Mic: Selected (or any) input connected to REAPER or Mic_AI
+                    if "alsa_input" in src_lower and "capture" in src_lower:
+                        if active_in:
+                            if active_in in src and ("reaper" in dest_lower or "mic_ai" in dest_lower):
                                 has_mic = True
-                        if "reaper" in src_lower and "out" in src_lower:
-                            if active_out:
-                                if active_out in dest:
-                                    has_master = True
-                            else:
-                                has_master = True
+                        else:
+                            if "reaper" in dest_lower or "mic_ai" in dest_lower:
+                                has_mic = True
+                                
+                    # 3. Master: REAPER output connected to Master_AI
+                    if "reaper" in src_lower and "out" in src_lower:
+                        if "master_ai" in dest_lower:
+                            has_master = True
             
             # Auto-route and isolate Browser to REAPER (prevent dual playback to system speakers)
             browser_ports = []
@@ -592,9 +596,11 @@ class KaraokeApp(Gtk.Window):
             else:
                 self.mic_conn_lbl.set_markup("<span font='9' color='#e74c3c'>🎤 Mic: Chưa nối AI</span>")
                 
-            if has_master and active_out:
-                friendly_out = self.get_device_friendly_name(active_out)
-                friendly_out = friendly_out.replace("🔊", "").strip()
+            if has_master:
+                friendly_out = "AI Hoạt động"
+                if active_out:
+                    friendly_out = self.get_device_friendly_name(active_out)
+                    friendly_out = friendly_out.replace("🔊", "").strip()
                 
                 # Check Master status
                 master_status = friendly_out
