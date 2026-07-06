@@ -590,7 +590,7 @@ def main():
     # → Không gây xáo trộn bất kỳ kết nối nào trên qpwgraph
     cmd = [
         "pw-record",
-        "-P", "node.name=Vocal_AI node.description='AI Vocal Analyzer (VOCAL)' media.name=Vocal_AI",
+        "-P", "node.name=Vocal_AI node.description=Vocal_AI media.name=Vocal_AI",
         "--rate", str(SAMPLE_RATE),
         "--channels", str(CHANNELS),
         "--format", "s16",
@@ -627,7 +627,7 @@ def main():
             proc.terminate()
             cmd_fallback = [
                 "pw-record",
-                "-P", "node.name=Vocal_AI node.description='AI Vocal Analyzer (VOCAL)' media.name=Vocal_AI",
+                "-P", "node.name=Vocal_AI node.description=Vocal_AI media.name=Vocal_AI",
                 "--rate", str(SAMPLE_RATE),
                 "--channels", str(CHANNELS),
                 "--format", "s16",
@@ -641,7 +641,7 @@ def main():
         proc.terminate()
         cmd_fallback = [
             "pw-record",
-            "-P", "node.name=Vocal_AI node.description='AI Vocal Analyzer (VOCAL)' media.name=Vocal_AI",
+            "-P", "node.name=Vocal_AI node.description=Vocal_AI media.name=Vocal_AI",
             "--rate", str(SAMPLE_RATE),
             "--channels", str(CHANNELS),
             "--format", "s16",
