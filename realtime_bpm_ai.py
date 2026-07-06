@@ -25,8 +25,9 @@ def find_recorder_port(pid, retries=15):
         try:
             res = subprocess.run(["pw-link", "-i"], capture_output=True, text=True)
             for l in res.stdout.splitlines():
-                if "beat_ai" in l.lower() or "pw-record" in l.lower() or "pw-cat" in l.lower():
-                    return l.strip()
+                port = l.strip()
+                if ("beat_ai" in port.lower() and "key" not in port.lower()) or "pw-record" in port.lower() or "pw-cat" in port.lower():
+                    return port
         except: pass
     return None
 
