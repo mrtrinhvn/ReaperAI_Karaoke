@@ -13,12 +13,102 @@ BPM_FILE = "/tmp/ai_karaoke_bpm.txt"
 KEY_FILE = "/tmp/ai_karaoke_key.json"
 
 PRESETS = {
-    "bolero": {"name": "Bolero", "emoji": "🌹", "bpm_suggest": 85, "color": "#e74c3c", "delay_fraction": 0.5, "delay_volume": 0.18, "delay_feedback": 0.15, "reverb_room": 0.65, "reverb_wet": 0.38, "reverb_damp": 0.50, "reverb_width": 0.80, "chorus_mix": 0.15, "comp_ratio": 0.20, "comp_thresh": 0.55, "duck_intensity": 0.8, "saturation_amount": 0.15},
-    "dan_ca": {"name": "Dân ca / Ca cổ", "emoji": "🎋", "bpm_suggest": 100, "color": "#27ae60", "delay_fraction": 0.5, "delay_volume": 0.15, "delay_feedback": 0.10, "reverb_room": 0.40, "reverb_wet": 0.35, "reverb_damp": 0.60, "reverb_width": 0.65, "chorus_mix": 0.10, "comp_ratio": 0.22, "comp_thresh": 0.52, "duck_intensity": 0.6, "saturation_amount": 0.08},
-    "nhac_tre": {"name": "Nhạc trẻ", "emoji": "🎤", "bpm_suggest": 120, "color": "#9b59b6", "delay_fraction": 0.5, "delay_volume": 0.16, "delay_feedback": 0.12, "reverb_room": 0.45, "reverb_wet": 0.32, "reverb_damp": 0.55, "reverb_width": 0.75, "chorus_mix": 0.10, "comp_ratio": 0.30, "comp_thresh": 0.48, "duck_intensity": 1.0, "saturation_amount": 0.20},
-    "ballad": {"name": "Ballad", "emoji": "💫", "bpm_suggest": 75, "color": "#2980b9", "delay_fraction": 0.5, "delay_volume": 0.20, "delay_feedback": 0.18, "reverb_room": 0.70, "reverb_wet": 0.42, "reverb_damp": 0.45, "reverb_width": 0.85, "chorus_mix": 0.15, "comp_ratio": 0.18, "comp_thresh": 0.55, "duck_intensity": 0.9, "saturation_amount": 0.25},
-    "rap": {"name": "Rap", "emoji": "🎧", "bpm_suggest": 95, "color": "#e67e22", "delay_fraction": 0.25, "delay_volume": 0.08, "delay_feedback": 0.0, "reverb_room": 0.20, "reverb_wet": 0.15, "reverb_damp": 0.70, "reverb_width": 0.50, "chorus_mix": 0.0, "comp_ratio": 0.40, "comp_thresh": 0.42, "duck_intensity": 1.2, "saturation_amount": 0.35},
-    "dance": {"name": "Dance", "emoji": "🪩", "bpm_suggest": 128, "color": "#1abc9c", "delay_fraction": 0.5, "delay_volume": 0.12, "delay_feedback": 0.0, "reverb_room": 0.25, "reverb_wet": 0.22, "reverb_damp": 0.65, "reverb_width": 0.70, "chorus_mix": 0.15, "comp_ratio": 0.35, "comp_thresh": 0.45, "duck_intensity": 1.0, "saturation_amount": 0.30},
+    "bolero": {
+        "name": "Bolero", 
+        "emoji": "🌹", 
+        "bpm_suggest": 85, 
+        "color": "#e74c3c", 
+        "delay_fraction": 0.5, "delay_volume": 0.18, "delay_feedback": 0.15, 
+        "reverb_room": 0.65, "reverb_wet": 0.38, "reverb_damp": 0.50, "reverb_width": 0.80, 
+        "chorus_mix": 0.15, "comp_ratio": 0.20, "comp_thresh": 0.55, "duck_intensity": 0.8, "saturation_amount": 0.15,
+        "desc": (
+            "<b>🌹 BOLERO (Trữ Tình - Sầu Lắng)</b>\n"
+            "• <b>Tempo:</b> Chậm rãi (~85 BPM).\n"
+            "• <b>Reverb:</b> Sâu &amp; Rộng (65% Room, 38% Wet) tạo chiều sâu sân khấu ảo.\n"
+            "• <b>Delay:</b> Đuôi dài ấm áp (18% Volume, 15% Feedback, nhịp 1/2) hỗ trợ ngân hơi mượt mà.\n"
+            "• <b>Đặc điểm:</b> Giọng ca hòa quyện đậm đà, rất nịnh giọng hát chậm, luyến láy."
+        )
+    },
+    "dan_ca": {
+        "name": "Dân ca / Ca cổ", 
+        "emoji": "🎋", 
+        "bpm_suggest": 100, 
+        "color": "#27ae60", 
+        "delay_fraction": 0.5, "delay_volume": 0.15, "delay_feedback": 0.10, 
+        "reverb_room": 0.40, "reverb_wet": 0.35, "reverb_damp": 0.60, "reverb_width": 0.65, 
+        "chorus_mix": 0.10, "comp_ratio": 0.22, "comp_thresh": 0.52, "duck_intensity": 0.6, "saturation_amount": 0.08,
+        "desc": (
+            "<b>🎋 DÂN CA / CA CỔ (Ngọt Ngào - Mộc Mạc)</b>\n"
+            "• <b>Tempo:</b> Vừa phải (~100 BPM).\n"
+            "• <b>Reverb:</b> Vừa tầm (40% Room, 35% Wet) bảo tồn sự tự nhiên mộc mạc của giọng ca.\n"
+            "• <b>Delay:</b> Nhẹ dịu (15% Volume, 10% Feedback).\n"
+            "• <b>Đặc điểm:</b> Khóa giọng theo <b>thang ngũ cung (Pentatonic)</b>, hạn chế Autotune mạnh (giới hạn depth 0.25) để tránh méo tiếng và giữ sự ngọt ngào truyền thống."
+        )
+    },
+    "nhac_tre": {
+        "name": "Nhạc trẻ", 
+        "emoji": "🎤", 
+        "bpm_suggest": 120, 
+        "color": "#9b59b6", 
+        "delay_fraction": 0.5, "delay_volume": 0.16, "delay_feedback": 0.12, 
+        "reverb_room": 0.45, "reverb_wet": 0.32, "reverb_damp": 0.55, "reverb_width": 0.75, 
+        "chorus_mix": 0.10, "comp_ratio": 0.30, "comp_thresh": 0.48, "duck_intensity": 1.0, "saturation_amount": 0.20,
+        "desc": (
+            "<b>🎤 NHẠC TRẺ (Pop/Ballad Hiện Đại)</b>\n"
+            "• <b>Tempo:</b> Nhanh nhẹn (~120 BPM).\n"
+            "• <b>Reverb:</b> Hiện đại, lung linh vừa đủ (45% Room, 32% Wet).\n"
+            "• <b>Delay:</b> Đồng bộ nhịp (16% Volume, 12% Feedback).\n"
+            "• <b>Đặc điểm:</b> Nén dynamic chặt (Ratio 0.30) kết hợp Autotune sắc nét để giọng hát bắt tai, hiện đại và nổi bật trên nền nhạc pop sôi động."
+        )
+    },
+    "ballad": {
+        "name": "Ballad", 
+        "emoji": "💫", 
+        "bpm_suggest": 75, 
+        "color": "#2980b9", 
+        "delay_fraction": 0.5, "delay_volume": 0.20, "delay_feedback": 0.18, 
+        "reverb_room": 0.70, "reverb_wet": 0.42, "reverb_damp": 0.45, "reverb_width": 0.85, 
+        "chorus_mix": 0.15, "comp_ratio": 0.18, "comp_thresh": 0.55, "duck_intensity": 0.9, "saturation_amount": 0.25,
+        "desc": (
+            "<b>💫 BALLAD (Bay Bổng - Cảm Xúc)</b>\n"
+            "• <b>Tempo:</b> Chậm rãi (~75 BPM).\n"
+            "• <b>Reverb:</b> Không gian rộng lớn (70% Room, 42% Wet) tạo cảm giác cực kỳ bay bổng, lung linh.\n"
+            "• <b>Delay:</b> Sâu lắng (20% Volume, 18% Feedback) nâng đỡ các nốt cao ngâm dài.\n"
+            "• <b>Đặc điểm:</b> Dành cho các bài hát tự sự cảm xúc, tôn giọng hát cao và ngân dài."
+        )
+    },
+    "rap": {
+        "name": "Rap", 
+        "emoji": "🎧", 
+        "bpm_suggest": 95, 
+        "color": "#e67e22", 
+        "delay_fraction": 0.25, "delay_volume": 0.08, "delay_feedback": 0.0, 
+        "reverb_room": 0.20, "reverb_wet": 0.15, "reverb_damp": 0.70, "reverb_width": 0.50, 
+        "chorus_mix": 0.0, "comp_ratio": 0.40, "comp_thresh": 0.42, "duck_intensity": 1.2, "saturation_amount": 0.35,
+        "desc": (
+            "<b>🎧 RAP (Khô Ráo - Rõ Lời - Sắc Nét)</b>\n"
+            "• <b>Tempo:</b> Nhịp điệu dồn dập (~95 BPM).\n"
+            "• <b>Reverb:</b> Rất ngắn &amp; Khô (20% Room, 15% Wet) để giữ nguyên chi tiết giọng đọc.\n"
+            "• <b>Delay:</b> Hầu như không có (8% Volume, 0% Feedback).\n"
+            "• <b>Đặc điểm:</b> Nén dynamic cực mạnh (Ratio 0.40) kết hợp ưu tiên dìm nhạc nền khi có tiếng nói (Ducking 1.2) giúp giọng hát đè lên beat rap sắc nét và uy lực."
+        )
+    },
+    "dance": {
+        "name": "Dance", 
+        "emoji": "🪩", 
+        "bpm_suggest": 128, 
+        "color": "#1abc9c", 
+        "delay_fraction": 0.5, "delay_volume": 0.12, "delay_feedback": 0.0, 
+        "reverb_room": 0.25, "reverb_wet": 0.22, "reverb_damp": 0.65, "reverb_width": 0.70, 
+        "chorus_mix": 0.15, "comp_ratio": 0.35, "comp_thresh": 0.45, "duck_intensity": 1.0, "saturation_amount": 0.30,
+        "desc": (
+            "<b>🪩 DANCE (Sôi Động - Điện Tử - Autotune Mạnh)</b>\n"
+            "• <b>Tempo:</b> Rất nhanh (~128 BPM).\n"
+            "• <b>Reverb:</b> Hạn chế tối đa (25% Room, 22% Wet) tránh gây đục tiếng trên beat nhanh.\n"
+            "• <b>Delay:</b> Tắt nhanh (0% Feedback).\n"
+            "• <b>Đặc điểm:</b> Autotune ở mức tối đa kết hợp Saturation (0.30) để tạo hiệu ứng giọng máy đặc trưng hòa vào nhạc điện tử vũ trường."
+        )
+    },
 }
 
 class KaraokeApp(Gtk.Window):
@@ -75,6 +165,7 @@ class KaraokeApp(Gtk.Window):
         for key, p in PRESETS.items():
             btn = Gtk.Button()
             btn.get_style_context().add_class("genre-btn")
+            btn.set_tooltip_markup(p["desc"])
             
             box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=5)
             emoji = Gtk.Label(label=f"<span font='24'>{p['emoji']}</span>", use_markup=True)
