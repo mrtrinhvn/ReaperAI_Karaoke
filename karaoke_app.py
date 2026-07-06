@@ -260,16 +260,36 @@ class KaraokeApp(Gtk.Window):
             ("Surprise 😮", "surprise.wav"),
             ("Booing 👎", "boo.wav"),
             ("ThumbsUp 👍", "thumbs_up.wav"),
-            ("Airhorn 📣", "airhorn.wav")
+            ("Airhorn 📣", "airhorn.wav"),
+            ("Crickets 🦗", "crickets.wav"),
+            ("Heart ❤️", "love.wav"),
+            ("Message 💬", "message.wav")
         ]
 
-        for label, filename in sfx_list:
+        self.sfx_buttons = []
+        for idx, (label, filename) in enumerate(sfx_list, 1):
             btn = Gtk.Button()
             btn.get_style_context().add_class("sfx-btn")
+            
+            grid = Gtk.Grid()
+            grid.set_column_spacing(6)
+            grid.set_valign(Gtk.Align.CENTER)
+            
+            num_lbl = Gtk.Label()
+            num_lbl.set_markup(f"<span font='8' weight='bold' color='#00f0ff'>● {idx}</span>")
+            num_lbl.set_halign(Gtk.Align.START)
+            
             btn_lbl = Gtk.Label(label=f"<span font='9' weight='bold'>{label}</span>", use_markup=True)
-            btn.add(btn_lbl)
+            btn_lbl.set_halign(Gtk.Align.CENTER)
+            btn_lbl.set_hexpand(True)
+            
+            grid.attach(num_lbl, 0, 0, 1, 1)
+            grid.attach(btn_lbl, 1, 0, 1, 1)
+            
+            btn.add(grid)
             btn.connect("clicked", self.play_sfx, filename)
             sfx_flow.insert(btn, -1)
+            self.sfx_buttons.append(btn)
             
         self.status_lbl = Gtk.Label(label="<span font='9' color='#71717a'>Sẵn sàng.</span>", use_markup=True)
         vbox.pack_start(self.status_lbl, False, False, 5)
@@ -299,6 +319,30 @@ class KaraokeApp(Gtk.Window):
         # Khởi chạy kiểm tra Tone file định kỳ
         self.last_key_timestamp = 0
         GLib.timeout_add(500, self.check_key_file)
+        
+        # Kết nối sự kiện bàn phím cho 9 phím tắt SFX
+        self.connect("key-press-event", self.on_key_press)
+
+    def on_key_press(self, widget, event):
+        keyval_name = Gdk.keyval_name(event.keyval)
+        key_map = {
+            '1': 0, 'KP_1': 0,
+            '2': 1, 'KP_2': 1,
+            '3': 2, 'KP_3': 2,
+            '4': 3, 'KP_4': 3,
+            '5': 4, 'KP_5': 4,
+            '6': 5, 'KP_6': 5,
+            '7': 6, 'KP_7': 6,
+            '8': 7, 'KP_8': 7,
+            '9': 8, 'KP_9': 8
+        }
+        if keyval_name in key_map:
+            idx = key_map[keyval_name]
+            if idx < len(self.sfx_buttons):
+                btn = self.sfx_buttons[idx]
+                btn.emit("clicked")
+                return True
+        return False
 
     def on_slider_press(self, widget, event):
         self.user_sliding = True

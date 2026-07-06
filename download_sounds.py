@@ -10,7 +10,10 @@ SOUND_URLS = {
     "surprise.mp3": "https://cdn.jsdelivr.net/gh/jitsi/jitsi-meet@master/sounds/reactions-surprise.mp3",
     "boo.mp3": "https://cdn.jsdelivr.net/gh/jitsi/jitsi-meet@master/sounds/reactions-boo.mp3",
     "thumbs_up.mp3": "https://cdn.jsdelivr.net/gh/jitsi/jitsi-meet@master/sounds/reactions-thumbs-up.mp3",
-    "airhorn.mp3": "https://cdn.jsdelivr.net/gh/GoogleChromeLabs/airhorn@main/app/sounds/airhorn.mp3"
+    "airhorn.mp3": "https://cdn.jsdelivr.net/gh/GoogleChromeLabs/airhorn@main/app/sounds/airhorn.mp3",
+    "crickets.mp3": "https://cdn.jsdelivr.net/gh/jitsi/jitsi-meet@master/sounds/reactions-crickets.mp3",
+    "love.mp3": "https://cdn.jsdelivr.net/gh/jitsi/jitsi-meet@master/sounds/reactions-love.mp3",
+    "message.mp3": "https://cdn.jsdelivr.net/gh/jitsi/jitsi-meet@master/sounds/incomingMessage.mp3"
 }
 
 def main():
