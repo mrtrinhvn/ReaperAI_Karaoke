@@ -546,7 +546,7 @@ def find_recorder_port(pid, retries=10):
             )
             for line in result.stdout.splitlines():
                 line = line.strip()
-                if "mic_ai" in line.lower() or "pw-record" in line.lower() or "pw-cat" in line.lower():
+                if "vocal_ai" in line.lower() or "pw-record" in line.lower() or "pw-cat" in line.lower():
                     return line
         except Exception:
             pass
@@ -590,7 +590,7 @@ def main():
     # → Không gây xáo trộn bất kỳ kết nối nào trên qpwgraph
     cmd = [
         "pw-record",
-        "-P", "node.name=Mic_AI node.description='AI Vocal Analyzer (MIC)' media.name=Mic_AI",
+        "-P", "node.name=Vocal_AI node.description='AI Vocal Analyzer (VOCAL)' media.name=Vocal_AI",
         "--rate", str(SAMPLE_RATE),
         "--channels", str(CHANNELS),
         "--format", "s16",
@@ -605,7 +605,7 @@ def main():
     try:
         proc = subprocess.Popen(
             cmd, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
-            env=dict(os.environ, PIPEWIRE_CLIENT_NAME="Mic_AI")
+            env=dict(os.environ, PIPEWIRE_CLIENT_NAME="Vocal_AI")
         )
     except FileNotFoundError:
         print("❌ Không tìm thấy pw-record!")
@@ -627,7 +627,7 @@ def main():
             proc.terminate()
             cmd_fallback = [
                 "pw-record",
-                "-P", "node.name=Mic_AI node.description='AI Vocal Analyzer (MIC)' media.name=Mic_AI",
+                "-P", "node.name=Vocal_AI node.description='AI Vocal Analyzer (VOCAL)' media.name=Vocal_AI",
                 "--rate", str(SAMPLE_RATE),
                 "--channels", str(CHANNELS),
                 "--format", "s16",
@@ -641,7 +641,7 @@ def main():
         proc.terminate()
         cmd_fallback = [
             "pw-record",
-            "-P", "node.name=Mic_AI node.description='AI Vocal Analyzer (MIC)' media.name=Mic_AI",
+            "-P", "node.name=Vocal_AI node.description='AI Vocal Analyzer (VOCAL)' media.name=Vocal_AI",
             "--rate", str(SAMPLE_RATE),
             "--channels", str(CHANNELS),
             "--format", "s16",

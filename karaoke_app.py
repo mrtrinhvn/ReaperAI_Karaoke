@@ -471,7 +471,7 @@ class KaraokeApp(Gtk.Window):
                 res_i = subprocess.run(["pw-link", "-i"], capture_output=True, text=True, timeout=0.5)
                 for line in res_i.stdout.splitlines():
                     line = line.strip()
-                    if "mic_ai" in line.lower() or "pw-record" in line.lower() or "pw-cat" in line.lower():
+                    if "vocal_ai" in line.lower() or "pw-record" in line.lower() or "pw-cat" in line.lower():
                         if not any(x in line.lower() for x in ["beat_ai", "beat_ai_key", "master_ai"]):
                             mic_ai_ports.append(line)
             except: pass
@@ -578,10 +578,10 @@ class KaraokeApp(Gtk.Window):
                     # 2. Mic: Selected (or any) input connected to REAPER or Mic_AI
                     if "alsa_input" in src_lower and "capture" in src_lower:
                         if active_in:
-                            if active_in in src and ("reaper" in dest_lower or "mic_ai" in dest_lower):
+                            if active_in in src and ("reaper" in dest_lower or "vocal_ai" in dest_lower):
                                 has_mic = True
                         else:
-                            if "reaper" in dest_lower or "mic_ai" in dest_lower:
+                            if "reaper" in dest_lower or "vocal_ai" in dest_lower:
                                 has_mic = True
                                 
                     # 3. Master: REAPER output connected to Master_AI
