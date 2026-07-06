@@ -502,7 +502,37 @@ class KaraokeApp(Gtk.Window):
         else:
             self.status_lbl.set_markup(f"<span font='9' color='#e74c3c'>⚠️ Lỗi: Không thấy file {filename}</span>")
 
+def create_desktop_launcher():
+    try:
+        home = os.path.expanduser("~")
+        desktop_dir = os.path.join(home, ".local", "share", "applications")
+        os.makedirs(desktop_dir, exist_ok=True)
+        
+        dir_path = os.path.dirname(os.path.realpath(__file__))
+        app_path = os.path.join(dir_path, "karaoke_app.py")
+        icon_path = os.path.join(dir_path, "karaoke_icon.png")
+        desktop_file = os.path.join(desktop_dir, "karaoke-ai-panel.desktop")
+        
+        content = f"""[Desktop Entry]
+Type=Application
+Name=Karaoke AI Panel
+Comment=AI Karaoke Control Panel for REAPER
+Exec=python3 {app_path}
+Icon={icon_path}
+Terminal=false
+Categories=AudioVideo;Audio;
+StartupWMClass=karaoke-ai-panel
+"""
+        with open(desktop_file, "w") as f:
+            f.write(content)
+        os.chmod(desktop_file, 0o755)
+    except Exception as e:
+        print(f"Không thể tạo .desktop launcher: {e}")
+
 if __name__ == '__main__':
+    create_desktop_launcher()
+    GLib.set_prgname('karaoke-ai-panel')
+    GLib.set_application_name('Karaoke AI Panel')
     win = KaraokeApp()
     win.connect("destroy", Gtk.main_quit)
     win.show_all()
