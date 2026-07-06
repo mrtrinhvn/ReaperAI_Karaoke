@@ -57,29 +57,87 @@ function setup()
     reaper.Undo_BeginBlock()
     reaper.PreventUIRefresh(1)
 
-    -- Hàm hỗ trợ tìm track theo tên
-    local function get_or_create_track(name, is_stereo_input)
-        for i = 0, reaper.CountTracks(0) - 1 do
-            local t = reaper.GetTrack(0, i)
-            local _, tname = reaper.GetSetMediaTrackInfo_String(t, "P_NAME", "", false)
-            if tname:lower():find(name:lower(), 1, true) then
-                return t, false -- false means track existed
+    -- Mặc định: Vocal dùng Input 1 (Mono = 0), Nhạc dùng Input 3/4 (Stereo = 1024 + 2*32 = 1064)
+    local vocal_input_val = 0
+    local music_input_val = 1024 + 2*32
+
+    -- Tìm đường dẫn .env
+    local info = debug.getinfo(1, 'S')
+    local script_path = info.source:sub(2)
+    local project_dir = script_path:match("(.*[/\\])")
+    if project_dir then
+        local env_file = io.open(project_dir .. ".env", "r")
+        if env_file then
+            local music_in_l, vocal_in_l
+            for line in env_file:lines() do
+                if not line:match("^#") and line:match("=") then
+                    local key, val = line:match("^([^=]+)=(.*)$")
+                    if key and val then
+                        key = key:gsub("%s+", "")
+                        val = val:gsub("%s+", ""):gsub('"', ''):gsub("'", "")
+                        if key == "REAPER_MUSIC_IN_L" then
+                            music_in_l = val
+                        elseif key == "REAPER_VOCAL_IN_L" then
+                            vocal_in_l = val
+                        end
+                    end
+                end
+            end
+            env_file:close()
+
+            -- Phân tích số cổng từ chuỗi tên cổng (ví dụ: "REAPER:in1" hoặc "REAPER:in3")
+            if music_in_l then
+                local num = music_in_l:match("in(%d+)")
+                if num then
+                    local idx = tonumber(num) - 1
+                    if idx >= 0 then
+                        music_input_val = 1024 + idx * 32
+                    end
+                end
+            end
+
+            if vocal_in_l then
+                local num = vocal_in_l:match("in(%d+)")
+                if num then
+                    local idx = tonumber(num) - 1
+                    if idx >= 0 then
+                        vocal_input_val = idx
+                    end
+                end
             end
         end
-        -- Nếu không thấy, tạo mới ở cuối
-        reaper.InsertTrackAtIndex(reaper.CountTracks(0), true)
-        local t = reaper.GetTrack(0, reaper.CountTracks(0) - 1)
-        reaper.GetSetMediaTrackInfo_String(t, "P_NAME", name, true)
+    end
+
+    -- Hàm hỗ trợ tìm track theo tên
+    local function get_or_create_track(name, is_stereo_input)
+        local t
+        local is_new = false
+        for i = 0, reaper.CountTracks(0) - 1 do
+            local current_t = reaper.GetTrack(0, i)
+            local _, tname = reaper.GetSetMediaTrackInfo_String(current_t, "P_NAME", "", false)
+            if tname:lower():find(name:lower(), 1, true) then
+                t = current_t
+                break
+            end
+        end
+
+        if not t then
+            -- Nếu không thấy, tạo mới ở cuối
+            reaper.InsertTrackAtIndex(reaper.CountTracks(0), true)
+            t = reaper.GetTrack(0, reaper.CountTracks(0) - 1)
+            reaper.GetSetMediaTrackInfo_String(t, "P_NAME", name, true)
+            is_new = true
+        end
         
-        -- Cài đặt mặc định khi mới tạo
+        -- Cài đặt/Cập nhật cổng đầu vào
         reaper.SetMediaTrackInfo_Value(t, "I_RECARM", 1)
         reaper.SetMediaTrackInfo_Value(t, "I_RECMON", 1)
         if is_stereo_input then
-            reaper.SetMediaTrackInfo_Value(t, "I_RECINPUT", 1024 + 2*32) -- Stereo 3/4
+            reaper.SetMediaTrackInfo_Value(t, "I_RECINPUT", music_input_val)
         else
-            reaper.SetMediaTrackInfo_Value(t, "I_RECINPUT", 0) -- Input 1 Mono
+            reaper.SetMediaTrackInfo_Value(t, "I_RECINPUT", vocal_input_val)
         end
-        return t, true
+        return t, is_new
     end
 
     -- ══════════════════════════════════════════════════════════════
