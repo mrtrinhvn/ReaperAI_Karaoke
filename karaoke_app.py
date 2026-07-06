@@ -518,6 +518,13 @@ class KaraokeApp(Gtk.Window):
                             if dest.startswith("alsa_output.") and not dest.startswith(f"{active_out}:"):
                                 subprocess.run(["pw-link", "-d", src_port, dest], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
+                # Ngắt kết nối của tất cả các nguồn âm thanh khác (không phải REAPER) tới thiết bị đầu ra được chọn
+                for src_port, active_conns in list(connections.items()):
+                    if src_port not in ["REAPER:out1", "REAPER:out2"]:
+                        for dest in active_conns:
+                            if dest.startswith(f"{active_out}:"):
+                                subprocess.run(["pw-link", "-d", src_port, dest], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
             # Analyze connection states for UI indicators
             for src, dests in connections.items():
                 src_lower = src.lower()
