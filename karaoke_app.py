@@ -157,9 +157,14 @@ class KaraokeApp(Gtk.Window):
             self.save_genre("nhac_tre")
 
         current_saved = "nhac_tre"
+        is_podcast = False
+        autotune_enabled = True
         try:
             with open(GENRE_FILE, "r") as f:
-                current_saved = json.load(f).get("genre", "nhac_tre")
+                saved_data = json.load(f)
+                current_saved = saved_data.get("genre", "nhac_tre")
+                is_podcast = saved_data.get("force_podcast", False)
+                autotune_enabled = saved_data.get("autotune_enabled", True)
         except: pass
 
         for key, p in PRESETS.items():
@@ -205,7 +210,7 @@ class KaraokeApp(Gtk.Window):
         tone_box.pack_start(at_lbl, False, False, 0)
         
         self.autotune_toggle = Gtk.Switch()
-        self.autotune_toggle.set_active(True)
+        self.autotune_toggle.set_active(autotune_enabled)
         self.autotune_toggle.connect("notify::active", self.on_autotune_toggle)
         tone_box.pack_start(self.autotune_toggle, False, False, 0)
         
@@ -221,7 +226,7 @@ class KaraokeApp(Gtk.Window):
         
         # Nút Bật/Tắt chế độ MC / Podcast
         self.podcast_toggle = Gtk.Switch()
-        self.podcast_toggle.set_active(False)
+        self.podcast_toggle.set_active(is_podcast)
         self.podcast_toggle.connect("notify::active", self.on_podcast_toggle)
         
         toggle_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=15)
@@ -235,7 +240,7 @@ class KaraokeApp(Gtk.Window):
         toggle_box.pack_start(self.lbl_podcast, False, False, 0)
         vbox.pack_start(toggle_box, False, False, 10)
         
-        self.update_mode_labels(False) # Khởi tạo màu sắc ban đầu
+        self.update_mode_labels(is_podcast) # Khởi tạo màu sắc ban đầu từ file lưu trữ
         
         # ═══ SOUNDBOARD SECTION (Livestream SFX) ═══
         sfx_title = Gtk.Label(label="<span font='10' weight='bold' color='#38bdf8'>🔊 Hiệu Ứng Âm Thanh Livestream</span>", use_markup=True)
@@ -531,11 +536,11 @@ class KaraokeApp(Gtk.Window):
             
     def update_mode_labels(self, is_podcast):
         if is_podcast:
-            self.lbl_hat.set_markup("<span font='11' weight='bold' color='#71717a'>HÁT</span>")
-            self.lbl_podcast.set_markup("<span font='11' weight='bold' color='#2ecc71'>🎙️ PODCAST</span>")
+            self.lbl_hat.set_markup("<span font='10' weight='bold' color='#52525b'>○ HÁT (TẮT)</span>")
+            self.lbl_podcast.set_markup("<span font='10' weight='bold' color='#2ecc71'>● 🎙️ PODCAST (BẬT)</span>")
         else:
-            self.lbl_hat.set_markup("<span font='11' weight='bold' color='#2ecc71'>🎵 HÁT</span>")
-            self.lbl_podcast.set_markup("<span font='11' weight='bold' color='#71717a'>PODCAST</span>")
+            self.lbl_hat.set_markup("<span font='10' weight='bold' color='#38bdf8'>● 🎤 HÁT (BẬT)</span>")
+            self.lbl_podcast.set_markup("<span font='10' weight='bold' color='#52525b'>○ PODCAST (TẮT)</span>")
 
     def on_autotune_toggle(self, switch, gparam):
         is_active = switch.get_active()
