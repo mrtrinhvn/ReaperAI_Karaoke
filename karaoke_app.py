@@ -1706,15 +1706,7 @@ class KaraokeApp(Gtk.Window):
             parent=self, 
             flags=0
         )
-        btn_cancel = dialog.add_button("Đóng", Gtk.ResponseType.CLOSE)
-        btn_cancel.get_style_context().add_class("dialog-btn")
-        btn_cancel.get_style_context().add_class("cancel-btn")
-        
-        btn_ok = dialog.add_button("🔌 Kết nối thiết bị", Gtk.ResponseType.APPLY)
-        btn_ok.get_style_context().add_class("dialog-btn")
-        btn_ok.get_style_context().add_class("ok-btn")
-        
-        dialog.set_default_size(320, 200)
+        dialog.set_default_size(320, 240)
         dialog.get_style_context().add_class("settings-dialog")
         
         content_area = dialog.get_content_area()
@@ -1772,10 +1764,25 @@ class KaraokeApp(Gtk.Window):
         combo_out.set_active(active_out_idx)
         grid.attach(combo_out, 1, 1, 1, 1)
         
-        # Row 2: Khởi tạo project — xuống dưới cùng, nổi bật
+        # Row 2: Box chứa 2 nút: Kết nối và Đóng (sát với hộp chọn thiết bị)
+        btn_connect = Gtk.Button(label="🔌 Kết nối thiết bị")
+        btn_connect.get_style_context().add_class("dialog-btn")
+        btn_connect.get_style_context().add_class("ok-btn")
+        
+        btn_close = Gtk.Button(label="Đóng")
+        btn_close.get_style_context().add_class("dialog-btn")
+        btn_close.get_style_context().add_class("cancel-btn")
+        
+        btn_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        btn_box.pack_start(btn_connect, True, True, 0)
+        btn_box.pack_start(btn_close, True, True, 0)
+        grid.attach(btn_box, 0, 2, 2, 1)
+        
+        # Row 3: Đường phân cách
         sep = Gtk.Separator(orientation=Gtk.Orientation.HORIZONTAL)
-        grid.attach(sep, 0, 2, 2, 1)
-
+        grid.attach(sep, 0, 3, 2, 1)
+        
+        # Row 4: Nút Khởi tạo project hát karaoke ở đáy
         btn_setup = Gtk.Button()
         btn_setup.get_style_context().add_class("setup-btn")
         setup_inner = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=8)
@@ -1787,14 +1794,14 @@ class KaraokeApp(Gtk.Window):
         setup_inner.pack_start(setup_icon, False, False, 0)
         setup_inner.pack_start(setup_text, False, False, 0)
         btn_setup.add(setup_inner)
-        grid.attach(btn_setup, 0, 3, 2, 1)
+        grid.attach(btn_setup, 0, 4, 2, 1)
         
-        # Nhãn trạng thái kết nối bên trong dialog
+        # Row 5: Nhãn trạng thái kết nối dưới cùng
         dialog_status_lbl = Gtk.Label(label="")
         dialog_status_lbl.set_use_markup(True)
         dialog_status_lbl.set_halign(Gtk.Align.CENTER)
-        grid.attach(dialog_status_lbl, 0, 4, 2, 1)
-
+        grid.attach(dialog_status_lbl, 0, 5, 2, 1)
+        
         def show_dialog_status(msg, color="#2ecc71", timeout=3000):
             dialog_status_lbl.set_markup(f"<span font='9' color='{color}'>{msg}</span>")
             GLib.timeout_add(timeout, lambda: dialog_status_lbl.set_markup("") or False)
@@ -1825,16 +1832,17 @@ class KaraokeApp(Gtk.Window):
         def on_setup_project_clicked(button):
             try:
                 setup_script = os.path.join(os.path.dirname(os.path.abspath(__file__)), "setup_karaoke.lua")
-                subprocess.run(["/opt/REAPER/reaper", setup_script], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                subprocess.run(["/opt/REAPER/reaper", "-nonewinst", setup_script], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
                 fix_script = os.path.join(os.path.dirname(os.path.abspath(__file__)), "fix_master.lua")
-                subprocess.run(["/opt/REAPER/reaper", fix_script], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                subprocess.run(["/opt/REAPER/reaper", "-nonewinst", fix_script], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
                 show_dialog_status("⚡ Project REAPER đã được khởi tạo!")
-                self.update_status("<span font='9' color='#2ecc71'>⚡ Đã thiết lập Project REAPER v6 (87BPM, F#Major, Room 17%, Delay 63ms)!</span>")
+                self.update_status("<span font='9' color='#2ecc71'>⚡ Đã thiết lập Project REAPER v6!</span>")
                 GLib.timeout_add(4000, lambda: self.update_status("") or False)
             except Exception as e:
                 show_dialog_status(f"❌ Lỗi: {str(e)}", "#e74c3c")
                 
-        btn_ok.connect("clicked", lambda w: connect_devices())
+        btn_connect.connect("clicked", lambda w: connect_devices())
+        btn_close.connect("clicked", lambda w: dialog.response(Gtk.ResponseType.CLOSE))
         btn_setup.connect("clicked", on_setup_project_clicked)
         
         content_area.add(grid)
