@@ -46,13 +46,11 @@ PRESETS = {
         "color": "#e74c3c", 
         "delay_fraction": 0.5, "delay_volume": 0.12, "delay_feedback": 0.10, 
         "reverb_room": 0.80, "reverb_wet": 0.42, "reverb_damp": 0.15, "reverb_width": 1.00, 
-        "chorus_mix": 0.15, "comp_ratio": 0.02, "comp_thresh": 0.05, "duck_intensity": 0.8, "saturation_amount": 0.15,
+        "chorus_mix": 0.15, "comp_ratio": 0.025, "comp_thresh": 0.030, "duck_intensity": 0.8, "saturation_amount": 0.15,
         "desc": (
-            "<b>🌹 BOLERO (Trữ Tình - Sầu Lắng)</b>\n"
-            "• <b>Tempo:</b> Chậm rãi (~85 BPM).\n"
-            "• <b>Reverb:</b> Cực kỳ sâu &amp; Vang lâu (80% Room, 42% Wet, damp 15%) giúp nâng đỡ giọng ngân ngọt ngào.\n"
-            "• <b>Delay:</b> Đuôi nhại nhịp móc đơn (12% Volume, 10% Feedback) tạo slapback nhịp nhàng nâng giọng hát.\n"
-            "• <b>Đặc điểm:</b> Giọng ca hòa quyện đậm đà, rất nịnh giọng hát chậm, luyến láy."
+            "<b>🌹 BOLERO (Trữ Tình - Sâu Lắng - Vang Sáng Mịn)</b>\n"
+            "• <b>Vang Reverb:</b> Cực sâu &amp; Đuôi sáng mịn (80% Room, 42% Wet, Damp 15%) giúp nâng đỡ giọng hát ngân ngọt ngào.\n"
+            "• <b>Màu sắc:</b> Chorus 15% mượt mà, Saturation 15% cho chất giọng trữ tình mộc mạc."
         )
     },
     "dan_ca": {
@@ -61,14 +59,12 @@ PRESETS = {
         "bpm_suggest": 100, 
         "color": "#27ae60", 
         "delay_fraction": 0.5, "delay_volume": 0.10, "delay_feedback": 0.08, 
-        "reverb_room": 0.65, "reverb_wet": 0.38, "reverb_damp": 0.25, "reverb_width": 0.85, 
-        "chorus_mix": 0.10, "comp_ratio": 0.015, "comp_thresh": 0.07, "duck_intensity": 0.6, "saturation_amount": 0.08,
+        "reverb_room": 0.70, "reverb_wet": 0.38, "reverb_damp": 0.20, "reverb_width": 0.90, 
+        "chorus_mix": 0.10, "comp_ratio": 0.025, "comp_thresh": 0.030, "duck_intensity": 0.6, "saturation_amount": 0.08,
         "desc": (
-            "<b>🎋 DÂN CA / CA CỔ (Ngọt Ngào - Mộc Mạc)</b>\n"
-            "• <b>Tempo:</b> Vừa phải (~100 BPM).\n"
-            "• <b>Reverb:</b> Vang rộng tự nhiên (65% Room, 38% Wet) bảo tồn sự tự nhiên mộc mạc của giọng ca.\n"
-            "• <b>Delay:</b> Nhẹ nhàng, êm dịu (10% Volume, 8% Feedback).\n"
-            "• <b>Đặc điểm:</b> Khóa giọng theo <b>thang ngũ cung (Pentatonic)</b>, hạn chế Autotune mạnh (giới hạn depth 0.25) để tránh méo tiếng và giữ sự ngọt ngào truyền thống."
+            "<b>🎋 DÂN CA / CA CỔ (Ngọt Ngào - Mộc Mạc - Bay Bổng)</b>\n"
+            "• <b>Vang Reverb:</b> Không gian rộng mở tự nhiên (70% Room, 38% Wet, Damp 20%) tạo độ bay mà vẫn mộc mạc.\n"
+            "• <b>Màu sắc:</b> Thang âm ngũ cung hạn chế autotune méo tiếng, giữ sự ngọt ngào truyền thống."
         )
     },
     "nhac_tre": {
@@ -77,14 +73,12 @@ PRESETS = {
         "bpm_suggest": 120, 
         "color": "#9b59b6", 
         "delay_fraction": 0.5, "delay_volume": 0.10, "delay_feedback": 0.08, 
-        "reverb_room": 0.72, "reverb_wet": 0.35, "reverb_damp": 0.20, "reverb_width": 0.90, 
-        "chorus_mix": 0.10, "comp_ratio": 0.03, "comp_thresh": 0.05, "duck_intensity": 1.0, "saturation_amount": 0.20,
+        "reverb_room": 0.76, "reverb_wet": 0.38, "reverb_damp": 0.15, "reverb_width": 0.95, 
+        "chorus_mix": 0.10, "comp_ratio": 0.025, "comp_thresh": 0.030, "duck_intensity": 1.0, "saturation_amount": 0.20,
         "desc": (
-            "<b>🎤 NHẠC TRẺ (Pop/Ballad Hiện Đại)</b>\n"
-            "• <b>Tempo:</b> Nhanh nhẹn (~120 BPM).\n"
-            "• <b>Reverb:</b> Hiện đại, lung linh rộng rãi (72% Room, 35% Wet).\n"
-            "• <b>Delay:</b> Đồng bộ nhịp ngắn gọn (10% Volume, 8% Feedback).\n"
-            "• <b>Đặc điểm:</b> Nén dynamic chuẩn (Ratio 4:1) kết hợp Autotune sắc nét để giọng hát bắt tai, hiện đại và nổi bật trên nền nhạc pop sôi động."
+            "<b>🎤 NHẠC TRẺ (Pop/Ballad Hiện Đại - Lung Linh)</b>\n"
+            "• <b>Vang Reverb:</b> Hiện đại, đuôi vang lấp lánh (76% Room, 38% Wet, Damp 15%) cho giọng hát bắt tai, cuốn hút.\n"
+            "• <b>Màu sắc:</b> Autotune nhạy bén kết hợp độ bóng bẩy nhẹ nhàng nổi bật trên nền beat."
         )
     },
     "ballad": {
@@ -94,12 +88,11 @@ PRESETS = {
         "color": "#2980b9", 
         "delay_fraction": 0.5, "delay_volume": 0.18, "delay_feedback": 0.25, 
         "reverb_room": 0.85, "reverb_wet": 0.48, "reverb_damp": 0.10, "reverb_width": 1.00, 
-        "chorus_mix": 0.22, "comp_ratio": 0.025, "comp_thresh": 0.05, "duck_intensity": 0.9, "saturation_amount": 0.32,
+        "chorus_mix": 0.22, "comp_ratio": 0.025, "comp_thresh": 0.030, "duck_intensity": 0.9, "saturation_amount": 0.32,
         "desc": (
-            "<b>💫 BALLAD (Bay Bổng - Cực Kỳ Mượt Mà &amp; Màu Sắc)</b>\n"
-            "• <b>Vang Reverb:</b> Không gian siêu rộng, ẩm mịn quyện giọng (85% Room, 48% Wet) giúp hát nhẹ nhõm không tốn sức.\n"
-            "• <b>Hiệu ứng màu (Chorus &amp; Saturation):</b> Chorus rộng 22% tạo độ bóng bẩy long lanh, Saturation 32% cho chất giọng ấm áp có màu analog.\n"
-            "• <b>Echo/Delay:</b> Ngân vang dìu dịu (Vol 18%, FB 25%) làm mượt các nốt cao ngân dài."
+            "<b>💫 BALLAD (Bay Bổng - Siêu Mượt Mà - Màu Sắc Pro)</b>\n"
+            "• <b>Vang Reverb:</b> Không gian siêu rộng, ẩm mịn quyện giọng (85% Room, 48% Wet, Damp 10%) giúp hát nhẹ nhõm không tốn sức.\n"
+            "• <b>Màu sắc:</b> Chorus 22% lộng lẫy pha lê, Saturation 32% dày dặn âm sắc analog."
         )
     },
     "rap": {
@@ -108,14 +101,12 @@ PRESETS = {
         "bpm_suggest": 95, 
         "color": "#e67e22", 
         "delay_fraction": 0.25, "delay_volume": 0.08, "delay_feedback": 0.04, 
-        "reverb_room": 0.35, "reverb_wet": 0.15, "reverb_damp": 0.50, "reverb_width": 0.60, 
-        "chorus_mix": 0.0, "comp_ratio": 0.06, "comp_thresh": 0.02, "duck_intensity": 1.2, "saturation_amount": 0.35,
+        "reverb_room": 0.55, "reverb_wet": 0.25, "reverb_damp": 0.30, "reverb_width": 0.80, 
+        "chorus_mix": 0.0, "comp_ratio": 0.025, "comp_thresh": 0.030, "duck_intensity": 1.2, "saturation_amount": 0.35,
         "desc": (
-            "<b>🎧 RAP (Khô Ráo - Rõ Lời - Sắc Nét)</b>\n"
-            "• <b>Tempo:</b> Nhịp điệu dồn dập (~95 BPM).\n"
-            "• <b>Reverb:</b> Rất ngắn &amp; Khô (35% Room, 15% Wet) để giữ nguyên chi tiết giọng đọc.\n"
-            "• <b>Delay:</b> Hầu như không có (8% Volume, 4% Feedback).\n"
-            "• <b>Đặc điểm:</b> Nén dynamic mạnh (Ratio 7:1) kết hợp ưu tiên dìm nhạc nền khi có tiếng nói (Ducking 1.2) giúp giọng hát đè lên beat rap sắc nét và uy lực."
+            "<b>🎧 RAP (Hiện Đại - Rõ Lời - Độ Sâu Tốt)</b>\n"
+            "• <b>Vang Reverb:</b> Không gian phòng vừa phải, rất trong trẻo (55% Room, 25% Wet, Damp 30%) giữ độ nét ca từ.\n"
+            "• <b>Màu sắc:</b> Hài âm saturation 35% ấm dày, nén chặt để vocal đè lên beat rap uy lực."
         )
     },
     "dance": {
@@ -124,14 +115,12 @@ PRESETS = {
         "bpm_suggest": 128, 
         "color": "#1abc9c", 
         "delay_fraction": 0.5, "delay_volume": 0.12, "delay_feedback": 0.05, 
-        "reverb_room": 0.40, "reverb_wet": 0.25, "reverb_damp": 0.40, "reverb_width": 0.75, 
-        "chorus_mix": 0.15, "comp_ratio": 0.05, "comp_thresh": 0.03, "duck_intensity": 1.0, "saturation_amount": 0.30,
+        "reverb_room": 0.60, "reverb_wet": 0.32, "reverb_damp": 0.25, "reverb_width": 0.85, 
+        "chorus_mix": 0.15, "comp_ratio": 0.025, "comp_thresh": 0.030, "duck_intensity": 1.0, "saturation_amount": 0.30,
         "desc": (
-            "<b>🪩 DANCE (Sôi Động - Điện Tử - Autotune Mạnh)</b>\n"
-            "• <b>Tempo:</b> Rất nhanh (~128 BPM).\n"
-            "• <b>Reverb:</b> Vang năng động (40% Room, 25% Wet) tránh gây đục tiếng trên beat nhanh.\n"
-            "• <b>Delay:</b> Tắt nhanh (12% Volume, 5% Feedback).\n"
-            "• <b>Đặc điểm:</b> Autotune ở mức tối đa kết hợp Saturation (0.30) để tạo hiệu ứng giọng máy đặc trưng hòa vào nhạc điện tử vũ trường."
+            "<b>🪩 DANCE (Sôi Động - Điện Tử - Bay Bổng)</b>\n"
+            "• <b>Vang Reverb:</b> Vang năng động sáng rõ (60% Room, 32% Wet, Damp 25%) tránh đục tiếng trên beat nhanh.\n"
+            "• <b>Màu sắc:</b> Autotune mạnh kết hợp Saturation 30% tạo giọng máy đặc trưng hòa vào beat."
         )
     },
     "khong_gian_ok": {
@@ -141,12 +130,11 @@ PRESETS = {
         "color": "#16a085", 
         "delay_fraction": 0.5, "delay_volume": 0.22, "delay_feedback": 0.52, 
         "reverb_room": 0.75, "reverb_wet": 0.45, "reverb_damp": 0.30, "reverb_width": 1.00, 
-        "chorus_mix": 0.18, "comp_ratio": 0.025, "comp_thresh": 0.02, "duck_intensity": 0.9, "saturation_amount": 0.25,
+        "chorus_mix": 0.18, "comp_ratio": 0.025, "comp_thresh": 0.030, "duck_intensity": 0.9, "saturation_amount": 0.25,
         "desc": (
             "<b>🌊 KHÔNG GIAN OK (Mượt Mà - Long Lanh - Màu Sắc Pro)</b>\n"
             "• <b>Vang Reverb:</b> Vang rộng &amp; Ẩm mượt (Room 75%, Wet 45%, Damp 30%) tạo độ mịn màng nâng đỡ hơi hát cực tốt.\n"
-            "• <b>Màu sắc (Chorus &amp; Saturation):</b> Chorus rộng 18% phủ bóng pha lê, Saturation 25% cho giọng đầy đặn, sang trọng.\n"
-            "• <b>Echo/Delay:</b> Nhại nhịp 1/8 dài lâu (Vol 22%, FB 52%) cho âm thanh lộng lẫy và đầm ấm."
+            "• <b>Màu sắc:</b> Chorus rộng 18% phủ bóng pha lê, Saturation 25% sang trọng, ấm dày."
         )
     },
 }
@@ -551,6 +539,9 @@ class KaraokeApp(Gtk.Window):
         
         # Kết nối sự kiện bàn phím cho 9 phím tắt SFX
         self.connect("key-press-event", self.on_key_press)
+        
+        # Khởi tạo giá trị hiển thị cho các tooltip của preset
+        self.update_genre_tooltips()
 
     def on_key_press(self, widget, event):
         keyval_name = Gdk.keyval_name(event.keyval)
@@ -1445,6 +1436,34 @@ class KaraokeApp(Gtk.Window):
         with open(GENRE_FILE, "w") as f:
             json.dump(data, f)
 
+    def update_genre_tooltips(self):
+        reverb_scale = self.reverb_scale.get_value() if hasattr(self, "reverb_scale") else 0.0
+        scale_factor = 1.0 + (reverb_scale / 100.0)
+        room_scale_factor = 1.0 + (reverb_scale / 200.0)
+        
+        for key, p in PRESETS.items():
+            btn = self.buttons.get(key)
+            if not btn: continue
+            
+            wet = p.get("reverb_wet", 0.0)
+            room = p.get("reverb_room", 0.0)
+            scaled_wet = min(max(wet * scale_factor, 0.0), 0.95)
+            scaled_room = min(max(room * room_scale_factor, 0.2), 0.95)
+            
+            # Xây dựng bảng hiển thị thông số âm học chi tiết khi hover
+            tooltip_text = (
+                f"{p['desc']}\n\n"
+                f"<b>📊 CHỈ SỐ DSP THỰC TẾ (Đã điều chỉnh):</b>\n"
+                f"  • Kích thước phòng (Room): <b>{scaled_room:.0%}</b> (Gốc: {room:.0%})\n"
+                f"  • Tỷ lệ vang (Reverb Wet): <b>{scaled_wet:.0%}</b> (Gốc: {wet:.0%})\n"
+                f"  • Tiêu tán âm dải cao (Damp): <b>{p.get('reverb_damp', 0.0):.0%}</b>\n"
+                f"  • Độ bóng bẩy (Chorus Mix): <b>{p.get('chorus_mix', 0.0):.0%}</b>\n"
+                f"  • Màu sắc hài âm (Saturation): <b>{p.get('saturation_amount', 0.0):.0%}</b>\n"
+                f"  • Âm lượng nhại (Delay Vol): <b>{p.get('delay_volume', 0.0):.0%}</b>\n"
+                f"  • Độ giữ nhại (Delay FB): <b>{p.get('delay_feedback', 0.0):.0%}</b>"
+            )
+            btn.set_tooltip_markup(tooltip_text)
+
     def on_reverb_scale_changed(self, widget):
         val = widget.get_value()
         try:
@@ -1454,6 +1473,7 @@ class KaraokeApp(Gtk.Window):
         data["timestamp"] = time.time()
         with open(GENRE_FILE, "w") as f:
             json.dump(data, f)
+        self.update_genre_tooltips()
 
     def on_music_volume_changed(self, widget):
         pct = widget.get_value()
