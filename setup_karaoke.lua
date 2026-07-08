@@ -270,17 +270,7 @@ function setup()
     reaper.SetTrackSendInfo_Value(voc, 0, send_del, "D_VOL", 1.0)
     reaper.SetTrackSendInfo_Value(voc, 0, send_del, "I_SENDMODE", 0)
 
-    -- 4. Send Sidechain từ VOCAL sang VOCAL REVERB (chạy vào cổng 3/4 của Compressor)
-    local sc_rev = reaper.CreateTrackSend(voc, voc_rev)
-    reaper.SetTrackSendInfo_Value(voc, 0, sc_rev, "D_VOL", 1.0)
-    reaper.SetTrackSendInfo_Value(voc, 0, sc_rev, "I_SENDMODE", 1) -- Pre-Fader / Post-FX
-    reaper.SetTrackSendInfo_Value(voc, 0, sc_rev, "I_DSTCHAN", 2)  -- Aux Input 3/4
 
-    -- 5. Send Sidechain từ VOCAL sang VOCAL DELAY (chạy vào cổng 3/4 của Compressor)
-    local sc_del = reaper.CreateTrackSend(voc, voc_del)
-    reaper.SetTrackSendInfo_Value(voc, 0, sc_del, "D_VOL", 1.0)
-    reaper.SetTrackSendInfo_Value(voc, 0, sc_del, "I_SENDMODE", 1) -- Pre-Fader / Post-FX
-    reaper.SetTrackSendInfo_Value(voc, 0, sc_del, "I_DSTCHAN", 2)  -- Aux Input 3/4
 
     -- XÓA TẤT CẢ CÁC SEND CŨ TRÊN TRACK VOCAL DELAY (tránh trùng lặp)
     local num_del_sends = reaper.GetTrackNumSends(voc_del, 0)
