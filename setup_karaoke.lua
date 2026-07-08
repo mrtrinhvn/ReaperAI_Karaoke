@@ -263,12 +263,12 @@ function setup()
     -- Band 2: Bell (Mud Cut ở 250Hz, giảm -3dB để giọng thanh thoát, hết hộp giấy)
     set_p(voc, veq, "Freq-Band 2", 0.26)        -- ~250Hz
     set_p(voc, veq, "Gain-Band 2", 0.44)        -- -3dB
-    -- Band 3: Bell (Clarity Boost ở 3.2kHz, tăng +2.5dB giúp các nốt cao sáng rõ, bay bổng, không bị mờ tối)
+    -- Band 3: Bell (Clarity Boost ở 3.2kHz, tăng +3.5dB giúp các nốt cao cực kỳ sáng rõ, đanh giòn, phóng về trước)
     set_p(voc, veq, "Freq-Band 3", 0.62)        -- ~3.2kHz
-    set_p(voc, veq, "Gain-Band 3", 0.542)       -- +2.5dB
-    -- Band 4: High Shelf (Air & Brilliance ở 10kHz, tăng mạnh +5.0dB tạo độ long lanh sang trọng trên livestream)
+    set_p(voc, veq, "Gain-Band 3", 0.573)       -- +3.5dB
+    -- Band 4: High Shelf (Air & Brilliance ở 10kHz, tăng mạnh +6.0dB tạo độ sáng mịn lấp lánh đỉnh cao)
     set_p(voc, veq, "Freq-High Shelf 4", 0.85)  -- ~10kHz
-    set_p(voc, veq, "Gain-High Shelf 4", 0.604) -- +5.0dB
+    set_p(voc, veq, "Gain-High Shelf 4", 0.625) -- +6.0dB
     set_p(voc, veq, "BW-High Shelf 4", 0.20)
 
     -- FX3: ReaComp (Vocal Compressor mượt mà)
