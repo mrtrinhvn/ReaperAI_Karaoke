@@ -153,7 +153,7 @@ function setup()
     -- ══════════════════════════════════════════════════════════════
     local voc, is_new_voc = get_or_create_track("VOCAL", false)
     set_color(voc, 230, 55, 55)
-    reaper.SetMediaTrackInfo_Value(voc, "D_VOL", 1.0)
+    reaper.SetMediaTrackInfo_Value(voc, "D_VOL", 0.0) -- Khởi đầu câm lặng (mute) để diệt tận gốc tiếng rú rít trước khi Python app kết nối và đẩy volume lên
     reaper.SetMediaTrackInfo_Value(voc, "D_PAN", 0.0)
 
     local voc_par, is_new_voc_par = get_or_create_track("VOCAL PARALLEL", false)
@@ -182,7 +182,7 @@ function setup()
 
     local mus, is_new_mus = get_or_create_track("NHẠC", true)
     set_color(mus, 40, 120, 220)
-    reaper.SetMediaTrackInfo_Value(mus, "D_VOL", 0.56) -- -5.0dB (tối ưu theo phản hồi người dùng)
+    reaper.SetMediaTrackInfo_Value(mus, "D_VOL", 0.0) -- Mute lúc khởi động để bảo vệ loa, Python app sẽ tự động phục hồi volume theo slide giao diện
     reaper.SetMediaTrackInfo_Value(mus, "D_PAN", 0.0)
     
     -- Dọn dẹp Stereo Width cũ trên track NHẠC
