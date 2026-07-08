@@ -117,9 +117,26 @@ function setup()
             local current_t = reaper.GetTrack(0, i)
             local _, tname = reaper.GetSetMediaTrackInfo_String(current_t, "P_NAME", "", false)
             local clean_tname = tname:lower()
-            if clean_tname:find(name:lower(), 1, true) or 
-               (name == "NHAC" and (clean_tname:find("nhac", 1, true) or clean_tname:find("nhạc", 1, true))) then
+            local is_match = false
+            
+            if clean_tname:find(name:lower(), 1, true) then
+                is_match = true
+            elseif name == "NHAC" then
+                if clean_tname:find("nhac", 1, true) or 
+                   clean_tname:find("nh", 1, true) or 
+                   clean_tname:find("music", 1, true) or 
+                   clean_tname:find("beat", 1, true) then
+                    if not clean_tname:find("vocal") and not clean_tname:find("reverb") and not clean_tname:find("delay") then
+                        is_match = true
+                    end
+                end
+            end
+            
+            if is_match then
                 t = current_t
+                if tname ~= name then
+                    reaper.GetSetMediaTrackInfo_String(t, "P_NAME", name, true)
+                end
                 break
             end
         end
@@ -139,6 +156,51 @@ function setup()
             reaper.SetMediaTrackInfo_Value(t, "I_RECINPUT", vocal_input_val)
         end
         return t, is_new
+    end
+
+    -- ══════════════════════════════════════════════════════════════
+    -- TỰ ĐỘNG GIẢI QUYẾT TRÙNG LẶP TRACK NHẠC (SELF-HEALING DUPLICATES)
+    -- ══════════════════════════════════════════════════════════════
+    local music_tracks = {}
+    for i = 0, reaper.CountTracks(0) - 1 do
+        local tr = reaper.GetTrack(0, i)
+        local _, tname = reaper.GetSetMediaTrackInfo_String(tr, "P_NAME", "", false)
+        local clean_tname = tname:lower()
+        local is_mus = false
+        if clean_tname:find("nhac", 1, true) or 
+           clean_tname:find("nh", 1, true) or 
+           clean_tname:find("music", 1, true) or 
+           clean_tname:find("beat", 1, true) then
+            if not clean_tname:find("vocal") and not clean_tname:find("reverb") and not clean_tname:find("delay") then
+                is_mus = true
+            end
+        end
+        if is_mus then
+            table.insert(music_tracks, tr)
+        end
+    end
+    
+    if #music_tracks > 1 then
+        -- Giữ lại track chứa Media Items (chứa file nhạc đã kéo vào)
+        local keep_tr = nil
+        for _, tr in ipairs(music_tracks) do
+            if reaper.CountTrackMediaItems(tr) > 0 then
+                keep_tr = tr
+                break
+            end
+        end
+        -- Nếu không track nào chứa item, giữ track đầu tiên
+        if not keep_tr then keep_tr = music_tracks[1] end
+        
+        -- Xóa các track trùng lặp trống khác
+        for _, tr in ipairs(music_tracks) do
+            if tr ~= keep_tr then
+                reaper.DeleteTrack(tr)
+            end
+        end
+        
+        -- Đổi tên track giữ lại thành "NHAC" để đồng bộ
+        reaper.GetSetMediaTrackInfo_String(keep_tr, "P_NAME", "NHAC", true)
     end
 
     -- ══════════════════════════════════════════════════════════════
