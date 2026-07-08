@@ -242,10 +242,10 @@ function apply(data)
             end
             
             if data.autotune_enabled ~= false then
-                -- 1. Áp dụng dynamic depth (Flex-Tune)
-                if data.autotune_depth then
-                    adjust_autotune_dynamics(vocal, at, data.autotune_depth)
-                end
+                -- 1. Áp dụng dynamic depth (Flex-Tune) - TẮT ĐỂ TRÁNH RESET BUFFER LÀM CỤT NỐT
+                -- if data.autotune_depth then
+                --     adjust_autotune_dynamics(vocal, at, data.autotune_depth)
+                -- end
                 
                 -- 2. Áp dụng scale âm giai (chỉ khi có tone nhạc được phát hiện)
                 if data.root_note and data.scale then

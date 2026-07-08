@@ -247,10 +247,30 @@ function setup()
     end
 
     -- FX1: Auto-Tune
+    -- FX1: Auto-Tune (Thiết lập cố định dải điểm ngọt để giữ nốt cực kỳ ổn định, không bị cụt nốt)
     local at = add_fx(voc, "MAutoPitch")
-    if at < 0 then at = add_fx(voc, "Graillon") end
-    if at < 0 then at = add_fx(voc, "Fat1") end
-    if at < 0 then at = add_fx(voc, "ReaTune") end
+    if at >= 0 then
+        set_p(voc, at, "Depth", 0.90)       -- 90% Depth
+        set_p(voc, at, "Speed", 0.45)       -- ~45ms Speed (tốc độ bám nốt cực kỳ mượt mà)
+        set_p(voc, at, "Detune", 0.50)      -- 0 cents
+    else
+        at = add_fx(voc, "Graillon")
+        if at >= 0 then
+            set_p(voc, at, "Correction", 0.50) -- 50% Correction depth
+            set_p(voc, at, "Smooth", 0.25)     -- ~25ms Smoothness
+        else
+            at = add_fx(voc, "Fat1")
+            if at >= 0 then
+                set_p(voc, at, "Correction", 0.50)
+                set_p(voc, at, "Speed", 0.35)
+            else
+                at = add_fx(voc, "ReaTune")
+                if at >= 0 then
+                    set_p(voc, at, "Correction rate (ms)", 0.040) -- ~40ms (bám nốt vững chắc, mượt mà)
+                end
+            end
+        end
+    end
 
     -- FX2: ReaEQ (Vocal shaping - Khớp trung âm ấm áp của khonggianhatok.wav)
     local veq = add_fx(voc, "ReaEQ")
