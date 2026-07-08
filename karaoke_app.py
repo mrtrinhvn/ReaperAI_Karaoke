@@ -281,7 +281,8 @@ class KaraokeApp(Gtk.Window):
         self._bpm_led_ev = bpm_led_ev  # giữ tham chiếu để set_tooltip_text sau
         bpm_box.pack_start(bpm_led_ev, False, False, 0)
 
-        bpm_lbl = Gtk.Label(label="<span font='10' color='#ffffff'>BPM</span>", use_markup=True)
+        bpm_lbl = Gtk.Label(label="BPM")
+        bpm_lbl.get_style_context().add_class("fixed-lbl")
         bpm_box.pack_start(bpm_lbl, False, False, 0)
         
         self.bpm_scale = Gtk.Scale.new_with_range(Gtk.Orientation.HORIZONTAL, 60, 180, 1)
@@ -293,7 +294,8 @@ class KaraokeApp(Gtk.Window):
         
         # Reverb Scale Section (Vang tăng thêm %)
         reverb_scale_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
-        reverb_scale_lbl = Gtk.Label(label="<span font='10' color='#ffffff'>Vang (%)</span>", use_markup=True)
+        reverb_scale_lbl = Gtk.Label(label="Vang (%)")
+        reverb_scale_lbl.get_style_context().add_class("fixed-lbl")
         reverb_scale_box.pack_start(reverb_scale_lbl, False, False, 0)
         
         self.reverb_scale = Gtk.Scale.new_with_range(Gtk.Orientation.HORIZONTAL, -100, 100, 5)
@@ -310,7 +312,8 @@ class KaraokeApp(Gtk.Window):
 
         # Music Volume Section (Tăng/giảm Nhạc)
         music_vol_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
-        music_vol_lbl = Gtk.Label(label="<span font='10' color='#ffffff'>Nhạc (%)</span>", use_markup=True)
+        music_vol_lbl = Gtk.Label(label="Nhạc (%)")
+        music_vol_lbl.get_style_context().add_class("fixed-lbl")
         music_vol_box.pack_start(music_vol_lbl, False, False, 0)
         
         self.music_vol_scale = Gtk.Scale.new_with_range(Gtk.Orientation.HORIZONTAL, 0, 150, 1)
@@ -533,6 +536,8 @@ class KaraokeApp(Gtk.Window):
         self.bpm_scale.connect("button-release-event", self.on_slider_release)
         self.reverb_scale.connect("button-press-event", self.on_slider_press)
         self.reverb_scale.connect("button-release-event", self.on_slider_release)
+        self.music_vol_scale.connect("button-press-event", self.on_slider_press)
+        self.music_vol_scale.connect("button-release-event", self.on_slider_release)
         
         # Khởi chạy kiểm tra kết nối định kỳ
         GLib.timeout_add(2000, self.check_audio_connections)
@@ -570,6 +575,19 @@ class KaraokeApp(Gtk.Window):
 
     def on_slider_press(self, widget, event):
         self.user_sliding = True
+        if event.type == Gdk.EventType.DOUBLE_BUTTON_PRESS:
+            if widget == self.music_vol_scale:
+                widget.set_value(100) # Reset Nhạc về 100% (0dB)
+            elif widget == self.reverb_scale:
+                widget.set_value(0)   # Reset Vang về 0% (Offset = 0)
+            elif widget == self.bpm_scale:
+                try:
+                    with open(GENRE_FILE, "r") as f:
+                        key = json.load(f).get("genre", "nhac_tre")
+                    widget.set_value(PRESETS.get(key, PRESETS["nhac_tre"])["bpm_suggest"])
+                except:
+                    widget.set_value(100)
+            return True
         return False
 
     def on_slider_release(self, widget, event):
@@ -1003,6 +1021,13 @@ class KaraokeApp(Gtk.Window):
     def setup_css(self):
         css = """
         window { background-color: #121218; }
+        .fixed-lbl {
+            color: #d1d5db !important;
+            text-shadow: none;
+        }
+        .fixed-lbl:backdrop, .fixed-lbl:disabled {
+            color: #d1d5db !important;
+        }
         button {
             background-image: none;
             text-shadow: none;
