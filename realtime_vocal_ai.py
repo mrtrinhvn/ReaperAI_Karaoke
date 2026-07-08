@@ -397,11 +397,12 @@ def generate_eq_adjustments(band_data, rms_db, sensitivity=1.0):
     music_adj["music_eq_band_3_gain_db"] = -1.5 # Gọt dải sáng (5kHz) để dọn chỗ cho độ bóng bẩy (gloss) của Vocal
     # ── COMPRESSOR & EQ (LOCKED TO OPTIMAL SWEET SPOTS) ──
     # Giữ cố định ở mức ngọt tối ưu để giọng hát có động lực học (dynamics) tự nhiên, hát nhẹ nhàng, không tốn sức
-    vocal_adj["comp_ratio"] = 0.025  # ~3.5:1 ratio (nén nhẹ ấm áp)
+    vocal_adj["comp_ratio"] = 0.025  # ~3.5:1 ratio (nén nhẹ nhàng, mềm mại, dẻo dai)
     vocal_adj["comp_thresh"] = 0.030 # -24.4dB threshold (unity)
-    vocal_adj["eq_band_2_gain_db"] = 0.0 # Để EQ căn chỉnh gốc từ setup_karaoke.lua hoặc Auto-Calibrate làm chủ đạo
-    vocal_adj["eq_band_4_gain_db"] = 0.0
-    vocal_adj["comp_note"] = "Compressor & EQ khóa cứng ở điểm ngọt tối ưu (Dễ hát, nhẹ hơi)"
+    vocal_adj["eq_band_2_gain_db"] = -1.5 # Giữ nguyên mud cut -1.5dB từ setup_karaoke.lua
+    vocal_adj["eq_band_3_gain_db"] = 0.0  # Triệt tiêu hoàn toàn độ chói chọc tai (giữ phẳng 0dB)
+    vocal_adj["eq_band_4_gain_db"] = 3.0  # Boost dải siêu cao 12kHz (+3dB Air) tạo âm mềm xốp bay bổng
+    vocal_adj["comp_note"] = "Compressor & EQ khóa cứng ở điểm ngọt mềm xốp tối ưu"
 
     # ── REVERB: body-based override (Giữ cực kỳ ổn định) ──
     # Khóa cứng reverb_wet theo tempo & preset, không tự động dìm bớt khi giọng dày lên để tránh cảm giác bị hụt vang

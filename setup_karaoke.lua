@@ -282,21 +282,21 @@ function setup()
     -- Band 2: Bell (Mud Cut ở 250Hz, giảm nhẹ -1.5dB để giữ độ đầy đặn cho giọng)
     set_p(voc, veq, "Freq-Band 2", 0.26)        -- ~250Hz
     set_p(voc, veq, "Gain-Band 2", 0.47)        -- -1.5dB
-    -- Band 3: Bell (Clarity Boost ở 3.2kHz, nhích nhẹ lên +1.5dB để phóng chữ tốt hơn mà vẫn êm tai)
+    -- Band 3: Bell (Giữ phẳng ở 0dB để triệt tiêu hoàn toàn độ chói cốt cứng chọc tai)
     set_p(voc, veq, "Freq-Band 3", 0.62)        -- ~3.2kHz
-    set_p(voc, veq, "Gain-Band 3", 0.531)       -- +1.5dB
-    -- Band 4: High Shelf (Air & Brilliance hạ về 7kHz, tăng +4.5dB để ròn phần cao, tạo chi tiết sạch, bay đẹp)
-    set_p(voc, veq, "Freq-High Shelf 4", 0.80)  -- ~7.0kHz
-    set_p(voc, veq, "Gain-High Shelf 4", 0.594) -- +4.5dB
+    set_p(voc, veq, "Gain-Band 3", 0.50)        -- 0dB (flat)
+    -- Band 4: High Shelf (Dịch hẳn lên dải siêu cao 12kHz tạo hơi thở xốp mịn, tránh xa dải chói tai 5k-8k)
+    set_p(voc, veq, "Freq-High Shelf 4", 0.89)  -- ~12.0kHz
+    set_p(voc, veq, "Gain-High Shelf 4", 0.563) -- +3.0dB (Air)
     set_p(voc, veq, "BW-High Shelf 4", 0.20)
 
-    -- FX3: ReaComp (Vocal Compressor mượt mà)
+    -- FX3: ReaComp (Vocal Compressor mềm xốp, giảm nén gắt)
     local vcomp = add_fx(voc, "ReaComp")
-    set_p(voc, vcomp, "Thresh", 0.030)         -- -24.4dB (norm 0.030 khớp giọng nói/hát)
-    set_p(voc, vcomp, "Ratio", 0.040)          -- ~4.5:1 (nén gọn gàng, chặt chẽ hơn)
-    set_p(voc, vcomp, "Attack", 0.05)          -- 5ms (bắt mic nhanh hơn)
+    set_p(voc, vcomp, "Thresh", 0.030)         -- -24.4dB (norm 0.030)
+    set_p(voc, vcomp, "Ratio", 0.025)          -- ~3.5:1 (nén nhẹ nhàng, dẻo dai)
+    set_p(voc, vcomp, "Attack", 0.12)          -- 12ms (cho transient đi qua mềm mại, không bị cứng đanh)
     set_p(voc, vcomp, "Release", 0.15)         -- 150ms
-    set_p(voc, vcomp, "Knee", 0.35)
+    set_p(voc, vcomp, "Knee", 0.50)            -- Soft-knee (đường cong nén cực mịn)
     set_p(voc, vcomp, "Auto make", 1.0)
 
     -- FX4: JS Saturation (Hài âm tạo độ ấm đắt tiền)
@@ -347,27 +347,27 @@ function setup()
     
     set_p(voc_rev, vreveq, "Gain-Band 3", 0.50)          -- 0dB (flat)
     
-    -- Mở rộng dải cao (Vang cao) để tiếng xì vang lấp lánh, bay bổng
-    set_p(voc_rev, vreveq, "Freq-High Shelf 4", 0.78)    -- ~6.5kHz
-    set_p(voc_rev, vreveq, "Gain-High Shelf 4", 0.54)    -- +2.0dB
+    -- Mở rộng dải cao của Reverb (Vang cao) để tiếng vang siêu bay bổng, lấp lánh dải Air
+    set_p(voc_rev, vreveq, "Freq-High Shelf 4", 0.89)    -- ~12.0kHz
+    set_p(voc_rev, vreveq, "Gain-High Shelf 4", 0.583)   -- +4.0dB (Vang Air cực kỳ mềm xốp)
 
     -- Chorus làm rộng và tạo độ bóng (modulate) cho đuôi Reverb
     local rev_chorus = add_fx(voc_rev, "Chorus")
     if rev_chorus >= 0 then
-        set_p(voc_rev, rev_chorus, "Rate", 0.15)
-        set_p(voc_rev, rev_chorus, "Depth", 0.20)
-        set_p(voc_rev, rev_chorus, "Mix", 0.35)        -- 35% Chorus để tạo đuôi reverb long lanh, bóng bẩy trên stream
+        set_p(voc_rev, rev_chorus, "Rate", 0.20)
+        set_p(voc_rev, rev_chorus, "Depth", 0.25)
+        set_p(voc_rev, rev_chorus, "Mix", 0.40)        -- 40% Chorus tạo độ xốp mượt, bóng bẩy bao quanh đầu
     end
 
-    -- Reverb 100% Wet (Phòng rộng rãi, mịn màng và vang xa bay bổng)
+    -- Reverb 100% Wet (Không gian rộng lớn, xốp mịn, nâng đỡ giọng ca)
     local vrev = add_fx(voc_rev, "ReaVerbate")
     set_p(voc_rev, vrev, "Wet", 1.0)
     set_p(voc_rev, vrev, "Dry", 0.0)
-    set_p(voc_rev, vrev, "Room Size", 0.22)             -- Tăng lên 22% để phòng rộng mở hơn, vang bay xa hơn
-    set_p(voc_rev, vrev, "Dampening", 0.30)             -- Giảm về 30% Dampening để giữ lại các đuôi vang cao sáng, mịn
-    set_p(voc_rev, vrev, "Delay", 0.20)                 -- Pre-delay = 20ms (tách bạch giọng mộc giúp tiếng hát cực kỳ gọn gàng)
+    set_p(voc_rev, vrev, "Room Size", 0.35)             -- Tăng lên 35% cho không gian rộng mở và mịn hơn
+    set_p(voc_rev, vrev, "Dampening", 0.20)             -- Giảm về 20% Dampening để giữ đuôi vang tơ lụa, xốp bay bổng
+    set_p(voc_rev, vrev, "Delay", 0.20)                 -- Pre-delay = 20ms
     set_p(voc_rev, vrev, "Width", 1.0)
-    set_p(voc_rev, vrev, "Stereo", 0.90)
+    set_p(voc_rev, vrev, "Stereo", 1.0)                 -- Mở rộng tối đa 100% stereo width cho Reverb
 
     -- Sidechain Ducker (Reverb né giọng thật)
     local vrev_comp = add_fx(voc_rev, "ReaComp")
