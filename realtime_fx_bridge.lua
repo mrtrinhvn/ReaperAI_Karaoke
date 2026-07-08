@@ -18,7 +18,7 @@ function find_track(name)
     for i = 0, reaper.CountTracks(0) - 1 do
         local tr = reaper.GetTrack(0, i)
         local _, n = reaper.GetSetMediaTrackInfo_String(tr, "P_NAME", "", false)
-        if n and n:find(name) then return tr end
+        if n == name or (n and n:find(name, 1, true)) then return tr end
     end
     return nil
 end
@@ -90,7 +90,7 @@ function adjust_autotune_dynamics(track, fx_idx, depth)
         if retval then
             local name = buf:lower()
             -- Nhận diện các núm vặn mức độ can thiệp (Depth / Correction / Amount)
-            if name:find("correction") or name:find("depth") or name:find("amount") then
+            if (name:find("correction") and name ~= "correction") or name:find("depth") or name:find("amount") then
                 smooth(track, fx_idx, p, depth, 0.25)
             -- Nhận diện các núm độ trễ / quán tính / độ mượt (Smooth / Inertia)
             elseif name:find("smooth") or name:find("inertia") then
@@ -135,13 +135,15 @@ function apply(data)
 
     local vocal = find_track("VOCAL")
     local music = find_track("NHẠC")
+    local voc_rev = find_track("VOCAL REVERB") or vocal
+    local voc_del = find_track("VOCAL DELAY") or vocal
 
     -- ═══ VOCAL TRACK ═══
     if vocal then
         local eq = find_fx(vocal, "ReaEQ")
         local comp = find_fx(vocal, "ReaComp")
-        local verb = find_fx(vocal, "ReaVerbate")
-        local del = find_fx(vocal, "ReaDelay")
+        local verb = find_fx(voc_rev, "ReaVerbate")
+        local del = find_fx(voc_del, "ReaDelay")
         local chorus = find_fx(vocal, "Chorus")
 
         -- Vocal EQ Band 2 (Mud)
@@ -156,7 +158,7 @@ function apply(data)
         end
         -- Vocal EQ Band 4 (Air)
         if eq >= 0 and data.eq_band_4_gain_db then
-            local p = find_p(vocal, eq, "Gain-Band 4")
+            local p = find_p(vocal, eq, "Gain-High Shelf 4")
             if p >= 0 then smooth(vocal, eq, p, db_to_norm(data.eq_band_4_gain_db), 0.2) end
         end
         -- Compressor ratio
@@ -171,45 +173,49 @@ function apply(data)
         end
         -- ★ DELAY: Tempo-synced length
         if del >= 0 and data.delay_length then
-            local p = find_p(vocal, del, "Length")
-            if p >= 0 then smooth(vocal, del, p, data.delay_length, 0.3) end
+            -- Tắt hẳn musical length để ép ReaDelay nhận tham số mili-giây (time-based)
+            local pmus = find_p(voc_del, del, "Length (musical)")
+            if pmus >= 0 then reaper.TrackFX_SetParamNormalized(voc_del, del, pmus, 0.0) end
+            
+            local p = find_p(voc_del, del, "Length (time)")
+            if p >= 0 then smooth(voc_del, del, p, data.delay_length, 0.3) end
         end
         -- ★ DELAY: Volume
         if del >= 0 and data.delay_volume then
-            local p = find_p(vocal, del, "Volume")
-            if p >= 0 then smooth(vocal, del, p, data.delay_volume, 0.2) end
+            local p = find_p(voc_del, del, "Volume")
+            if p >= 0 then smooth(voc_del, del, p, data.delay_volume, 0.2) end
         end
         -- ★ DELAY: Feedback (genre-driven)
         if del >= 0 and data.delay_feedback then
-            local p = find_p(vocal, del, "Feedback")
-            if p >= 0 then smooth(vocal, del, p, data.delay_feedback, 0.2) end
+            local p = find_p(voc_del, del, "Feedback")
+            if p >= 0 then smooth(voc_del, del, p, data.delay_feedback, 0.2) end
         end
         -- ★ REVERB: Room Size
         if verb >= 0 and data.reverb_room then
-            local p = find_p(vocal, verb, "Room Size")
-            if p >= 0 then smooth(vocal, verb, p, data.reverb_room, 0.15) end
+            local p = find_p(voc_rev, verb, "Room Size")
+            if p >= 0 then smooth(voc_rev, verb, p, data.reverb_room, 0.15) end
         end
         -- REVERB: Wet
         if verb >= 0 and data.reverb_wet then
-            local p = find_p(vocal, verb, "Wet")
-            if p >= 0 then smooth(vocal, verb, p, data.reverb_wet, 0.15) end
+            local p = find_p(voc_rev, verb, "Wet")
+            if p >= 0 then smooth(voc_rev, verb, p, data.reverb_wet, 0.15) end
         end
         -- REVERB: Dampening (genre-driven)
         if verb >= 0 and data.reverb_damp then
-            local p = find_p(vocal, verb, "Dampening")
-            if p >= 0 then smooth(vocal, verb, p, data.reverb_damp, 0.15) end
+            local p = find_p(voc_rev, verb, "Dampening")
+            if p >= 0 then smooth(voc_rev, verb, p, data.reverb_damp, 0.15) end
         end
         -- REVERB: Width (genre-driven)
         if verb >= 0 and data.reverb_width then
-            local p = find_p(vocal, verb, "Width")
-            if p >= 0 then smooth(vocal, verb, p, data.reverb_width, 0.15) end
+            local p = find_p(voc_rev, verb, "Width")
+            if p >= 0 then smooth(voc_rev, verb, p, data.reverb_width, 0.15) end
         end
         -- REVERB: Pre-Delay (Delay parameter in ReaVerbate / Pre-delay in other VSTs)
         if verb >= 0 then
-            local p = find_p(vocal, verb, "Delay")
-            if p < 0 then p = find_p(vocal, verb, "Pre-delay") end
-            if p < 0 then p = find_p(vocal, verb, "Predelay") end
-            if p >= 0 then smooth(vocal, verb, p, 0.25, 0.15) end
+            local p = find_p(voc_rev, verb, "Delay")
+            if p < 0 then p = find_p(voc_rev, verb, "Pre-delay") end
+            if p < 0 then p = find_p(voc_rev, verb, "Predelay") end
+            if p >= 0 then smooth(voc_rev, verb, p, 0.03, 0.15) end
         end
         -- CHORUS: Mix (genre-driven)
         if chorus >= 0 and data.chorus_mix then
@@ -224,31 +230,30 @@ function apply(data)
         end
         
         -- ★ AUTO-TUNE (Graillon, MAutoPitch, Fat1)
-        if data.root_note and data.scale then
-            -- MAutoPitch or similar VSTs that use "Root" and "Scale"
-            local at = find_fx(vocal, "MAutoPitch")
-            if at < 0 then at = find_fx(vocal, "Graillon") end
-            if at < 0 then at = find_fx(vocal, "Fat1") end
-            if at < 0 then at = find_fx(vocal, "AutoTune") end
+        local at = find_fx(vocal, "MAutoPitch")
+        if at < 0 then at = find_fx(vocal, "Graillon") end
+        if at < 0 then at = find_fx(vocal, "Fat1") end
+        if at < 0 then at = find_fx(vocal, "AutoTune") end
+        
+        if at >= 0 then
+            -- Bật / Tắt bypass
+            if data.autotune_enabled ~= nil then
+                reaper.TrackFX_SetEnabled(vocal, at, data.autotune_enabled)
+            end
             
-            if at >= 0 then
-                -- Bật / Tắt bypass
-                if data.autotune_enabled ~= nil then
-                    reaper.TrackFX_SetEnabled(vocal, at, data.autotune_enabled)
+            if data.autotune_enabled ~= false then
+                -- 1. Áp dụng dynamic depth (Flex-Tune)
+                if data.autotune_depth then
+                    adjust_autotune_dynamics(vocal, at, data.autotune_depth)
                 end
                 
-                if data.autotune_enabled ~= false then
-                    -- 1. Áp dụng dynamic depth (Flex-Tune)
-                    if data.autotune_depth then
-                        adjust_autotune_dynamics(vocal, at, data.autotune_depth)
-                    end
-                    
-                    -- 2. Áp dụng scale âm giai (Pentatonic hoặc Standard)
+                -- 2. Áp dụng scale âm giai (chỉ khi có tone nhạc được phát hiện)
+                if data.root_note and data.scale then
                     if data.scale_type == "Pentatonic" then
-                        -- Thử set note rời (cho Graillon 2)
+                        -- Thử set note rời (cho Graillon 2/3)
                         set_vst_notes(vocal, at, data.root_note, data.scale_type, data.scale)
                         
-                        -- Set Root & Scale thông qua các núm vặn chính (cho MAutoPitch / các plugin khác)
+                        -- Set Root & Scale thông qua các núm vặn chính (cho MAutoPitch / các VST khác)
                         local root_p = find_p(vocal, at, "Root")
                         if root_p < 0 then root_p = find_p(vocal, at, "Key") end
                         local scale_p = find_p(vocal, at, "Scale")
@@ -260,7 +265,6 @@ function apply(data)
                         end
                         if scale_p >= 0 then
                             -- MAutoPitch có Pentatonic Major/Minor ở vị trí index ~3,4. 
-                            -- Ta thử set giá trị tầm trung (ví dụ 0.28 cho Pentatonic Major, 0.36 cho Pentatonic Minor)
                             local scale_norm = (data.scale == "Major") and 0.28 or 0.36
                             reaper.TrackFX_SetParamNormalized(vocal, at, scale_p, scale_norm)
                         end
@@ -295,8 +299,11 @@ function apply(data)
         end
     end
 
-    -- ═══ MUSIC TRACK (Spectral Ducking) ═══
+    -- ═══ MUSIC TRACK (Spectral Ducking & Volume) ═══
     if music then
+        if data.music_volume then
+            reaper.SetMediaTrackInfo_Value(music, "D_VOL", data.music_volume)
+        end
         local meq = find_fx(music, "ReaEQ")
 
         -- Music EQ Band 1 (~800Hz)
@@ -314,6 +321,24 @@ function apply(data)
             local p = find_p(music, meq, "Gain-Band 3")
             if p >= 0 then smooth(music, meq, p, db_to_norm(data.music_eq_band_3_gain_db), 0.2) end
         end
+
+        -- Pitch Shifting cho Nhạc nền (ReaPitch) - Tự động bypass khi offset = 0 để diệt tận gốc latency PDC!
+        local rpitch = find_fx(music, "ReaPitch")
+        if rpitch >= 0 then
+            local offset = data.pitch_offset or 0.0
+            if math.abs(offset) < 0.01 then
+                -- Nếu không chuyển tone -> Bypass plugin để REAPER không tính trễ PDC (0 latency)
+                reaper.TrackFX_SetEnabled(music, rpitch, false)
+            else
+                -- Khi có chuyển tone -> Bật lại và chỉnh tham số pitch
+                reaper.TrackFX_SetEnabled(music, rpitch, true)
+                local norm_val = 0.5 + (offset / 24.0) -- +/- 12 semitones
+                local p = find_p(music, rpitch, "Shift (semitones)")
+                if p >= 0 then
+                    reaper.TrackFX_SetParamNormalized(music, rpitch, p, norm_val)
+                end
+            end
+        end
     end
 end
 
@@ -328,13 +353,30 @@ function loop()
         local key_data = read_json(KEY_FILE)
         
         if key_data and key_data.timestamp then
-            data.root_note = key_data.root_note
+            -- Đồng bộ hóa tone dịch chuyển: Cộng thêm pitch_offset vào tone phát hiện được
+            local offset = data.pitch_offset or 0
+            local shifted_root = (key_data.root_note + offset) % 12
+            data.root_note = shifted_root
             data.scale = key_data.scale
         end
         
         if data and (data.timestamp ~= last_mtime or key_data) then
             if data.timestamp then last_mtime = data.timestamp end
             apply(data)
+            
+            -- Hook chạy kịch bản tự động từ bên ngoài
+            if data.run_lua_file then
+                local script_path = data.run_lua_file
+                local ok, err = pcall(function()
+                    dofile(script_path)
+                end)
+                local status_f = io.open("/tmp/run_lua_status.txt", "w")
+                if status_f then
+                    if ok then status_f:write("SUCCESS\n")
+                    else status_f:write("ERROR: " .. tostring(err) .. "\n") end
+                    status_f:close()
+                end
+            end
         end
     end
     

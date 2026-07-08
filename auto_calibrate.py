@@ -53,12 +53,30 @@ def analyze_vocal(samples):
     return calib
 
 def main():
-    print("🎙️ Đang thu âm 5 giây để phân tích giọng...")
+    PROGRESS_FILE = "/tmp/ai_karaoke_calib_progress.json"
+    RECORD_SEC = 5.0
+    MAX_TIMEOUT = 30.0
+    
+    def write_progress(status, seconds):
+        try:
+            with open(PROGRESS_FILE, "w") as f:
+                json.dump({
+                    "status": status,
+                    "seconds": round(seconds, 1),
+                    "target_seconds": RECORD_SEC,
+                    "progress": min(1.0, round(seconds / RECORD_SEC, 2))
+                }, f)
+        except:
+            pass
+
+    print("🎙️ Khởi động lấy mẫu giọng hát (tự động bỏ qua khoảng lặng)...")
+    write_progress("waiting", 0.0)
+    
     cmd = [
         "pw-record", 
         "-P", "node.description='AI Vocal Snapshot'",
         "--rate", str(SAMPLE_RATE), "--channels", str(CHANNELS),
-        "--format", "s16", "--latency", "1024", "--target", "0", "-"
+        "--format", "s16", "--target", "0", "-"
     ]
     proc = subprocess.Popen(
         cmd, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
@@ -87,30 +105,64 @@ def main():
             subprocess.run(["pw-link", mic_port, rec_port], capture_output=True)
     except: pass
 
-    # Đọc trong 5 giây (Non-blocking loop để chống treo)
+    # Đọc non-blocking
     import fcntl
     flags = fcntl.fcntl(proc.stdout, fcntl.F_GETFL)
     fcntl.fcntl(proc.stdout, fcntl.F_SETFL, flags | os.O_NONBLOCK)
     
     start_time = time.time()
+    accumulated_seconds = 0.0
     raw = b""
-    while time.time() - start_time < RECORD_SEC:
-        try:
-            chunk = proc.stdout.read(8192)
-            if chunk: raw += chunk
-        except: pass
-        time.sleep(0.05)
+    CHUNK_SIZE = 4096 # 2048 samples = ~0.042 giây
+    
+    try:
+        while accumulated_seconds < RECORD_SEC:
+            elapsed = time.time() - start_time
+            if elapsed > MAX_TIMEOUT:
+                print("\n⚠️ Quá thời gian lấy mẫu (30 giây). Kết thúc.")
+                write_progress("timeout", accumulated_seconds)
+                proc.terminate()
+                return
+                
+            try:
+                chunk = proc.stdout.read(CHUNK_SIZE)
+                if chunk and len(chunk) > 0:
+                    samples = np.frombuffer(chunk, dtype=np.int16).astype(np.float32) / 32768.0
+                    rms = np.sqrt(np.mean(samples**2)) if len(samples) > 0 else 0.0
+                    
+                    # Ngưỡng phát hiện tiếng hát: 0.012 (~ -38dBFS)
+                    if rms > 0.012:
+                        raw += chunk
+                        accumulated_seconds += len(chunk) / (SAMPLE_RATE * 2.0)
+                        write_progress("recording", accumulated_seconds)
+                        sys.stdout.write(f"\r🎙️ Đang thu âm: {accumulated_seconds:.1f}s / {RECORD_SEC:.1f}s ({20*np.log10(rms+1e-5):.1f} dB)")
+                        sys.stdout.flush()
+                    else:
+                        write_progress("waiting", accumulated_seconds)
+                        sys.stdout.write(f"\r🎙️ Hãy hát vào mic: {accumulated_seconds:.1f}s / {RECORD_SEC:.1f}s (Chờ giọng hát...)  ")
+                        sys.stdout.flush()
+                else:
+                    time.sleep(0.01)
+            except BlockingIOError:
+                time.sleep(0.01)
+            except Exception:
+                time.sleep(0.01)
+    except KeyboardInterrupt:
+        print("\n🛑 Bị dừng bởi người dùng.")
+        write_progress("error", accumulated_seconds)
+        proc.terminate()
+        return
         
     proc.terminate()
     
     if len(raw) < 1000:
-        print("Không thu được âm thanh!")
-        # Tạo calib giả để UI vẫn nhận được phản hồi
+        print("\nKhông thu đủ âm thanh giọng hát!")
         calib = {"eq_band_2_gain_db": 0.0, "eq_band_3_gain_db": 0.0, "eq_band_4_gain_db": 0.0}
+        write_progress("error", accumulated_seconds)
     else:
         samples = np.frombuffer(raw, dtype=np.int16).astype(np.float32) / 32768.0
-        # Phân tích DSP
         calib = analyze_vocal(samples)
+        write_progress("done", accumulated_seconds)
     
     calib["timestamp"] = time.time()
     
@@ -127,7 +179,7 @@ def main():
     pres_change = calib.get('eq_band_3_gain_db', 0.0)
     air_change = calib.get('eq_band_4_gain_db', 0.0)
     
-    # Base values từ setup_karaoke.lua (Band 2: -3dB, Band 3: +3dB, Band 4: +2.5dB)
+    # Base values từ setup_karaoke.lua
     print(f" • Bùn đục (Low-mid 300Hz): -3.0 dB ➔ {(-3.0 + mud_change):.1f} dB (Thay đổi: {mud_change:+.1f} dB)")
     print(f" • Sắc nét (Presence 2.5kHz): +3.0 dB ➔ {(3.0 + pres_change):.1f} dB (Thay đổi: {pres_change:+.1f} dB)")
     print(f" • Bông xốp (Air 12kHz):    +2.5 dB ➔ {(2.5 + air_change):.1f} dB (Thay đổi: {air_change:+.1f} dB)")

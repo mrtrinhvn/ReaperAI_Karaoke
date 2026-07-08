@@ -94,7 +94,7 @@ def main():
         "pw-record", 
         "-P", "node.name=Beat_AI node.description=Beat_AI media.name=Beat_AI",
         "--rate", str(SAMPLE_RATE), "--channels", str(CHANNELS),
-        "--format", "s16", "--latency", "1024", "--target", "0", "-"
+        "--format", "s16", "--target", "0", "-"
     ]
     proc = subprocess.Popen(
         cmd, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,

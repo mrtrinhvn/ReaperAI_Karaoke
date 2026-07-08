@@ -45,19 +45,19 @@ echo ""
 BROWSER_FL=$(echo "$BROWSER_OUTPUTS" | head -1)
 BROWSER_FR=$(echo "$BROWSER_OUTPUTS" | head -2 | tail -1)
 
-# Lấy REAPER input ports 3 & 4 (hoặc bất kỳ input có sẵn)
-# REAPER inputs thường có tên dạng: reaper:in3, reaper:in4
-REAPER_IN3=$(echo "$REAPER_INPUTS" | grep -E "(in3|input_3|In 3)" | head -1)
-REAPER_IN4=$(echo "$REAPER_INPUTS" | grep -E "(in4|input_4|In 4)" | head -1)
+# Lấy REAPER input ports 1 & 2 (hoặc bất kỳ input có sẵn)
+# REAPER inputs thường có tên dạng: reaper:in1, reaper:in2
+REAPER_IN1=$(echo "$REAPER_INPUTS" | grep -E "(in1|input_1|In 1)" | head -1)
+REAPER_IN2=$(echo "$REAPER_INPUTS" | grep -E "(in2|input_2|In 2)" | head -1)
 
-# Nếu không tìm thấy in3/in4, dùng 2 input đầu tiên chưa được dùng
-if [ -z "$REAPER_IN3" ] || [ -z "$REAPER_IN4" ]; then
-    echo "⚠️  Không tìm thấy Input 3/4 cụ thể. Sẽ thử nối vào input có sẵn."
-    REAPER_IN3=$(echo "$REAPER_INPUTS" | head -3 | tail -1)
-    REAPER_IN4=$(echo "$REAPER_INPUTS" | head -4 | tail -1)
+# Nếu không tìm thấy in1/in2, dùng 2 input đầu tiên chưa được dùng
+if [ -z "$REAPER_IN1" ] || [ -z "$REAPER_IN2" ]; then
+    echo "⚠️  Không tìm thấy Input 1/2 cụ thể. Sẽ thử nối vào input có sẵn."
+    REAPER_IN1=$(echo "$REAPER_INPUTS" | head -1)
+    REAPER_IN2=$(echo "$REAPER_INPUTS" | head -2 | tail -1)
 fi
 
-if [ -z "$REAPER_IN3" ] || [ -z "$REAPER_IN4" ]; then
+if [ -z "$REAPER_IN1" ] || [ -z "$REAPER_IN2" ]; then
     echo "❌ Không đủ REAPER input ports để nối."
     echo ""
     echo "📋 Danh sách tất cả input ports:"
@@ -69,11 +69,11 @@ if [ -z "$REAPER_IN3" ] || [ -z "$REAPER_IN4" ]; then
 fi
 
 echo "🔗 Đang nối dây..."
-echo "   Browser FL → REAPER: $BROWSER_FL → $REAPER_IN3"
-pw-link "$BROWSER_FL" "$REAPER_IN3" 2>/dev/null && echo "   ✅ FL connected!" || echo "   ⚠️ FL: đã nối hoặc lỗi"
+echo "   Browser FL → REAPER: $BROWSER_FL → $REAPER_IN1"
+pw-link "$BROWSER_FL" "$REAPER_IN1" 2>/dev/null && echo "   ✅ FL connected!" || echo "   ⚠️ FL: đã nối hoặc lỗi"
 
-echo "   Browser FR → REAPER: $BROWSER_FR → $REAPER_IN4"
-pw-link "$BROWSER_FR" "$REAPER_IN4" 2>/dev/null && echo "   ✅ FR connected!" || echo "   ⚠️ FR: đã nối hoặc lỗi"
+echo "   Browser FR → REAPER: $BROWSER_FR → $REAPER_IN2"
+pw-link "$BROWSER_FR" "$REAPER_IN2" 2>/dev/null && echo "   ✅ FR connected!" || echo "   ⚠️ FR: đã nối hoặc lỗi"
 
 echo ""
 echo "🎤 XONG! Bây giờ bạn có thể:"
@@ -81,6 +81,6 @@ echo "   1. Mở YouTube, bật nhạc Karaoke"
 echo "   2. Cầm mic MixPre-6 và HÁT!"
 echo ""
 echo "💡 Nếu không nghe thấy nhạc từ YouTube trong REAPER,"
-echo "   hãy kiểm tra lại track NHẠC NỀN có đang nhận Input 3/4 không."
+echo "   hãy kiểm tra lại track NHẠC NỀN có đang nhận Input 1/2 không."
 echo "   Hoặc mở qpwgraph bằng lệnh:"
 echo "   flatpak run org.rncbc.qpwgraph"

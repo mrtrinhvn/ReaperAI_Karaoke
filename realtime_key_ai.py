@@ -12,7 +12,7 @@ import librosa
 from collections import deque
 import threading
 
-SAMPLE_RATE = 22050  # Librosa default for faster processing
+SAMPLE_RATE = 48000  # Sử dụng sample rate hệ thống gốc để tránh PipeWire resampler
 CHANNELS = 1
 CHUNK_SAMPLES = 2048
 CHUNK_BYTES = CHUNK_SAMPLES * 2 * CHANNELS
@@ -90,7 +90,7 @@ def main():
         "pw-record", 
         "-P", "node.name=Beat_AI_Key node.description=Beat_AI_Key media.name=Beat_AI_Key",
         "--rate", str(SAMPLE_RATE), "--channels", str(CHANNELS),
-        "--format", "s16", "--latency", "2048", "--target", "0", "-"
+        "--format", "s16", "--target", "0", "-"
     ]
     proc = subprocess.Popen(
         cmd, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
@@ -122,7 +122,7 @@ def main():
             # Cứ mỗi 3 giây phân tích Tone 1 lần
             if now - last_analysis > 3.0 and len(buffer) > max_chunks // 2:
                 key_info = analyze_key(list(buffer))
-                if key_info and key_info['confidence'] > 0.6:
+                if key_info and key_info['confidence'] > 0.5:
                     # Chống nhiễu: Chỉ cập nhật nếu confidence cao
                     current_key = key_info
                     

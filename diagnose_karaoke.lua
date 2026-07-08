@@ -86,35 +86,12 @@ local vocal = find_track("VOCAL")
 if vocal then
     log("\n═══ VOCAL DETAIL ═══")
     
-    local del, dn = find_fx(vocal, "ReaDelay")
-    if del >= 0 then
-        log("  ReaDelay:")
-        local len = show_p(vocal, del, "Length")
-        local fb = show_p(vocal, del, "Feedback")
-        local dvol = show_p(vocal, del, "Volume")
-        show_p(vocal, del, "Lowpass")
-        local est = len * 5000
-        log(string.format("  → Delay ~%.0fms (beat=%.0fms) %s", est, ms, est > ms and "⚠️ TRÀN BEAT!" or "✅ OK"))
-        log(string.format("  → Feedback=%.3f %s", fb, fb > 0.01 and "⚠️ CÒN NHẠI!" or "✅ Chỉ 1 lần"))
+    local gate = find_fx(vocal, "ReaGate")
+    if gate >= 0 then
+        log("  ReaGate (Noise Gate):")
+        show_p(vocal, gate, "Threshold")
     end
-    
-    local verb, vn = find_fx(vocal, "ReaVerbate")
-    if verb >= 0 then
-        log("  ReaVerbate:")
-        local room = show_p(vocal, verb, "Room Size")
-        local wet = show_p(vocal, verb, "Wet")
-        local dry = show_p(vocal, verb, "Dry")
-        local damp = show_p(vocal, verb, "Dampening")
-        show_p(vocal, verb, "Stereo")
-        show_p(vocal, verb, "Width")
-        show_p(vocal, verb, "Low Cut")
-        show_p(vocal, verb, "High Cut")
-        
-        log(string.format("  → Room=%.2f %s", room, room > 0.50 and "⚠️ QUÁ LỚN!" or "✅ OK"))
-        log(string.format("  → Wet=%.2f %s", wet, wet > 0.30 and "⚠️ QUÁ NHIỀU!" or "✅ OK"))
-        log(string.format("  → Damp=%.2f %s", damp, damp < 0.40 and "⚠️ THẤP! Treble vang lâu" or "✅ OK"))
-    end
-    
+
     local eq = find_fx(vocal, "ReaEQ")
     if eq >= 0 then
         log("  ReaEQ:")
@@ -126,9 +103,70 @@ if vocal then
     
     local comp = find_fx(vocal, "ReaComp")
     if comp >= 0 then
-        log("  ReaComp:")
+        log("  ReaComp (Vocal Compressor):")
         show_p(vocal, comp, "Thresh")
         show_p(vocal, comp, "Ratio")
+    end
+end
+
+-- VOCAL AUX / PARALLEL DETAIL
+local voc_par = find_track("VOCAL PARALLEL")
+if voc_par then
+    log("\n═══ VOCAL PARALLEL DETAIL ═══")
+    local vpcomp = find_fx(voc_par, "ReaComp")
+    if vpcomp >= 0 then
+        log("  ReaComp (Parallel Smashed Comp):")
+        show_p(voc_par, vpcomp, "Thresh")
+        show_p(voc_par, vpcomp, "Ratio")
+    end
+end
+
+local voc_rev = find_track("VOCAL REVERB")
+if voc_rev then
+    log("\n═══ VOCAL REVERB DETAIL ═══")
+    local verb, vn = find_fx(voc_rev, "ReaVerbate")
+    if verb >= 0 then
+        log("  ReaVerbate:")
+        local room = show_p(voc_rev, verb, "Room Size")
+        local wet = show_p(voc_rev, verb, "Wet")
+        local dry = show_p(voc_rev, verb, "Dry")
+        local damp = show_p(voc_rev, verb, "Dampening")
+        show_p(voc_rev, verb, "Stereo")
+        show_p(voc_rev, verb, "Width")
+        show_p(voc_rev, verb, "Low Cut")
+        show_p(voc_rev, verb, "High Cut")
+        
+        log(string.format("  → Room=%.2f %s", room, room > 0.60 and "⚠️ QUÁ LỚN!" or "✅ OK"))
+        log(string.format("  → Wet=%.2f %s", wet, wet > 1.0 and "⚠️ SAI CHẾ ĐỘ WET!" or "✅ OK (100% Wet)"))
+        log(string.format("  → Damp=%.2f %s", damp, damp < 0.40 and "⚠️ THẤP! Treble vang lâu" or "✅ OK"))
+    end
+    local rcomp = find_fx(voc_rev, "ReaComp")
+    if rcomp >= 0 then
+        log("  ReaComp (Sidechain Ducker):")
+        show_p(voc_rev, rcomp, "Thresh")
+        show_p(voc_rev, rcomp, "Ratio")
+    end
+end
+
+local voc_del = find_track("VOCAL DELAY")
+if voc_del then
+    log("\n═══ VOCAL DELAY DETAIL ═══")
+    local del, dn = find_fx(voc_del, "ReaDelay")
+    if del >= 0 then
+        log("  ReaDelay:")
+        local len = show_p(voc_del, del, "Length")
+        local fb = show_p(voc_del, del, "Feedback")
+        local dvol = show_p(voc_del, del, "Volume")
+        show_p(voc_del, del, "Lowpass")
+        local est = len * 5000
+        log(string.format("  → Delay ~%.0fms (beat=%.0fms) %s", est, ms, est > ms and "⚠️ TRÀN BEAT!" or "✅ OK"))
+        log(string.format("  → Feedback=%.3f %s", fb, fb > 0.50 and "⚠️ QUÁ NHIỀU!" or "✅ OK"))
+    end
+    local dcomp = find_fx(voc_del, "ReaComp")
+    if dcomp >= 0 then
+        log("  ReaComp (Sidechain Ducker):")
+        show_p(voc_del, dcomp, "Thresh")
+        show_p(voc_del, dcomp, "Ratio")
     end
 end
 

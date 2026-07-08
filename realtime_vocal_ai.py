@@ -152,22 +152,36 @@ def calc_tempo_sync(bpm, genre=None):
     # Lấy reverb từ genre hoặc tính theo tempo
     if genre and "reverb_room" in genre:
         room = genre["reverb_room"]
-        wet = genre.get("reverb_wet", 0.38) # Tăng mặc định từ 0.25 lên 0.38
+        wet = genre.get("reverb_wet", 0.38)
     else:
-        if bpm > 140: room, wet = 0.30, 0.28 # Tăng từ 0.20 lên 0.28
-        elif bpm > 100: room, wet = 0.45, 0.35 # Tăng từ 0.25 lên 0.35
-        else: room, wet = 0.65, 0.45 # Tăng từ 0.32 lên 0.45 (Bolero/chậm vang rất xốp)
+        if bpm > 140: room, wet = 0.30, 0.28
+        elif bpm > 100: room, wet = 0.45, 0.35
+        else: room, wet = 0.65, 0.45
+    
+    delay_vol = genre.get("delay_volume", 0.22) if genre else 0.22
+    delay_fb = genre.get("delay_feedback", 0.0) if genre else 0.0
+    damp = genre.get("reverb_damp", 0.45) if genre else 0.45
+    width = genre.get("reverb_width", 0.75) if genre else 0.75
+    
+    # Áp dụng Reverb Scale tỉ lệ thuận từ thanh kéo (%) chỉ cho Reverb
+    reverb_scale = genre.get("reverb_scale", 0.0) if genre else 0.0
+    scale_factor = 1.0 + (reverb_scale / 100.0)
+    
+    scaled_wet = min(max(wet * scale_factor, 0.0), 0.95)
+    scaled_delay_vol = min(max(delay_vol, 0.0), 0.95) # Giữ nguyên lượng delay như preset chuẩn, không tăng theo thanh reverb
+    scaled_room = min(max(room * (1.0 + (reverb_scale / 200.0)), 0.2), 0.95)
+    scaled_delay_fb = min(max(delay_fb, 0.0), 0.4)    # Giữ nguyên feedback như preset chuẩn, không tăng theo thanh reverb
     
     return {
         "delay_length": delay_norm,
         "delay_ms": delay_ms,
         "delay_type": delay_type,
-        "delay_volume": genre.get("delay_volume", 0.22) if genre else 0.22,
-        "delay_feedback": genre.get("delay_feedback", 0.0) if genre else 0.0,
-        "reverb_room": room,
-        "reverb_wet_tempo": wet,
-        "reverb_damp": genre.get("reverb_damp", 0.45) if genre else 0.45, # Mở đuôi vang (High Frequencies) để tiếng sáng và bay bổng hơn, tránh tiếng bị bí như loa nén
-        "reverb_width": genre.get("reverb_width", 0.75) if genre else 0.75,
+        "delay_volume": scaled_delay_vol,
+        "delay_feedback": scaled_delay_fb,
+        "reverb_room": scaled_room,
+        "reverb_wet_tempo": scaled_wet,
+        "reverb_damp": damp,
+        "reverb_width": width,
     }
 
 
@@ -238,43 +252,45 @@ def generate_eq_adjustments(band_data, rms_db, sensitivity=1.0):
     vocal_adj["reverb_width"] = tempo["reverb_width"]
     vocal_adj["tempo_note"] = f"[{genre_name}] BPM={current_bpm:.0f} Delay={tempo['delay_ms']:.0f}ms ({tempo['delay_type']})"
     
-    vocal_adj["autotune_enabled"] = current_genre.get("autotune_enabled", True)
-    vocal_adj["saturation_amount"] = float(current_genre.get("saturation_amount", 0.0))
+    vocal_adj["autotune_enabled"] = current_genre.get("autotune_enabled", True) if is_singing else False
+    vocal_adj["saturation_amount"] = float(current_genre.get("saturation_amount", 0.0)) if is_singing else 0.0
 
     # ── ADAPTIVE AUTOTUNE (FLEX-TUNE & PENTATONIC) ──
     genre_key = current_genre.get("genre", "nhac_tre")
     scale_type = "Standard"
-    autotune_depth = 0.5  # default baseline
+    autotune_depth = 0.0
     
-    # Calculate pitch stability
-    with lock:
-        active_pitches = [p for p in list(pitch_history) if p > 50]
-        
-    if len(active_pitches) >= 4:
-        # Convert Hz to MIDI notes for standard deviation calculation
-        midi_notes = [69 + 12 * np.log2(hz / 440.0) for hz in active_pitches]
-        pitch_std = np.std(midi_notes)
-        
-        # Flex-Tune logic: if pitch standard deviation is high (singer is sliding/vibrato),
-        # reduce autotune depth so it doesn't yank the voice.
-        if pitch_std > 1.0:     # high fluctuation -> slide / vibrato / transition
-            autotune_depth = 0.05
-        elif pitch_std < 0.3:   # extremely stable -> holding a note
-            autotune_depth = 0.8
-        else:                   # moderate transition
-            autotune_depth = 0.4
-    else:
-        autotune_depth = 0.0  # quiet or unstable
-        
-    # Genre-based limits & Scale types
-    if genre_key == "dan_ca":
-        scale_type = "Pentatonic"
-        # Always limit autotune depth for traditional music to keep it natural
-        autotune_depth = min(autotune_depth, 0.25)
-    elif genre_key == "bolero":
-        # Bolero has lots of slides, restrict depth
-        autotune_depth = min(autotune_depth, 0.45)
-        
+    if is_singing:
+        autotune_depth = 0.5  # default baseline
+        # Calculate pitch stability
+        with lock:
+            active_pitches = [p for p in list(pitch_history) if p > 50]
+            
+        if len(active_pitches) >= 4:
+            # Convert Hz to MIDI notes for standard deviation calculation
+            midi_notes = [69 + 12 * np.log2(hz / 440.0) for hz in active_pitches]
+            pitch_std = np.std(midi_notes)
+            
+            # Flex-Tune logic: if pitch standard deviation is high (singer is sliding/vibrato),
+            # reduce autotune depth so it doesn't yank the voice.
+            if pitch_std > 1.0:     # high fluctuation -> slide / vibrato / transition
+                autotune_depth = 0.05
+            elif pitch_std < 0.3:   # extremely stable -> holding a note
+                autotune_depth = 0.8
+            else:                   # moderate transition
+                autotune_depth = 0.4
+        else:
+            autotune_depth = 0.0  # quiet or unstable
+            
+        # Genre-based limits & Scale types
+        if genre_key == "dan_ca":
+            scale_type = "Pentatonic"
+            # Always limit autotune depth for traditional music to keep it natural
+            autotune_depth = min(autotune_depth, 0.25)
+        elif genre_key == "bolero":
+            # Bolero has lots of slides, restrict depth
+            autotune_depth = min(autotune_depth, 0.45)
+            
     vocal_adj["autotune_depth"] = float(autotune_depth)
     vocal_adj["scale_type"] = scale_type
 
@@ -288,89 +304,119 @@ def generate_eq_adjustments(band_data, rms_db, sensitivity=1.0):
     is_music_playing = current_genre.get("is_music_playing", True)
     force_podcast = current_genre.get("force_podcast", False)
     
-    if not is_music_playing or force_podcast:
-        # Chế độ Livestream / Podcast: Tắt vang, nén gắt, thêm độ ấm cho giọng nói
+    if force_podcast:
+        # Chế độ Podcast/Live thủ công: Khóa cứng giọng nói ấm, tắt autotune & delay & reverb, không dynamic EQ
+        vocal_adj["autotune_enabled"] = False
+        vocal_adj["autotune_depth"] = 0.0
         vocal_adj["reverb_wet"] = 0.0
         vocal_adj["delay_volume"] = 0.0
-        vocal_adj["comp_ratio"] = 0.6  # Nén mạnh tay kiểu phát thanh viên
-        vocal_adj["comp_thresh"] = 0.3 # Bắt tín hiệu sớm
+        vocal_adj["comp_ratio"] = 0.35   # ~5:1 ratio (normalized)
+        vocal_adj["comp_thresh"] = 0.43  # -24dB threshold (normalized)
+        vocal_adj["eq_band_1_gain"] = 0.0
+        vocal_adj["eq_band_2_gain_db"] = 2.5
+        vocal_adj["eq_band_3_gain_db"] = 0.0
+        vocal_adj["eq_band_4_gain_db"] = -2.0
+        vocal_adj["chorus_mix"] = 0.0
+        vocal_adj["reverb_note"] = "Chế độ Podcast cố định (Giọng ấm, Tắt Autotune & Vang)"
         
-        # Override EQ để tạo giọng ấm
-        vocal_adj["eq_band_2_gain_db"] = 2.0  # Tăng Mud/Warmth
-        vocal_adj["eq_band_4_gain_db"] = -1.5 # Giảm Brightness tránh chói tai khi nói
+        music_adj["music_eq_band_1_gain_db"] = 0.0
+        music_adj["music_eq_band_2_gain_db"] = 0.0
+        music_adj["music_eq_band_3_gain_db"] = 0.0
+        return {"vocal": vocal_adj, "music": music_adj, "is_singing": False}
         
-        if force_podcast:
-            vocal_adj["reverb_note"] = "Bật Thủ Công → Chế độ Livestream (Giọng ấm, Tắt Vang)"
-        else:
-            vocal_adj["reverb_note"] = "Nhạc tắt → Tự động chuyển chế độ Livestream"
+    # if not is_music_playing:
+    #     # Tự động chuyển chế độ thoại tạm thời khi dừng nhạc
+    #     vocal_adj["autotune_enabled"] = False
+    #     vocal_adj["reverb_wet"] = 0.0
+    #     vocal_adj["delay_volume"] = 0.0
+    #     vocal_adj["comp_ratio"] = 0.35   # ~5:1 ratio (normalized)
+    #     vocal_adj["comp_thresh"] = 0.43  # -24dB threshold (normalized)
+    #     vocal_adj["eq_band_2_gain_db"] = 2.0
+    #     vocal_adj["eq_band_4_gain_db"] = -1.5
+    #     vocal_adj["reverb_note"] = "Nhạc tắt → Tự động chuyển chế độ Livestream"
+    #     
+    #     music_adj["music_eq_band_1_gain_db"] = 0.0
+    #     music_adj["music_eq_band_2_gain_db"] = -1.5
+    #     music_adj["music_eq_band_3_gain_db"] = 0.0
+    #     return {"vocal": vocal_adj, "music": music_adj, "is_singing": False}
 
     # ── GENRE CHORUS ──
     if "chorus_mix" in current_genre:
         vocal_adj["chorus_mix"] = current_genre["chorus_mix"]
 
     # ── VOCAL TRACK EQ ──
-    for band_name, info in EQ_MAP.items():
-        if band_name not in band_data:
-            continue
+    if is_singing:
+        for band_name, info in EQ_MAP.items():
+            if band_name not in band_data:
+                continue
+                
+            energy = band_data[band_name]["energy"]
+            target = band_data[band_name]["target"]
+            diff = energy - target
+
+            if band_name == "Sub" and energy > target * 1.5:
+                vocal_adj["eq_band_1_type"] = "highpass"
+                vocal_adj["eq_band_1_gain"] = min(diff * 5 * sensitivity, 2.0)
+            elif band_name == "Mud":
+                if energy > target * 1.5: 
+                    vocal_adj["eq_band_2_gain_db"] = -min(diff * 5 * sensitivity, info["max_cut"])
+                elif energy < target * 0.7:
+                    vocal_adj["eq_band_2_gain_db"] = min((target - energy) * 12 * sensitivity, info["max_boost"])
+            elif band_name == "Presence" and energy < target * 0.90:
+                vocal_adj["eq_band_3_gain_db"] = min((target - energy) * 6 * sensitivity, info["max_boost"])
+            elif band_name == "Bright" and energy < target * 0.90:
+                vocal_adj["eq_band_4_gain_db"] = min((target - energy) * 5 * sensitivity, info["max_boost"])
+
+        # CỘNG THÊM OFFSET TỪ BẢN CALIBRATION 5 GIÂY (nếu có)
+        calib = read_calibration()
+        if "eq_band_2_gain_db" in calib and "eq_band_2_gain_db" in vocal_adj:
+            vocal_adj["eq_band_2_gain_db"] += calib["eq_band_2_gain_db"]
+        elif "eq_band_2_gain_db" in calib:
+            vocal_adj["eq_band_2_gain_db"] = calib["eq_band_2_gain_db"]
             
-        energy = band_data[band_name]["energy"]
-        target = band_data[band_name]["target"]
-        diff = energy - target
-
-        if band_name == "Sub" and energy > target * 1.5:
-            vocal_adj["eq_band_1_type"] = "highpass"
-            # Cắt tối đa 2.0 (tương đương 80Hz) để không làm mất độ rền, độ dày của giọng
-            vocal_adj["eq_band_1_gain"] = min(diff * 5 * sensitivity, 2.0)
-        elif band_name == "Mud":
-            if energy > target * 1.5: 
-                vocal_adj["eq_band_2_gain_db"] = -min(diff * 5 * sensitivity, info["max_cut"])
-            elif energy < target * 0.7:
-                vocal_adj["eq_band_2_gain_db"] = min((target - energy) * 12 * sensitivity, info["max_boost"]) # Auto-Warmth: Giảm bớt để không bị um
-        elif band_name == "Presence" and energy < target * 0.90:
-            vocal_adj["eq_band_3_gain_db"] = min((target - energy) * 6 * sensitivity, info["max_boost"]) # Giảm boost để giọng lùi sâu, quyện vào beat
-        elif band_name == "Bright" and energy < target * 0.90:
-            vocal_adj["eq_band_4_gain_db"] = min((target - energy) * 5 * sensitivity, info["max_boost"]) # Không boost siêu cao quá đà
-
-    # CỘNG THÊM OFFSET TỪ BẢN CALIBRATION 5 GIÂY (nếu có)
-    calib = read_calibration()
-    if "eq_band_2_gain_db" in calib and "eq_band_2_gain_db" in vocal_adj:
-        vocal_adj["eq_band_2_gain_db"] += calib["eq_band_2_gain_db"]
-    elif "eq_band_2_gain_db" in calib:
-        vocal_adj["eq_band_2_gain_db"] = calib["eq_band_2_gain_db"]
-        
-    if "eq_band_3_gain_db" in calib and "eq_band_3_gain_db" in vocal_adj:
-        vocal_adj["eq_band_3_gain_db"] += calib["eq_band_3_gain_db"]
-    elif "eq_band_3_gain_db" in calib:
-        vocal_adj["eq_band_3_gain_db"] = calib["eq_band_3_gain_db"]
-    if "eq_band_4_gain_db" in calib and "eq_band_4_gain_db" in vocal_adj:
-        vocal_adj["eq_band_4_gain_db"] += calib["eq_band_4_gain_db"]
-    elif "eq_band_4_gain_db" in calib:
-        vocal_adj["eq_band_4_gain_db"] = calib["eq_band_4_gain_db"]
+        if "eq_band_3_gain_db" in calib and "eq_band_3_gain_db" in vocal_adj:
+            vocal_adj["eq_band_3_gain_db"] += calib["eq_band_3_gain_db"]
+        elif "eq_band_3_gain_db" in calib:
+            vocal_adj["eq_band_3_gain_db"] = calib["eq_band_3_gain_db"]
+        if "eq_band_4_gain_db" in calib and "eq_band_4_gain_db" in vocal_adj:
+            vocal_adj["eq_band_4_gain_db"] += calib["eq_band_4_gain_db"]
+        elif "eq_band_4_gain_db" in calib:
+            vocal_adj["eq_band_4_gain_db"] = calib["eq_band_4_gain_db"]
+    else:
+        vocal_adj["eq_band_1_gain"] = 0.0
+        vocal_adj["eq_band_2_gain_db"] = 0.0
+        vocal_adj["eq_band_3_gain_db"] = 0.0
+        vocal_adj["eq_band_4_gain_db"] = 0.0
 
     # ── MUSIC TRACK SPECTRAL CARVING (Inverse EQ TĨNH) ──
     # User yêu cầu: "Không cần chỉnh trong thời gian thực".
     # Vì vậy, ta KHÓA CHẾT (Lock) một rãnh EQ cố định vào beat nhạc. 
     # Dù bạn có hát hay im lặng, Beat luôn chừa sẵn chỗ trống này, tránh việc nhảy EQ lên xuống (vặn vẹo).
     music_adj["music_eq_band_1_gain_db"] = 0.0  # Giữ nguyên độ dày
-    music_adj["music_eq_band_2_gain_db"] = -1.5 # KHÓA CỨNG: Luôn gọt 1.5dB ở dải trung cao để lót đường cho giọng
-    music_adj["music_eq_band_3_gain_db"] = 0.0  # Giữ nguyên độ sáng
+    music_adj["music_eq_band_2_gain_db"] = -2.5 # Gọt sâu thêm tí ở dải trung (2.5kHz) để lót đường cho giọng
+    music_adj["music_eq_band_3_gain_db"] = -1.5 # Gọt dải sáng (5kHz) để dọn chỗ cho độ bóng bẩy (gloss) của Vocal
 
     # ── COMPRESSOR AUTO-ADJUST ──
-    if len(history) >= 5:
-        recent_rms = [h["rms_db"] for h in list(history)[-10:]]
-        dynamic_range = max(recent_rms) - min(recent_rms)
-        if dynamic_range > 12: # Hát gào to hoặc biên độ âm lượng giật cục
-            vocal_adj["comp_ratio"] = 0.45 # Siết chặt độ nén (Ratio cao) để ghìm các đỉnh âm thanh lại
-            vocal_adj["comp_thresh"] = 0.35 # Hạ ngưỡng bắt (Threshold) để tóm gọn các âm sắc nhọn sớm hơn
-            vocal_adj["comp_note"] = "Giọng gắt → Siết chặt Compressor để bảo vệ nhạc"
-        elif max(recent_rms) < -25: # Hát quá nhỏ
-            vocal_adj["comp_ratio"] = 0.15 # Nhả nén gần như hoàn toàn
-            vocal_adj["comp_thresh"] = 0.55
-            vocal_adj["comp_note"] = "Giọng nhỏ → Nhả nén để trợ lực (Punch & Volume)"
-        elif dynamic_range < 6: # Hát êm ái, đều đều
-            vocal_adj["comp_ratio"] = 0.20
-            vocal_adj["comp_thresh"] = 0.50
-            vocal_adj["comp_note"] = "Giọng ổn định → Nén nhẹ nhàng"
+    # Tắt tự động siết/nhả compressor khi hát để tránh tiếng bị ngộp/bí, giữ compressor sạch theo setup_karaoke.lua
+    # if is_singing and len(history) >= 5:
+    #     recent_rms = [h["rms_db"] for h in list(history)[-10:]]
+    #     dynamic_range = max(recent_rms) - min(recent_rms)
+    #     if dynamic_range > 12: # Hát gào to hoặc biên độ âm lượng giật cục
+    #         vocal_adj["comp_ratio"] = 0.05  # 6:1 ratio
+    #         vocal_adj["comp_thresh"] = 0.03 # -24dB threshold
+    #         vocal_adj["comp_note"] = "Giọng gắt → Siết chặt Compressor để bảo vệ nhạc"
+    #     elif max(recent_rms) < -25: # Hát quá nhỏ
+    #         vocal_adj["comp_ratio"] = 0.01  # 2:1 ratio
+    #         vocal_adj["comp_thresh"] = 0.10 # -14dB threshold
+    #         vocal_adj["comp_note"] = "Giọng nhỏ → Nhả nén để trợ lực (Punch & Volume)"
+    #     elif dynamic_range < 6: # Hát êm ái, đều đều
+    #         vocal_adj["comp_ratio"] = 0.03  # 4:1 ratio
+    #         vocal_adj["comp_thresh"] = 0.05 # -20dB threshold
+    #         vocal_adj["comp_note"] = "Giọng ổn định → Nén nhẹ nhàng"
+    # else:
+    #     vocal_adj["comp_ratio"] = 0.03  # 4:1 ratio
+    #     vocal_adj["comp_thresh"] = 0.05 # -20dB threshold
+    #     vocal_adj["comp_note"] = "Im lặng → Giữ Compressor ở mức mặc định"
 
     # ── REVERB: body-based override ──
     body_energy = band_data.get("Body", {}).get("energy", 0)
@@ -469,8 +515,6 @@ def render_display(band_data, rms_db, pitch_hz, adjustments):
         
         if force_podcast:
             verb_stat = "\033[94m🎙️ PODCAST (ÉP BẬT)\033[0m"
-        elif not music_play:
-            verb_stat = "\033[94m🎙️ PODCAST (TỰ ĐỘNG)\033[0m"
         else:
             verb_stat = "\033[92mBẬT\033[0m"
             
@@ -519,6 +563,12 @@ def analysis_loop(sensitivity):
             flat.update(result.get("music", {}))
             flat["is_singing"] = result.get("is_singing", False)
             flat["rms_db"] = float(latest["rms_db"])
+            
+            # Đọc pitch_offset và music_volume từ UI và chuyển qua cho Lua bridge
+            current_genre = read_genre()
+            flat["pitch_offset"] = current_genre.get("pitch_offset", 0)
+            flat["music_volume"] = current_genre.get("music_volume", 0.56)  # 0.56 is default (-5.0dB)
+            
             write_commands(flat)
 
 
@@ -594,7 +644,6 @@ def main():
         "--rate", str(SAMPLE_RATE),
         "--channels", str(CHANNELS),
         "--format", "s16",
-        "--latency", "2048",
         "--target", "0",   # ★ KHÔNG AUTO-LINK
         "-",               # Output to stdout
     ]

@@ -70,23 +70,22 @@ log("\n🎙️ ═══ KIỂM TRA VOCAL INPUT ═══\n")
 for i = 0, reaper.CountTracks(0) - 1 do
     local tr = reaper.GetTrack(0, i)
     local _, name = reaper.GetSetMediaTrackInfo_String(tr, "P_NAME", "", false)
-    if name and name:find("VOCAL") then
+    if name and name == "VOCAL" then
         local inp = reaper.GetMediaTrackInfo_Value(tr, "I_RECINPUT")
         local arm = reaper.GetMediaTrackInfo_Value(tr, "I_RECARM")
         local mon = reaper.GetMediaTrackInfo_Value(tr, "I_RECMON")
         log(string.format("  Input channel: %d", inp))
         log(string.format("  RecArm: %s | Monitor: %s", arm==1 and "ON" or "OFF", mon==1 and "ON" or "OFF"))
         
-        -- inp=0 là mono ch1, inp=1 là mono ch2, inp=2 là mono ch3
-        -- MixPre-6 thường ở ch1 (inp=0) hoặc ch2 (inp=1)
-        if inp > 1 then
-            log(string.format("  ⚠️ Input = %d (channel %d) — Có thể sai!", inp, inp+1))
-            log("  → MixPre-6 thường ở Input 1 (inp=0) hoặc Input 2 (inp=1)")
-            log("  → Đặt lại sang Input 1...")
-            reaper.SetMediaTrackInfo_Value(tr, "I_RECINPUT", 0)  -- Mono channel 1
-            log("  ✅ Đã chuyển về Input 1 Mono")
+        -- inp=0 là mono ch1, inp=1 là mono ch2, inp=2 là mono ch3, inp=3 là mono ch4
+        -- Thiết bị âm thanh chỉ kết nối với đường in 3-4 (inp=2 hoặc inp=3)
+        if inp ~= 2 and inp ~= 3 then
+            log(string.format("  ⚠️ Input = %d (channel %d) — Sai cổng kết nối! Phải là in3 hoặc in4.", inp, inp+1))
+            log("  → Đặt lại sang Input 3 (inp=2)...")
+            reaper.SetMediaTrackInfo_Value(tr, "I_RECINPUT", 2)  -- Mono channel 3
+            log("  ✅ Đã chuyển về Input 3 Mono")
         else
-            log("  ✅ Input OK")
+            log(string.format("  ✅ Input OK (channel %d)", inp+1))
         end
     end
 end

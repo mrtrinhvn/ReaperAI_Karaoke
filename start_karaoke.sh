@@ -11,8 +11,8 @@
 DIR="$(cd "$(dirname "$0")" && pwd)"
 
 # Thử đọc .env để cấu hình cổng nhạc nền của REAPER
-REAPER_MUSIC_IN_L="REAPER:in3"
-REAPER_MUSIC_IN_R="REAPER:in4"
+REAPER_MUSIC_IN_L="REAPER:in1"
+REAPER_MUSIC_IN_R="REAPER:in2"
 if [ -f "$DIR/.env" ]; then
     while IFS= read -r line || [ -n "$line" ]; do
         # Bỏ qua dòng comment và dòng trống
@@ -41,18 +41,26 @@ pkill -f "karaoke_app.py"
 killall -9 pw-record pw-play 2>/dev/null || true
 sleep 0.5
 
-# Step 1: Check REAPER is running
-if ! pgrep -x reaper > /dev/null 2>&1; then
-    echo "❌ REAPER chưa mở! Hãy mở REAPER trước."
-    exit 1
-fi
-echo "✅ REAPER đang chạy."
+# Step 1: Khởi động Connection Watchdog (chạy nền — không cần REAPER mở trước)
+echo ""
+echo "🔌 Connection Watchdog (Định tuyến kết nối tự động)..."
+python3 "$DIR/manage_reaper_links.py" --watch &
+LINK_PID=$!
+echo "   ✅ Watchdog đang chạy (PID $LINK_PID) — tự nối khi REAPER xuất hiện"
+echo "   🚫 Không còn tự kết nối webcam/lóa linh tinh nữa!"
+echo ""
+sleep 1
 
-# Step 2: Load the Lua bridge into REAPER
-echo "🔗 Đang nạp AI FX Bridge v3 vào REAPER..."
-/opt/REAPER/reaper "$DIR/realtime_fx_bridge.lua" &
-sleep 2
-echo "✅ AI FX Bridge đã được gửi tới REAPER."
+# Step 2: Nạp Lua bridge nếu REAPER đang chạy (watchdog sẽ xử lý nếu chưa)
+if pgrep -x reaper > /dev/null 2>&1; then
+    echo "🌉 REAPER đã chạy sẵn. Nạp AI FX Bridge v3..."
+    /opt/REAPER/reaper -nonewinst "$DIR/realtime_fx_bridge.lua" &
+    sleep 2
+    echo "   ✅ AI FX Bridge đã được gửi tới REAPER."
+else
+    echo "🔔 REAPER chưa mở — Watchdog sẽ tự nối khi bạn mở REAPER."
+    echo "   → Mở REAPER bất kỳ lúc nào, hệ thống sẽ tự cấu hình!"  
+fi
 
 # Step 3: Check (nhưng KHÔNG tự nối) Browser audio
 # Chỉ nối nếu chưa có kết nối sẵn
@@ -108,6 +116,7 @@ cleanup() {
     kill $BPM_PID 2>/dev/null
     kill $KEY_PID 2>/dev/null
     kill $MASTER_PID 2>/dev/null
+    kill $LINK_PID 2>/dev/null
     killall -9 pw-record pw-play 2>/dev/null || true
     echo "   ✅ Ứng dụng nổi và AI đã dừng"
     echo "   ✅ Kết nối qpwgraph không bị ảnh hưởng"
