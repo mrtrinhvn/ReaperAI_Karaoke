@@ -963,7 +963,7 @@ class KaraokeApp(Gtk.Window):
                 return
             res_i = subprocess.run(["pw-link", "-i"], capture_output=True, text=True, timeout=2)
             all_inputs = res_i.stdout.splitlines()
-            reaper_ports = ["REAPER:in1", "REAPER:in2"]
+            reaper_ports = [REAPER_MUSIC_IN_L, REAPER_MUSIC_IN_R]
             beat_ports = [l.strip() for l in all_inputs if "beat_ai" in l.lower() and "beat_ai_key" not in l.lower()]
             key_ports  = [l.strip() for l in all_inputs if "beat_ai_key" in l.lower()]
             connected = 0

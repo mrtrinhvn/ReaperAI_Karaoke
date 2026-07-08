@@ -20,17 +20,47 @@ DEFAULT_CONFIG = {
 }
 
 
+def load_env_overrides():
+    music_l = "REAPER:in1"
+    music_r = "REAPER:in2"
+    vocal_l = "REAPER:in3"
+    vocal_r = "REAPER:in4"
+    try:
+        env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env")
+        if os.path.exists(env_path):
+            with open(env_path, "r") as f:
+                for line in f:
+                    line = line.strip()
+                    if line and not line.startswith("#") and "=" in line:
+                        k, v = line.split("=", 1)
+                        k = k.strip()
+                        v = v.strip().strip('"').strip("'")
+                        if k == "REAPER_MUSIC_IN_L": music_l = v
+                        elif k == "REAPER_MUSIC_IN_R": music_r = v
+                        elif k == "REAPER_VOCAL_IN_L": vocal_l = v
+                        elif k == "REAPER_VOCAL_IN_R": vocal_r = v
+    except Exception as e:
+        print(f"Lỗi đọc cấu hình cổng từ .env trong manage_reaper_links.py: {e}")
+    return [music_l, music_r], [vocal_l, vocal_r]
+
+
 def load_config():
+    music_ports, vocal_ports = load_env_overrides()
     try:
         with open(CONFIG_FILE) as f:
             cfg = json.load(f)
+            cfg["reaper_music_in"] = music_ports
+            cfg["reaper_vocal_in"] = vocal_ports
             for k, v in DEFAULT_CONFIG.items():
                 if k not in cfg:
                     cfg[k] = v
             return cfg
     except Exception:
-        save_config(DEFAULT_CONFIG)
-        return DEFAULT_CONFIG.copy()
+        cfg = DEFAULT_CONFIG.copy()
+        cfg["reaper_music_in"] = music_ports
+        cfg["reaper_vocal_in"] = vocal_ports
+        save_config(cfg)
+        return cfg
 
 
 def save_config(cfg):

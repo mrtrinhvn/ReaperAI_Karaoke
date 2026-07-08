@@ -45,10 +45,14 @@ local function find_track(name)
     for i = 0, reaper.CountTracks(0) - 1 do
         local tr = reaper.GetTrack(0, i)
         local _, n = reaper.GetSetMediaTrackInfo_String(tr, "P_NAME", "", false)
-        local clean_n = n:lower()
-        if n == name or (n and n:find(name, 1, true)) or
-           (name == "NHAC" and (clean_n:find("nhac", 1, true) or clean_n:find("nhạc", 1, true))) then
-            return tr, n
+        if n then
+            local clean_n = n:lower()
+            -- Giải quyết triệt để lỗi Unicode Normalization trên Linux (NFC vs NFD) cho track NHẠC
+            if name == "NHẠC" and (clean_n:find("nhac", 1, true) or clean_n:find("nhạc", 1, true) or clean_n:sub(1, 2) == "nh") then
+                return tr, n
+            elseif clean_n:find(name:lower(), 1, true) then
+                return tr, n
+            end
         end
     end
     return nil, ""
@@ -175,7 +179,7 @@ if voc_del then
 end
 
 -- MUSIC DETAIL
-local music = find_track("NHAC")
+local music = find_track("NHẠC")
 if music then
     log("\n═══ NHẠC NỀN DETAIL ═══")
     local meq = find_fx(music, "ReaEQ")

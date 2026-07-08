@@ -116,28 +116,18 @@ function setup()
         for i = 0, reaper.CountTracks(0) - 1 do
             local current_t = reaper.GetTrack(0, i)
             local _, tname = reaper.GetSetMediaTrackInfo_String(current_t, "P_NAME", "", false)
-            local clean_tname = tname:lower()
-            local is_match = false
-            
-            if clean_tname:find(name:lower(), 1, true) then
-                is_match = true
-            elseif name == "NHAC" then
-                if clean_tname:find("nhac", 1, true) or 
-                   clean_tname:find("nh", 1, true) or 
-                   clean_tname:find("music", 1, true) or 
-                   clean_tname:find("beat", 1, true) then
-                    if not clean_tname:find("vocal") and not clean_tname:find("reverb") and not clean_tname:find("delay") then
-                        is_match = true
-                    end
+            if tname then
+                local tname_clean = tname:lower()
+                local match = false
+                if name == "NHẠC" and (tname_clean:find("nhac", 1, true) or tname_clean:find("nhạc", 1, true) or tname_clean:sub(1, 2) == "nh") then
+                    match = true
+                elseif tname_clean:find(name:lower(), 1, true) then
+                    match = true
                 end
-            end
-            
-            if is_match then
-                t = current_t
-                if tname ~= name then
-                    reaper.GetSetMediaTrackInfo_String(t, "P_NAME", name, true)
+                if match then
+                    t = current_t
+                    break
                 end
-                break
             end
         end
 
@@ -156,51 +146,6 @@ function setup()
             reaper.SetMediaTrackInfo_Value(t, "I_RECINPUT", vocal_input_val)
         end
         return t, is_new
-    end
-
-    -- ══════════════════════════════════════════════════════════════
-    -- TỰ ĐỘNG GIẢI QUYẾT TRÙNG LẶP TRACK NHẠC (SELF-HEALING DUPLICATES)
-    -- ══════════════════════════════════════════════════════════════
-    local music_tracks = {}
-    for i = 0, reaper.CountTracks(0) - 1 do
-        local tr = reaper.GetTrack(0, i)
-        local _, tname = reaper.GetSetMediaTrackInfo_String(tr, "P_NAME", "", false)
-        local clean_tname = tname:lower()
-        local is_mus = false
-        if clean_tname:find("nhac", 1, true) or 
-           clean_tname:find("nh", 1, true) or 
-           clean_tname:find("music", 1, true) or 
-           clean_tname:find("beat", 1, true) then
-            if not clean_tname:find("vocal") and not clean_tname:find("reverb") and not clean_tname:find("delay") then
-                is_mus = true
-            end
-        end
-        if is_mus then
-            table.insert(music_tracks, tr)
-        end
-    end
-    
-    if #music_tracks > 1 then
-        -- Giữ lại track chứa Media Items (chứa file nhạc đã kéo vào)
-        local keep_tr = nil
-        for _, tr in ipairs(music_tracks) do
-            if reaper.CountTrackMediaItems(tr) > 0 then
-                keep_tr = tr
-                break
-            end
-        end
-        -- Nếu không track nào chứa item, giữ track đầu tiên
-        if not keep_tr then keep_tr = music_tracks[1] end
-        
-        -- Xóa các track trùng lặp trống khác
-        for _, tr in ipairs(music_tracks) do
-            if tr ~= keep_tr then
-                reaper.DeleteTrack(tr)
-            end
-        end
-        
-        -- Đổi tên track giữ lại thành "NHAC" để đồng bộ
-        reaper.GetSetMediaTrackInfo_String(keep_tr, "P_NAME", "NHAC", true)
     end
 
     -- ══════════════════════════════════════════════════════════════
@@ -235,7 +180,7 @@ function setup()
     reaper.SetMediaTrackInfo_Value(voc_del, "I_RECMON", 0)
     reaper.SetMediaTrackInfo_Value(voc_del, "I_RECINPUT", -1)
 
-    local mus, is_new_mus = get_or_create_track("NHAC", true)
+    local mus, is_new_mus = get_or_create_track("NHẠC", true)
     set_color(mus, 40, 120, 220)
     reaper.SetMediaTrackInfo_Value(mus, "D_VOL", 0.56) -- -5.0dB (tối ưu theo phản hồi người dùng)
     reaper.SetMediaTrackInfo_Value(mus, "D_PAN", 0.0)
@@ -270,7 +215,17 @@ function setup()
     reaper.SetTrackSendInfo_Value(voc, 0, send_del, "D_VOL", 1.0)
     reaper.SetTrackSendInfo_Value(voc, 0, send_del, "I_SENDMODE", 0)
 
+    -- 4. Send Sidechain từ VOCAL sang VOCAL REVERB (chạy vào cổng 3/4 của Compressor)
+    local sc_rev = reaper.CreateTrackSend(voc, voc_rev)
+    reaper.SetTrackSendInfo_Value(voc, 0, sc_rev, "D_VOL", 1.0)
+    reaper.SetTrackSendInfo_Value(voc, 0, sc_rev, "I_SENDMODE", 1) -- Pre-Fader / Post-FX
+    reaper.SetTrackSendInfo_Value(voc, 0, sc_rev, "I_DSTCHAN", 2)  -- Aux Input 3/4
 
+    -- 5. Send Sidechain từ VOCAL sang VOCAL DELAY (chạy vào cổng 3/4 của Compressor)
+    local sc_del = reaper.CreateTrackSend(voc, voc_del)
+    reaper.SetTrackSendInfo_Value(voc, 0, sc_del, "D_VOL", 1.0)
+    reaper.SetTrackSendInfo_Value(voc, 0, sc_del, "I_SENDMODE", 1) -- Pre-Fader / Post-FX
+    reaper.SetTrackSendInfo_Value(voc, 0, sc_del, "I_DSTCHAN", 2)  -- Aux Input 3/4
 
     -- XÓA TẤT CẢ CÁC SEND CŨ TRÊN TRACK VOCAL DELAY (tránh trùng lặp)
     local num_del_sends = reaper.GetTrackNumSends(voc_del, 0)
