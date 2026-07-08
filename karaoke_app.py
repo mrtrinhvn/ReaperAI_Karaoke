@@ -1022,11 +1022,11 @@ class KaraokeApp(Gtk.Window):
         css = """
         window { background-color: #121218; }
         .fixed-lbl {
-            color: #d1d5db !important;
+            color: #d1d5db;
             text-shadow: none;
         }
         .fixed-lbl:backdrop, .fixed-lbl:disabled {
-            color: #d1d5db !important;
+            color: #d1d5db;
         }
         button {
             background-image: none;
