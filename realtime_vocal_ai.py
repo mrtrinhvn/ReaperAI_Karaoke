@@ -392,9 +392,9 @@ def generate_eq_adjustments(band_data, rms_db, sensitivity=1.0):
     # User yêu cầu: "Không cần chỉnh trong thời gian thực".
     # Vì vậy, ta KHÓA CHẾT (Lock) một rãnh EQ cố định vào beat nhạc. 
     # Dù bạn có hát hay im lặng, Beat luôn chừa sẵn chỗ trống này, tránh việc nhảy EQ lên xuống (vặn vẹo).
-    music_adj["music_eq_band_1_gain_db"] = 0.0  # Giữ nguyên độ dày
-    music_adj["music_eq_band_2_gain_db"] = -2.5 # Gọt sâu thêm tí ở dải trung (2.5kHz) để lót đường cho giọng
-    music_adj["music_eq_band_3_gain_db"] = -1.5 # Gọt dải sáng (5kHz) để dọn chỗ cho độ bóng bẩy (gloss) của Vocal
+    music_adj["music_eq_band_1_gain_db"] = -2.0  # Gọt dải siêu cao (10.0kHz High Shelf) nhường chỗ cho reverb bông xốp
+    music_adj["music_eq_band_2_gain_db"] = -4.5  # Gọt sâu dải trung (2.5kHz) tạo khoảng trống cực rộng cho giọng hát mịn
+    music_adj["music_eq_band_3_gain_db"] = -3.5  # Gọt dải sáng (5.0kHz) nhường chỗ cho độ bóng bẩy vocal
     # ── COMPRESSOR & EQ (LOCKED TO OPTIMAL SWEET SPOTS) ──
     # Giữ cố định ở mức ngọt tối ưu để giọng hát có động lực học (dynamics) tự nhiên, hát nhẹ nhàng, không tốn sức
     vocal_adj["comp_ratio"] = 0.025  # ~3.5:1 ratio (nén nhẹ nhàng, mềm mại, dẻo dai)

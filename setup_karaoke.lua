@@ -416,17 +416,21 @@ function setup()
     set_p(mus, rpitch, "Shift (semitones)", 0.5)
 
     local meq = add_fx(mus, "ReaEQ")
-    set_p(mus, meq, "Freq-Band 1", 0.30)
-    set_p(mus, meq, "Gain-Band 1", 0.47)
+    set_p(mus, meq, "Type-Band 1", 3)          -- Chuyển Band 1 thành High Shelf (để dọn sạch dải cao)
+    set_p(mus, meq, "Freq-Band 1", 0.85)       -- ~10.0kHz
+    set_p(mus, meq, "Gain-Band 1", 0.46)       -- -2.0dB cut (tạo không gian siêu thoáng cho Reverb xốp bay bổng)
     set_p(mus, meq, "Bandwidth-Band 1", 0.5)
-    set_p(mus, meq, "Freq-Band 2", 0.40)
-    set_p(mus, meq, "Gain-Band 2", 0.43)
+    
+    set_p(mus, meq, "Freq-Band 2", 0.40)       -- ~2.5kHz (Dải trung dọn chỗ cho giọng hát chính)
+    set_p(mus, meq, "Gain-Band 2", 0.41)       -- -4.5dB cut (tạo vocal pocket cực rộng để hát nhẹ hơi)
     set_p(mus, meq, "Bandwidth-Band 2", 0.45)
-    set_p(mus, meq, "Freq-Band 3", 0.52)
-    set_p(mus, meq, "Gain-Band 3", 0.47)
+    
+    set_p(mus, meq, "Freq-Band 3", 0.52)       -- ~5.0kHz (Dải sáng dọn chỗ cho độ bóng bẩy vocal)
+    set_p(mus, meq, "Gain-Band 3", 0.43)       -- -3.5dB cut
     set_p(mus, meq, "Bandwidth-Band 3", 0.4)
-    set_p(mus, meq, "Freq-Band 4", 0.08)
-    set_p(mus, meq, "Gain-Band 4", 0.56)
+    
+    set_p(mus, meq, "Freq-Band 4", 0.08)       -- ~120Hz (Low Shelf giữ âm trầm ấm áp cho beat)
+    set_p(mus, meq, "Gain-Band 4", 0.56)       -- +3.0dB (Bass warmth)
     set_p(mus, meq, "Bandwidth-Band 4", 0.3)
 
     local mcomp = add_fx(mus, "ReaComp")
