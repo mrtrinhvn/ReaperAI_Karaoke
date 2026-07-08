@@ -420,20 +420,22 @@ function setup()
         reaper.TrackFX_Delete(master, i)
     end
 
-    -- 1. Master EQ (Smile curve & Clean up)
+    -- 1. Master EQ (Smile curve & IEM Bass Leakage Compensation)
     local meq2 = add_fx(master, "ReaEQ")
-    set_p(master, meq2, "Type-Band 1", 0.14)   -- HPF dọn rác trầm dưới 25Hz
-    set_p(master, meq2, "Freq-Band 1", 0.025)
-    set_p(master, meq2, "Gain-Band 1", 0.5)
-    set_p(master, meq2, "Freq-Band 2", 0.25)   -- Cắt đục 500Hz
-    set_p(master, meq2, "Gain-Band 2", 0.48)
+    -- Band 1: Low Shelf ở 80Hz, tăng +3.8dB để bù đắp rò rỉ bass của tai nghe IEM khi đeo lỏng, nghe sát thì bass cực sâu ấm
+    set_p(master, meq2, "Freq-Low Shelf", 0.07)       -- ~80Hz
+    set_p(master, meq2, "Gain-Low Shelf", 0.58)       -- +3.8dB
+    
+    set_p(master, meq2, "Freq-Band 2", 0.25)          -- Cắt đục 500Hz
+    set_p(master, meq2, "Gain-Band 2", 0.47)          -- -1.5dB (bản gốc là 0.48)
     set_p(master, meq2, "Bandwidth-Band 2", 0.5)
-    set_p(master, meq2, "Freq-Band 3", 0.45)   -- Sáng nhẹ 3kHz
-    set_p(master, meq2, "Gain-Band 3", 0.54)
+    
+    set_p(master, meq2, "Freq-Band 3", 0.45)          -- Sáng nhẹ 3kHz
+    set_p(master, meq2, "Gain-Band 3", 0.54)          -- +2.0dB
     set_p(master, meq2, "Bandwidth-Band 3", 0.5)
-    set_p(master, meq2, "Type-Band 4", 0.86)   -- High-shelf
-    set_p(master, meq2, "Freq-Band 4", 0.75)   -- ~10kHz
-    set_p(master, meq2, "Gain-Band 4", 0.60)   -- +4.8dB Air
+    
+    set_p(master, meq2, "Freq-High Shelf 4", 0.75)    -- ~10kHz dải Air
+    set_p(master, meq2, "Gain-High Shelf 4", 0.60)    -- +4.8dB Air
 
     -- 2. Master Multiband Compressor (Keo dán mix)
     local mxc = add_fx(master, "ReaXcomp")
