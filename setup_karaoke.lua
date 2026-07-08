@@ -317,15 +317,20 @@ function setup()
     -- ══════════════════════════════════════════════════════════════
     -- CẤU HÌNH VST TRACK 3: 🌊 VOCAL REVERB (Aux Reverb)
     -- ══════════════════════════════════════════════════════════════
-    -- Filter Abbey Road (Cắt trầm 120Hz, và giảm dải cao sâu để ấm giọng theo khonggianhatok.wav)
+    -- Filter Abbey Road tối ưu hóa (Cắt trầm sạch sẽ dưới 160Hz, cắt đục 350Hz, và mở rộng dải cao long lanh)
     local vreveq = add_fx(voc_rev, "ReaEQ")
-    set_p(voc_rev, vreveq, "Freq-Low Shelf", 0.16)       -- ~120Hz
-    set_p(voc_rev, vreveq, "Gain-Low Shelf", 0.0)        -- -inf dB (cắt hoàn toàn dải trầm)
-    set_p(voc_rev, vreveq, "Freq-High Pass 5", 0.16)     -- ~120Hz (kết hợp tạo độ dốc cắt cực mạnh)
-    set_p(voc_rev, vreveq, "Gain-Band 2", 0.50)          -- 0dB (flat)
+    set_p(voc_rev, vreveq, "Freq-Low Shelf", 0.20)       -- ~160Hz
+    set_p(voc_rev, vreveq, "Gain-Low Shelf", 0.0)        -- -inf dB (cắt trầm sạch sẽ)
+    set_p(voc_rev, vreveq, "Freq-High Pass 5", 0.20)     -- ~160Hz (kết hợp HPF dốc mạnh)
+    
+    set_p(voc_rev, vreveq, "Freq-Band 2", 0.30)          -- ~350Hz (Cắt đục trong Reverb)
+    set_p(voc_rev, vreveq, "Gain-Band 2", 0.44)          -- -3dB
+    
     set_p(voc_rev, vreveq, "Gain-Band 3", 0.50)          -- 0dB (flat)
-    set_p(voc_rev, vreveq, "Freq-High Shelf 4", 0.72)    -- Hạ tần số High Cut về ~4.5kHz để làm ấm Reverb
-    set_p(voc_rev, vreveq, "Gain-High Shelf 4", 0.30)    -- Giảm -10dB dải cao để giảm rú rít và tạo reverb đầm ấm
+    
+    -- Mở rộng dải cao (Vang cao) để tiếng xì vang lấp lánh, bay bổng
+    set_p(voc_rev, vreveq, "Freq-High Shelf 4", 0.78)    -- ~6.5kHz
+    set_p(voc_rev, vreveq, "Gain-High Shelf 4", 0.54)    -- +2.0dB
 
     -- Chorus làm rộng và tạo độ bóng (modulate) cho đuôi Reverb
     local rev_chorus = add_fx(voc_rev, "Chorus")
@@ -335,12 +340,12 @@ function setup()
         set_p(voc_rev, rev_chorus, "Mix", 0.35)        -- 35% Chorus để tạo đuôi reverb long lanh, bóng bẩy trên stream
     end
 
-    -- Reverb 100% Wet (Khớp khonggianhatok.wav: RT60 ~0.5s, Pre-delay 7.1ms, Room Medium)
+    -- Reverb 100% Wet (Phòng rộng rãi, mịn màng và vang xa bay bổng)
     local vrev = add_fx(voc_rev, "ReaVerbate")
     set_p(voc_rev, vrev, "Wet", 1.0)
     set_p(voc_rev, vrev, "Dry", 0.0)
-    set_p(voc_rev, vrev, "Room Size", 0.17)             -- 17% Room Medium (RT60≈0.5s khớp phân tích WAV mẫu)
-    set_p(voc_rev, vrev, "Dampening", 0.60)             -- 60% Dampening tạo reverb tối ấm (brightness -10.3dB)
+    set_p(voc_rev, vrev, "Room Size", 0.22)             -- Tăng lên 22% để phòng rộng mở hơn, vang bay xa hơn
+    set_p(voc_rev, vrev, "Dampening", 0.30)             -- Giảm về 30% Dampening để giữ lại các đuôi vang cao sáng, mịn
     set_p(voc_rev, vrev, "Delay", 0.071)                -- Pre-delay = 7.1ms (khớp first reflection từ autocorrelation)
     set_p(voc_rev, vrev, "Width", 1.0)
     set_p(voc_rev, vrev, "Stereo", 0.90)
