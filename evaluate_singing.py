@@ -298,7 +298,7 @@ def generate_report(res):
 
 ### 2. Cao Độ & Autotune (Tuning Quality)
 {tuning_advice}
-*   *Giai điệu:* Phát hiện `{res['note_changes']}` lần chuyển nốt nhạc trong 10 giây qua.
+*   *Giai điệu:* Phát hiện `{res['note_changes']}` lần chuyển nốt nhạc trong {int(RECORD_DURATION)} giây qua.
 
 ### 3. Không Gian Vang (Reverb & Echo Space)
 {reverb_advice}
@@ -322,7 +322,7 @@ def main():
     print("🎤 ═══ KHỞI ĐỘNG CHƯƠNG TRÌNH THỬ GIỌNG VỚI AI ═══")
     active_mic, reaper_ports = find_active_ports()
     
-    print("\n🔴 Chuẩn bị ghi âm... Hãy chuẩn bị hát hoặc nói liên tục vào mic trong 10 giây nhé!")
+    print(f"\n🔴 Chuẩn bị ghi âm... Hãy chuẩn bị hát hoặc nói liên tục vào mic trong {int(RECORD_DURATION)} giây nhé!")
     for i in range(3, 0, -1):
         print(f"  ⏱️ Bắt đầu trong {i}...")
         time.sleep(1)
@@ -334,16 +334,19 @@ def main():
     for f in [vocal_wav, master_wav]:
         if os.path.exists(f): os.remove(f)
         
-    print("\n🎤 [ĐANG GHI ÂM CHẤN ĐOÁN] >>> Hãy Hát / Nói ngay bây giờ! (10 giây)...")
+    print(f"\n🎤 [ĐANG GHI ÂM CHẤN ĐOÁN] >>> Hãy Hát / Nói ngay bây giờ! ({int(RECORD_DURATION)} giây)...")
     
     # Ghi âm song song
     v_proc = record_node("Record_Vocal", 1, vocal_wav, [active_mic])
     m_proc = record_node("Record_Master", 2, master_wav, reaper_ports)
     
     # Progress bar
-    for s in range(10):
+    total_steps = int(RECORD_DURATION)
+    for s in range(total_steps):
         time.sleep(1.0)
-        sys.stdout.write(f"\r  🕒 Đang xử lý: [{'█' * (s+1)}{'░' * (9-s)}] {s+1}s / 10s")
+        progress = int((s + 1) / RECORD_DURATION * 20)
+        bar = '█' * progress + '░' * (20 - progress)
+        sys.stdout.write(f"\r  🕒 Đang xử lý: [{bar}] {s+1}s / {total_steps}s")
         sys.stdout.flush()
     print()
     
