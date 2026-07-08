@@ -149,7 +149,7 @@ function setup()
 
     local voc_par, is_new_voc_par = get_or_create_track("VOCAL PARALLEL", false)
     set_color(voc_par, 255, 92, 138)
-    reaper.SetMediaTrackInfo_Value(voc_par, "D_VOL", 0.22) -- Trộn song song dày dặn hơn (-13.1dB)
+    reaper.SetMediaTrackInfo_Value(voc_par, "D_VOL", 0.28) -- Trộn song song dày dặn hơn nữa để bồi thêm "độ cốt" cho giọng
     reaper.SetMediaTrackInfo_Value(voc_par, "D_PAN", 0.0)
     reaper.SetMediaTrackInfo_Value(voc_par, "I_RECARM", 0)
     reaper.SetMediaTrackInfo_Value(voc_par, "I_RECMON", 0)
@@ -279,9 +279,9 @@ function setup()
     -- Band 1: Low Shelf (giữ phẳng ở 0dB)
     set_p(voc, veq, "Freq-Low Shelf", 0.085)
     set_p(voc, veq, "Gain-Low Shelf", 0.5)      -- 0dB
-    -- Band 2: Bell (Mud Cut ở 250Hz, giảm nhẹ -1.5dB để giữ độ đầy đặn cho giọng)
+    -- Band 2: Bell (Mud Cut ở 250Hz, giảm bớt độ cắt về -0.8dB để bồi lại dải thân ấm "độ cốt" cho giọng)
     set_p(voc, veq, "Freq-Band 2", 0.26)        -- ~250Hz
-    set_p(voc, veq, "Gain-Band 2", 0.47)        -- -1.5dB
+    set_p(voc, veq, "Gain-Band 2", 0.484)       -- -0.8dB (nhẹ nhàng)
     -- Band 3: Bell (Dìm nhẹ dải chói 3.2kHz xuống -1.5dB để làm mềm dải trung cốt cứng)
     set_p(voc, veq, "Freq-Band 3", 0.62)        -- ~3.2kHz
     set_p(voc, veq, "Gain-Band 3", 0.47)        -- -1.5dB (cut)
@@ -302,15 +302,15 @@ function setup()
     -- FX4: JS Saturation (Hài âm tạo độ ấm đắt tiền)
     local vsat = add_fx(voc, "Saturation")
     if vsat >= 0 then
-        set_p(voc, vsat, "Amount (%)", 0.08)   -- 8% ấm analog
+        set_p(voc, vsat, "Amount (%)", 0.12)   -- Tăng lên 12% Saturation để bồi thêm hài âm ấm áp, đầm giọng
     end
 
     -- FX5: Chorus (Tắt bỏ trên track Vocal mộc để giữ giọng ca sắc nét ở trung tâm, tránh tiếng bị lảo đảo rẻ tiền)
     local chorus = add_fx(voc, "Chorus")
     if chorus >= 0 then
-        set_p(voc, chorus, "Rate", 0.25)
-        set_p(voc, chorus, "Depth", 0.30)
-        set_p(voc, chorus, "Mix", 0.0)          -- Set về 0% Mix
+        set_p(voc, chorus, "Rate", 0.10)        -- Tần số cực chậm tránh hiệu ứng rung lẩy bẩy
+        set_p(voc, chorus, "Depth", 0.15)       -- Độ trễ nông tinh tế
+        set_p(voc, chorus, "Mix", 0.08)          -- Boost 8% Mix để tạo hiệu ứng phủ rộng stereo sang hai bên tai cực kỳ sang trọng
     end
 
     -- ══════════════════════════════════════════════════════════════

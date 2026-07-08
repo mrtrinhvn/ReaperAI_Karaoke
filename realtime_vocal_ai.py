@@ -399,7 +399,7 @@ def generate_eq_adjustments(band_data, rms_db, sensitivity=1.0):
     # Giữ cố định ở mức ngọt tối ưu để giọng hát có động lực học (dynamics) tự nhiên, hát nhẹ nhàng, không tốn sức
     vocal_adj["comp_ratio"] = 0.025  # ~3.5:1 ratio (nén nhẹ nhàng, mềm mại, dẻo dai)
     vocal_adj["comp_thresh"] = 0.030 # -24.4dB threshold (unity)
-    vocal_adj["eq_band_2_gain_db"] = -1.5 # Giữ nguyên mud cut -1.5dB từ setup_karaoke.lua
+    vocal_adj["eq_band_2_gain_db"] = -0.8 # Giữ nguyên mud cut -0.8dB từ setup_karaoke.lua để lấy lại độ dày ấm
     vocal_adj["eq_band_3_gain_db"] = -1.5 # Dìm nhẹ dải chói 3.2kHz xuống -1.5dB để làm mềm dải trung
     vocal_adj["eq_band_4_gain_db"] = 1.5  # Boost nhẹ dải siêu cao 12kHz (+1.5dB Air) tạo hơi thở mềm mại xốp mịn
     vocal_adj["comp_note"] = "Compressor & EQ khóa cứng ở điểm ngọt mềm xốp tối ưu"
