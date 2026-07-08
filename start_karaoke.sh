@@ -74,16 +74,10 @@ if [ -n "$BROWSER_FL" ]; then
     if [ -n "$EXISTING" ]; then
         echo "   ✅ Browser đã được nối sẵn → REAPER. Không thay đổi."
     else
-        echo "   ⚠️  Browser chưa nối → REAPER."
-        read -p "   Bạn có muốn nối không? (y/N): " -n 1 -r
-        echo
-        if [[ $REPLY =~ ^[Yy]$ ]]; then
-            BROWSER_FR=$(pw-link -o 2>/dev/null | grep -iE "(firefox|chrom|brave|opera|edge|vivaldi)" | head -2 | tail -1)
-            pw-link "$BROWSER_FL" "$REAPER_MUSIC_IN_L" 2>/dev/null && echo "   ✅ Browser FL → $REAPER_MUSIC_IN_L"
-            [ -n "$BROWSER_FR" ] && pw-link "$BROWSER_FR" "$REAPER_MUSIC_IN_R" 2>/dev/null && echo "   ✅ Browser FR → $REAPER_MUSIC_IN_R"
-        else
-            echo "   → Bỏ qua. Kết nối giữ nguyên."
-        fi
+        echo "   ⚡ Đang tự động kết nối Browser → REAPER..."
+        BROWSER_FR=$(pw-link -o 2>/dev/null | grep -iE "(firefox|chrom|brave|opera|edge|vivaldi)" | head -2 | tail -1)
+        pw-link "$BROWSER_FL" "$REAPER_MUSIC_IN_L" 2>/dev/null && echo "   ✅ Kết nối Browser FL → $REAPER_MUSIC_IN_L"
+        [ -n "$BROWSER_FR" ] && pw-link "$BROWSER_FR" "$REAPER_MUSIC_IN_R" 2>/dev/null && echo "   ✅ Kết nối Browser FR → $REAPER_MUSIC_IN_R"
     fi
 else
     echo "   ⚠️ Không tìm thấy Browser đang phát nhạc (Firefox, Chrome, Brave...)."
