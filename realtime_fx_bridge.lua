@@ -18,7 +18,11 @@ function find_track(name)
     for i = 0, reaper.CountTracks(0) - 1 do
         local tr = reaper.GetTrack(0, i)
         local _, n = reaper.GetSetMediaTrackInfo_String(tr, "P_NAME", "", false)
-        if n == name or (n and n:find(name, 1, true)) then return tr end
+        local clean_n = n:lower()
+        if n == name or (n and n:find(name, 1, true)) or
+           (name == "NHAC" and (clean_n:find("nhac", 1, true) or clean_n:find("nhạc", 1, true))) then
+            return tr
+        end
     end
     return nil
 end
@@ -134,7 +138,7 @@ function apply(data)
     if data.reset then return end
 
     local vocal = find_track("VOCAL")
-    local music = find_track("NHẠC")
+    local music = find_track("NHAC")
     local voc_rev = find_track("VOCAL REVERB") or vocal
     local voc_del = find_track("VOCAL DELAY") or vocal
 

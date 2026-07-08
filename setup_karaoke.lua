@@ -116,7 +116,9 @@ function setup()
         for i = 0, reaper.CountTracks(0) - 1 do
             local current_t = reaper.GetTrack(0, i)
             local _, tname = reaper.GetSetMediaTrackInfo_String(current_t, "P_NAME", "", false)
-            if tname:lower():find(name:lower(), 1, true) then
+            local clean_tname = tname:lower()
+            if clean_tname:find(name:lower(), 1, true) or 
+               (name == "NHAC" and (clean_tname:find("nhac", 1, true) or clean_tname:find("nhạc", 1, true))) then
                 t = current_t
                 break
             end
@@ -171,7 +173,7 @@ function setup()
     reaper.SetMediaTrackInfo_Value(voc_del, "I_RECMON", 0)
     reaper.SetMediaTrackInfo_Value(voc_del, "I_RECINPUT", -1)
 
-    local mus, is_new_mus = get_or_create_track("NHẠC", true)
+    local mus, is_new_mus = get_or_create_track("NHAC", true)
     set_color(mus, 40, 120, 220)
     reaper.SetMediaTrackInfo_Value(mus, "D_VOL", 0.56) -- -5.0dB (tối ưu theo phản hồi người dùng)
     reaper.SetMediaTrackInfo_Value(mus, "D_PAN", 0.0)
