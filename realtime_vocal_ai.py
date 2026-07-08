@@ -395,35 +395,13 @@ def generate_eq_adjustments(band_data, rms_db, sensitivity=1.0):
     music_adj["music_eq_band_1_gain_db"] = 0.0  # Giữ nguyên độ dày
     music_adj["music_eq_band_2_gain_db"] = -2.5 # Gọt sâu thêm tí ở dải trung (2.5kHz) để lót đường cho giọng
     music_adj["music_eq_band_3_gain_db"] = -1.5 # Gọt dải sáng (5kHz) để dọn chỗ cho độ bóng bẩy (gloss) của Vocal
-    # ── AI PROXIMITY & GAIN COMPENSATION ──
-    # Tự động bù đắp dải âm và Compressor khi ca sĩ hát xa micro
-    if is_singing:
-        # rms_db dao động từ khoảng -45dB (hát xa/nhỏ) đến -25dB (hát sát mic/to)
-        # Tính toán hệ số khoảng cách (dist_factor) từ 0.0 (gần sát) đến 1.0 (xa mic)
-        dist_factor = min(max((-25.0 - rms_db) / 20.0, 0.0), 1.0)
-        
-        # 1. Bù đắp âm trầm (Proximity EQ Compensation): 
-        # Càng xa mic thì dải trầm (bass) càng bị suy giảm. Bù từ +0.0dB (gần) đến +3.5dB (xa) ở dải Mud (Band 2)
-        vocal_adj["eq_band_2_gain_db"] = float(dist_factor * 3.5)
-        
-        # 2. Bù đắp dải cao sáng (Treble Compensation):
-        # Càng xa thì dải treble cũng bị loãng. Bù thêm từ +0.0dB đến +1.5dB dải Bright (Band 4)
-        vocal_adj["eq_band_4_gain_db"] = float(dist_factor * 1.5)
-        
-        # 3. Tự động hạ ngưỡng nén của Compressor (Thresh) và tăng Ratio:
-        # Khi hát xa (giọng nhỏ), hạ Threshold xuống sâu để Compressor vẫn nén được tiếng, 
-        # và tăng Ratio nhẹ để giữ âm lượng dày dặn ổn định.
-        # Ở gần (0.0): Threshold = 0.030 (~-24dB), Ratio = 0.025 (~3.5:1)
-        # Ở xa (1.0): Threshold = 0.005 (~-55dB), Ratio = 0.040 (~5.5:1)
-        vocal_adj["comp_thresh"] = float(0.030 - (dist_factor * 0.025))
-        vocal_adj["comp_ratio"] = float(0.025 + (dist_factor * 0.015))
-        
-        vocal_adj["comp_note"] = f"Bù khoảng cách ({dist_factor:.0%}): Bass={vocal_adj['eq_band_2_gain_db']:+.1f}dB, Thresh={-60 + vocal_adj['comp_thresh']*1000:.1f}dB"
-    else:
-        vocal_adj["comp_ratio"] = 0.025  # ~3.5:1 ratio
-        vocal_adj["comp_thresh"] = 0.030 # -24.4dB threshold
-        vocal_adj["eq_band_2_gain_db"] = 0.0
-        vocal_adj["eq_band_4_gain_db"] = 0.0
+    # ── COMPRESSOR & EQ (LOCKED TO OPTIMAL SWEET SPOTS) ──
+    # Giữ cố định ở mức ngọt tối ưu để giọng hát có động lực học (dynamics) tự nhiên, hát nhẹ nhàng, không tốn sức
+    vocal_adj["comp_ratio"] = 0.025  # ~3.5:1 ratio (nén nhẹ ấm áp)
+    vocal_adj["comp_thresh"] = 0.030 # -24.4dB threshold (unity)
+    vocal_adj["eq_band_2_gain_db"] = 0.0 # Để EQ căn chỉnh gốc từ setup_karaoke.lua hoặc Auto-Calibrate làm chủ đạo
+    vocal_adj["eq_band_4_gain_db"] = 0.0
+    vocal_adj["comp_note"] = "Compressor & EQ khóa cứng ở điểm ngọt tối ưu (Dễ hát, nhẹ hơi)"
 
     # ── REVERB: body-based override ──
     body_energy = band_data.get("Body", {}).get("energy", 0)
