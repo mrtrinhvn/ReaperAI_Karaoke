@@ -19,7 +19,7 @@ import librosa
 import scipy.signal as signal
 
 # Config
-RECORD_DURATION = 10.0  # seconds
+RECORD_DURATION = 15.0  # seconds
 SR = 44100
 ARTIFACT_DIR = "/home/tao/.gemini/antigravity-ide/brain/abb62a03-a770-4fd4-bdfa-74ff7d90f1e2"
 REPORT_PATH = os.path.join(ARTIFACT_DIR, "singing_evaluation_report.md")
