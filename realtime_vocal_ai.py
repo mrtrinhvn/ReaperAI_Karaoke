@@ -403,14 +403,10 @@ def generate_eq_adjustments(band_data, rms_db, sensitivity=1.0):
     vocal_adj["eq_band_4_gain_db"] = 0.0
     vocal_adj["comp_note"] = "Compressor & EQ khóa cứng ở điểm ngọt tối ưu (Dễ hát, nhẹ hơi)"
 
-    # ── REVERB: body-based override ──
-    body_energy = band_data.get("Body", {}).get("energy", 0)
-    if body_energy < 0.2 and is_singing:
-        vocal_adj["reverb_wet"] = min(tempo["reverb_wet_tempo"] + 0.03, 0.45) # Tăng rất nhẹ để không làm lố
-        vocal_adj["reverb_note"] = "Giọng mỏng → Thêm xíu Vang để quyện nhạc"
-    elif body_energy > 0.5 and is_singing:
-        vocal_adj["reverb_wet"] = max(tempo["reverb_wet_tempo"] - 0.02, 0.25) # Giữ cho giọng hòa quyện
-        vocal_adj["reverb_note"] = "Giọng dày → Giảm bớt Reverb"
+    # ── REVERB: body-based override (Giữ cực kỳ ổn định) ──
+    # Khóa cứng reverb_wet theo tempo & preset, không tự động dìm bớt khi giọng dày lên để tránh cảm giác bị hụt vang
+    vocal_adj["reverb_wet"] = tempo["reverb_wet_tempo"]
+    vocal_adj["reverb_note"] = "Vang giữ ổn định theo thể loại"
 
     # ── ĐỌC THÔNG SỐ TỰ ĐỘNG CÂN CHỈNH (AUTO-CALIBRATE) ──
     try:
