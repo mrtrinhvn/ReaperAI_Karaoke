@@ -273,7 +273,7 @@ function setup()
     -- FX3: ReaComp (Vocal Compressor mượt mà)
     local vcomp = add_fx(voc, "ReaComp")
     set_p(voc, vcomp, "Thresh", 0.030)         -- -24.4dB (norm 0.030 khớp giọng nói/hát)
-    set_p(voc, vcomp, "Ratio", 0.025)          -- ~3.5:1 (norm 0.025 tránh bị nén quá chặt)
+    set_p(voc, vcomp, "Ratio", 0.040)          -- ~4.5:1 (nén gọn gàng, chặt chẽ hơn)
     set_p(voc, vcomp, "Attack", 0.05)          -- 5ms (bắt mic nhanh hơn)
     set_p(voc, vcomp, "Release", 0.15)         -- 150ms
     set_p(voc, vcomp, "Knee", 0.35)
@@ -345,7 +345,7 @@ function setup()
     set_p(voc_rev, vrev, "Dry", 0.0)
     set_p(voc_rev, vrev, "Room Size", 0.22)             -- Tăng lên 22% để phòng rộng mở hơn, vang bay xa hơn
     set_p(voc_rev, vrev, "Dampening", 0.30)             -- Giảm về 30% Dampening để giữ lại các đuôi vang cao sáng, mịn
-    set_p(voc_rev, vrev, "Delay", 0.071)                -- Pre-delay = 7.1ms (khớp first reflection từ autocorrelation)
+    set_p(voc_rev, vrev, "Delay", 0.20)                 -- Pre-delay = 20ms (tách bạch giọng mộc giúp tiếng hát cực kỳ gọn gàng)
     set_p(voc_rev, vrev, "Width", 1.0)
     set_p(voc_rev, vrev, "Stereo", 0.90)
 
