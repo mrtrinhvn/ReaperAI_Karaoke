@@ -1796,16 +1796,20 @@ class KaraokeApp(Gtk.Window):
         btn_setup.add(setup_inner)
         grid.attach(btn_setup, 0, 4, 2, 1)
         
-        # Row 5: Nhãn trạng thái kết nối dưới cùng
-        dialog_status_lbl = Gtk.Label(label="")
-        dialog_status_lbl.set_use_markup(True)
-        dialog_status_lbl.set_halign(Gtk.Align.CENTER)
-        grid.attach(dialog_status_lbl, 0, 5, 2, 1)
+        # Nhãn trạng thái kết nối dưới cùng (Đã loại bỏ để tránh làm giãn thành phần)
         
-        def show_dialog_status(msg, color="#2ecc71", timeout=3000):
-            dialog_status_lbl.set_markup(f"<span font='9' color='{color}'>{msg}</span>")
-            GLib.timeout_add(timeout, lambda: dialog_status_lbl.set_markup("") or False)
-
+        def show_message(title, message, msg_type=Gtk.MessageType.INFO):
+            msg_dialog = Gtk.MessageDialog(
+                transient_for=dialog,
+                flags=Gtk.DialogFlags.MODAL | Gtk.DialogFlags.DESTROY_WITH_PARENT,
+                message_type=msg_type,
+                buttons=Gtk.ButtonsType.OK,
+                text=title
+            )
+            msg_dialog.format_secondary_text(message)
+            msg_dialog.run()
+            msg_dialog.destroy()
+ 
         def connect_devices():
             """Kết nối thiết bị đã chọn và ghi nhớ — không đóng dialog."""
             sel_in_idx = combo_in.get_active()
@@ -1822,24 +1826,28 @@ class KaraokeApp(Gtk.Window):
                 json.dump(data, f)
             self.check_audio_connections()
             parts = []
-            if new_in: parts.append(f"đã ghi nhớ mic: {self.get_device_friendly_name(new_in)}")
-            if new_out: parts.append(f"loa: {self.get_device_friendly_name(new_out)}")
-            msg = ", ".join(parts) if parts else "Giữ nguyên thiết bị"
-            show_dialog_status(f"✅ Đã kết nối: {msg}")
+            if new_in: parts.append(f"Mic: {self.get_device_friendly_name(new_in)}")
+            if new_out: parts.append(f"Loa: {self.get_device_friendly_name(new_out)}")
+            msg = "\n".join(parts) if parts else "Giữ nguyên thiết bị"
+            
+            show_message("Kết Nối Thiết Bị Thành Công", f"Đã cấu hình và kết nối âm thanh:\n{msg}")
+            
             self.update_status(f"<span font='9' color='#2ecc71'>đã áp dụng cấu hình!</span>")
             GLib.timeout_add(3000, lambda: self.update_status("") or False)
-
+ 
         def on_setup_project_clicked(button):
             try:
                 setup_script = os.path.join(os.path.dirname(os.path.abspath(__file__)), "setup_karaoke.lua")
                 subprocess.run(["/opt/REAPER/reaper", "-nonewinst", setup_script], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
                 fix_script = os.path.join(os.path.dirname(os.path.abspath(__file__)), "fix_master.lua")
                 subprocess.run(["/opt/REAPER/reaper", "-nonewinst", fix_script], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-                show_dialog_status("⚡ Project REAPER đã được khởi tạo!")
+                
+                show_message("Khởi Tạo Thành Công", "Project REAPER Karaoke đã được thiết lập thành công!")
+                
                 self.update_status("<span font='9' color='#2ecc71'>⚡ Đã thiết lập Project REAPER v6!</span>")
                 GLib.timeout_add(4000, lambda: self.update_status("") or False)
             except Exception as e:
-                show_dialog_status(f"❌ Lỗi: {str(e)}", "#e74c3c")
+                show_message("Lỗi Thiết Lập", f"Không thể khởi tạo project:\n{str(e)}", Gtk.MessageType.ERROR)
                 
         btn_connect.connect("clicked", lambda w: connect_devices())
         btn_close.connect("clicked", lambda w: dialog.response(Gtk.ResponseType.CLOSE))
