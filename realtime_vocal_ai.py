@@ -400,8 +400,8 @@ def generate_eq_adjustments(band_data, rms_db, sensitivity=1.0):
     vocal_adj["comp_ratio"] = 0.025  # ~3.5:1 ratio (nén nhẹ nhàng, mềm mại, dẻo dai)
     vocal_adj["comp_thresh"] = 0.030 # -24.4dB threshold (unity)
     vocal_adj["eq_band_2_gain_db"] = -1.5 # Giữ nguyên mud cut -1.5dB từ setup_karaoke.lua
-    vocal_adj["eq_band_3_gain_db"] = 0.0  # Triệt tiêu hoàn toàn độ chói chọc tai (giữ phẳng 0dB)
-    vocal_adj["eq_band_4_gain_db"] = 3.0  # Boost dải siêu cao 12kHz (+3dB Air) tạo âm mềm xốp bay bổng
+    vocal_adj["eq_band_3_gain_db"] = -1.5 # Dìm nhẹ dải chói 3.2kHz xuống -1.5dB để làm mềm dải trung
+    vocal_adj["eq_band_4_gain_db"] = 1.5  # Boost nhẹ dải siêu cao 12kHz (+1.5dB Air) tạo hơi thở mềm mại xốp mịn
     vocal_adj["comp_note"] = "Compressor & EQ khóa cứng ở điểm ngọt mềm xốp tối ưu"
 
     # ── REVERB: body-based override (Giữ cực kỳ ổn định) ──

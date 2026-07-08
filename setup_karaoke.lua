@@ -157,7 +157,7 @@ function setup()
  
     local voc_rev, is_new_voc_rev = get_or_create_track("VOCAL REVERB", false)
     set_color(voc_rev, 56, 189, 248)
-    reaper.SetMediaTrackInfo_Value(voc_rev, "D_VOL", 0.63) -- Reverb level (-4dB, tăng thêm 11dB để vang dạt dào nịnh giọng)
+    reaper.SetMediaTrackInfo_Value(voc_rev, "D_VOL", 0.80) -- Tăng Reverb level lên -2.0dB để âm xốp dày dạt dào nịnh giọng
     reaper.SetMediaTrackInfo_Value(voc_rev, "D_PAN", 0.0)
     reaper.SetMediaTrackInfo_Value(voc_rev, "I_RECARM", 0)
     reaper.SetMediaTrackInfo_Value(voc_rev, "I_RECMON", 0)
@@ -165,7 +165,7 @@ function setup()
  
     local voc_del, is_new_voc_del = get_or_create_track("VOCAL DELAY", false)
     set_color(voc_del, 234, 179, 8)
-    reaper.SetMediaTrackInfo_Value(voc_del, "D_VOL", 0.63) -- Delay level (-4dB, tăng thêm 3dB để echo nổi bật)
+    reaper.SetMediaTrackInfo_Value(voc_del, "D_VOL", 0.70) -- Tăng nhẹ Delay level lên -3.1dB
     reaper.SetMediaTrackInfo_Value(voc_del, "D_PAN", 0.0)
     reaper.SetMediaTrackInfo_Value(voc_del, "I_RECARM", 0)
     reaper.SetMediaTrackInfo_Value(voc_del, "I_RECMON", 0)
@@ -282,12 +282,12 @@ function setup()
     -- Band 2: Bell (Mud Cut ở 250Hz, giảm nhẹ -1.5dB để giữ độ đầy đặn cho giọng)
     set_p(voc, veq, "Freq-Band 2", 0.26)        -- ~250Hz
     set_p(voc, veq, "Gain-Band 2", 0.47)        -- -1.5dB
-    -- Band 3: Bell (Giữ phẳng ở 0dB để triệt tiêu hoàn toàn độ chói cốt cứng chọc tai)
+    -- Band 3: Bell (Dìm nhẹ dải chói 3.2kHz xuống -1.5dB để làm mềm dải trung cốt cứng)
     set_p(voc, veq, "Freq-Band 3", 0.62)        -- ~3.2kHz
-    set_p(voc, veq, "Gain-Band 3", 0.50)        -- 0dB (flat)
-    -- Band 4: High Shelf (Dịch hẳn lên dải siêu cao 12kHz tạo hơi thở xốp mịn, tránh xa dải chói tai 5k-8k)
+    set_p(voc, veq, "Gain-Band 3", 0.47)        -- -1.5dB (cut)
+    -- Band 4: High Shelf (Dịch hẳn lên dải siêu cao 12kHz tạo hơi thở xốp mịn, giảm gain nhẹ để êm tai)
     set_p(voc, veq, "Freq-High Shelf 4", 0.89)  -- ~12.0kHz
-    set_p(voc, veq, "Gain-High Shelf 4", 0.563) -- +3.0dB (Air)
+    set_p(voc, veq, "Gain-High Shelf 4", 0.531) -- +1.5dB (Air)
     set_p(voc, veq, "BW-High Shelf 4", 0.20)
 
     -- FX3: ReaComp (Vocal Compressor mềm xốp, giảm nén gắt)
@@ -329,9 +329,9 @@ function setup()
     set_p(voc_par, vpeq, "Freq-Low Shelf", 0.23)         -- ~200Hz
     set_p(voc_par, vpeq, "Gain-Low Shelf", 0.0)          -- -inf dB (cắt trầm sạch sẽ)
     set_p(voc_par, vpeq, "Freq-Band 2", 0.45)            -- ~3kHz
-    set_p(voc_par, vpeq, "Gain-Band 2", 0.58)            -- ~+2.3dB boost
+    set_p(voc_par, vpeq, "Gain-Band 2", 0.50)            -- 0dB (Giữ phẳng để tránh chói gắt dải trung trên track song song)
     set_p(voc_par, vpeq, "Freq-Band 3", 0.75)            -- ~10kHz
-    set_p(voc_par, vpeq, "Gain-Band 3", 0.56)            -- ~+1.5dB boost
+    set_p(voc_par, vpeq, "Gain-Band 3", 0.50)            -- 0dB (Giữ phẳng để tránh chói gắt dải cao trên track song song)
 
     -- ══════════════════════════════════════════════════════════════
     -- CẤU HÌNH VST TRACK 3: 🌊 VOCAL REVERB (Aux Reverb)
