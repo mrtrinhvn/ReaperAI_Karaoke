@@ -263,12 +263,12 @@ function setup()
     -- Band 2: Bell (Mud Cut ở 250Hz, giảm -3dB để giọng thanh thoát, hết hộp giấy)
     set_p(voc, veq, "Freq-Band 2", 0.26)        -- ~250Hz
     set_p(voc, veq, "Gain-Band 2", 0.44)        -- -3dB
-    -- Band 3: Bell (Presence Boost ở 4.5kHz, tăng nhẹ +1.5dB tạo độ nét mà không bị đanh giọng)
-    set_p(voc, veq, "Freq-Band 3", 0.70)        -- ~4.5kHz
-    set_p(voc, veq, "Gain-Band 3", 0.525)       -- +1.5dB
-    -- Band 4: High Shelf (Air ở 12kHz, đặt ở +0.6dB để dải cao ấm áp, tự nhiên hơn giống file mẫu)
+    -- Band 3: Bell (Brilliance Boost ở 6.5kHz, tăng +2.5dB để giọng long lanh, sắc nét trên livestream)
+    set_p(voc, veq, "Freq-Band 3", 0.78)        -- ~6.5kHz
+    set_p(voc, veq, "Gain-Band 3", 0.542)       -- +2.5dB
+    -- Band 4: High Shelf (Air ở 12kHz, tăng mạnh +5.5dB để giữ dải cao sáng mịn màng sau khi bị nén qua livestream)
     set_p(voc, veq, "Freq-High Shelf 4", 0.88)  -- ~12kHz
-    set_p(voc, veq, "Gain-High Shelf 4", 0.58) -- +3.0dB (tăng dải cao tạo độ sáng, long lanh cho hát live)
+    set_p(voc, veq, "Gain-High Shelf 4", 0.615) -- +5.5dB
     set_p(voc, veq, "BW-High Shelf 4", 0.20)
 
     -- FX3: ReaComp (Vocal Compressor mượt mà)
@@ -332,7 +332,7 @@ function setup()
     if rev_chorus >= 0 then
         set_p(voc_rev, rev_chorus, "Rate", 0.15)
         set_p(voc_rev, rev_chorus, "Depth", 0.20)
-        set_p(voc_rev, rev_chorus, "Mix", 0.25)        -- 25% Chorus để tạo không gian rộng mở và bóng bẩy
+        set_p(voc_rev, rev_chorus, "Mix", 0.35)        -- 35% Chorus để tạo đuôi reverb long lanh, bóng bẩy trên stream
     end
 
     -- Reverb 100% Wet (Khớp khonggianhatok.wav: RT60 ~0.5s, Pre-delay 7.1ms, Room Medium)
