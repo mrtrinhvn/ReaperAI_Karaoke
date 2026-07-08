@@ -149,7 +149,7 @@ function setup()
 
     local voc_par, is_new_voc_par = get_or_create_track("VOCAL PARALLEL", false)
     set_color(voc_par, 255, 92, 138)
-    reaper.SetMediaTrackInfo_Value(voc_par, "D_VOL", 0.22) -- Trộn song song dày dặn hơn (-13.1dB)
+    reaper.SetMediaTrackInfo_Value(voc_par, "D_VOL", 0.32) -- Trộn song song dày dặn hơn (-10.0dB)
     reaper.SetMediaTrackInfo_Value(voc_par, "D_PAN", 0.0)
     reaper.SetMediaTrackInfo_Value(voc_par, "I_RECARM", 0)
     reaper.SetMediaTrackInfo_Value(voc_par, "I_RECMON", 0)
@@ -283,7 +283,7 @@ function setup()
     -- FX4: JS Saturation (Hài âm tạo độ ấm đắt tiền)
     local vsat = add_fx(voc, "Saturation")
     if vsat >= 0 then
-        set_p(voc, vsat, "Amount (%)", 0.08)   -- 8% ấm analog
+        set_p(voc, vsat, "Amount (%)", 0.12)   -- 12% ấm dày analog, lấp đầy khoang tai
     end
 
     -- FX5: Chorus (Tắt bỏ trên track Vocal mộc để giữ giọng ca sắc nét ở trung tâm, tránh tiếng bị lảo đảo rẻ tiền)
