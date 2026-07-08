@@ -274,13 +274,13 @@ def generate_eq_adjustments(band_data, rms_db, sensitivity=1.0):
             # Flex-Tune logic: if pitch standard deviation is high (singer is sliding/vibrato),
             # reduce autotune depth so it doesn't yank the voice.
             if pitch_std > 1.0:     # high fluctuation -> slide / vibrato / transition
-                autotune_depth = 0.05
+                autotune_depth = 0.25  # Giữ lực bám nhẹ để không bị hụt trợ năng
             elif pitch_std < 0.3:   # extremely stable -> holding a note
-                autotune_depth = 0.8
+                autotune_depth = 0.65  # Giữ độ tự nhiên, không bị méo giọng robot
             else:                   # moderate transition
-                autotune_depth = 0.4
+                autotune_depth = 0.45
         else:
-            autotune_depth = 0.0  # quiet or unstable
+            autotune_depth = 0.25  # Giữ lực bám nền nhẹ thay vì tắt ngóm về 0.0 gây hụt hẫng
             
         # Genre-based limits & Scale types
         if genre_key == "dan_ca":

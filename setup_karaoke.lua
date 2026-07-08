@@ -149,7 +149,7 @@ function setup()
 
     local voc_par, is_new_voc_par = get_or_create_track("VOCAL PARALLEL", false)
     set_color(voc_par, 255, 92, 138)
-    reaper.SetMediaTrackInfo_Value(voc_par, "D_VOL", 0.32) -- Trộn song song dày dặn hơn (-10.0dB)
+    reaper.SetMediaTrackInfo_Value(voc_par, "D_VOL", 0.22) -- Trộn song song dày dặn hơn (-13.1dB)
     reaper.SetMediaTrackInfo_Value(voc_par, "D_PAN", 0.0)
     reaper.SetMediaTrackInfo_Value(voc_par, "I_RECARM", 0)
     reaper.SetMediaTrackInfo_Value(voc_par, "I_RECMON", 0)
@@ -240,12 +240,11 @@ function setup()
         end
     end
 
-    -- FX0: Noise Gate lọc ồn phòng sạch sẽ
+    -- FX0: Noise Gate (Tắt mặc định để tránh chặt cụt các đoạn chuyển nốt, luyến láy nhẹ nhàng)
     local vgate = add_fx(voc, "ReaGate")
-    set_p(voc, vgate, "Threshold", 0.0010)       -- -54.0dB (nhạy, cực kỳ dễ bắt mic)
-    set_p(voc, vgate, "Attack", 0.002)         -- 2ms
-    set_p(voc, vgate, "Release", 0.15)         -- 150ms
-    set_p(voc, vgate, "Hold", 0.05)            -- 50ms
+    if vgate >= 0 then
+        reaper.TrackFX_SetEnabled(voc, vgate, false)
+    end
 
     -- FX1: Auto-Tune
     local at = add_fx(voc, "MAutoPitch")
@@ -283,7 +282,7 @@ function setup()
     -- FX4: JS Saturation (Hài âm tạo độ ấm đắt tiền)
     local vsat = add_fx(voc, "Saturation")
     if vsat >= 0 then
-        set_p(voc, vsat, "Amount (%)", 0.12)   -- 12% ấm dày analog, lấp đầy khoang tai
+        set_p(voc, vsat, "Amount (%)", 0.08)   -- 8% ấm analog
     end
 
     -- FX5: Chorus (Tắt bỏ trên track Vocal mộc để giữ giọng ca sắc nét ở trung tâm, tránh tiếng bị lảo đảo rẻ tiền)
