@@ -130,11 +130,11 @@ PRESETS = {
         "color": "#16a085", 
         "delay_fraction": 0.5, "delay_volume": 0.22, "delay_feedback": 0.52, 
         "reverb_room": 0.75, "reverb_wet": 0.45, "reverb_damp": 0.30, "reverb_width": 1.00, 
-        "chorus_mix": 0.18, "comp_ratio": 0.025, "comp_thresh": 0.030, "duck_intensity": 0.9, "saturation_amount": 0.25,
+        "chorus_mix": 0.18, "comp_ratio": 0.025, "comp_thresh": 0.030, "duck_intensity": 0.9, "saturation_amount": 0.15,
         "desc": (
             "<b>🌊 KHÔNG GIAN OK (Mượt Mà - Long Lanh - Màu Sắc Pro)</b>\n"
             "• <b>Vang Reverb:</b> Vang rộng &amp; Ẩm mượt (Room 75%, Wet 45%, Damp 30%) tạo độ mịn màng nâng đỡ hơi hát cực tốt.\n"
-            "• <b>Màu sắc:</b> Chorus rộng 18% phủ bóng pha lê, Saturation 25% sang trọng, ấm dày."
+            "• <b>Màu sắc:</b> Chorus rộng 18% phủ bóng pha lê, Saturation 15% sạch sẽ, trong trẻo."
         )
     },
 }

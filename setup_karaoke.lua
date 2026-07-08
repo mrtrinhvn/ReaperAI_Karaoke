@@ -262,9 +262,9 @@ function setup()
     -- Band 2: Bell (Mud Cut ở 250Hz, giảm nhẹ -1.5dB để giữ độ đầy đặn cho giọng)
     set_p(voc, veq, "Freq-Band 2", 0.26)        -- ~250Hz
     set_p(voc, veq, "Gain-Band 2", 0.47)        -- -1.5dB
-    -- Band 3: Bell (Clarity Boost ở 3.2kHz, giảm nhẹ về +1.0dB để bớt ròn thân, nghe êm tai và đỡ mệt)
+    -- Band 3: Bell (Clarity Boost ở 3.2kHz, nhích nhẹ lên +1.5dB để phóng chữ tốt hơn mà vẫn êm tai)
     set_p(voc, veq, "Freq-Band 3", 0.62)        -- ~3.2kHz
-    set_p(voc, veq, "Gain-Band 3", 0.521)       -- +1.0dB
+    set_p(voc, veq, "Gain-Band 3", 0.531)       -- +1.5dB
     -- Band 4: High Shelf (Air & Brilliance hạ về 7kHz, tăng +4.5dB để ròn phần cao, tạo chi tiết sạch, bay đẹp)
     set_p(voc, veq, "Freq-High Shelf 4", 0.80)  -- ~7.0kHz
     set_p(voc, veq, "Gain-High Shelf 4", 0.594) -- +4.5dB
