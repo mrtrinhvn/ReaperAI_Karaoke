@@ -235,6 +235,11 @@ function apply(data)
             local p = find_p(voc_rev, verb, "Dampening")
             if p >= 0 then smooth(voc_rev, verb, p, data.reverb_damp, 0.15) end
         end
+        -- REVERB: Pre-delay (BPM-synced, 25-40ms sweet spot)
+        if verb >= 0 and data.reverb_predelay then
+            local p = find_p(voc_rev, verb, "Delay")
+            if p >= 0 then smooth(voc_rev, verb, p, data.reverb_predelay, 0.15) end
+        end
         -- REVERB: Width (genre-driven)
         if verb >= 0 and data.reverb_width then
             local p = find_p(voc_rev, verb, "Width")

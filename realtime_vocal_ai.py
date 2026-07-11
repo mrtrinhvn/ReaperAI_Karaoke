@@ -168,9 +168,17 @@ def calc_tempo_sync(bpm, genre=None):
     scale_factor = 1.0 + (reverb_scale / 100.0)
     
     scaled_wet = min(max(wet * scale_factor, 0.0), 0.95)
-    scaled_delay_vol = min(max(delay_vol, 0.0), 0.95) # Giữ nguyên lượng delay như preset chuẩn, không tăng theo thanh reverb
+    scaled_delay_vol = min(max(delay_vol, 0.0), 0.95)
     scaled_room = min(max(room * (1.0 + (reverb_scale / 200.0)), 0.2), 0.95)
-    scaled_delay_fb = min(max(delay_fb, 0.0), 0.4)    # Giữ nguyên feedback như preset chuẩn, không tăng theo thanh reverb
+    scaled_delay_fb = min(max(delay_fb, 0.0), 0.4)
+    
+    # Pre-delay theo BPM: 1/64 note, clamp 25-40ms (sweet spot thính giác)
+    # < 25ms: não nghe thành 1 âm (thickening) → mất vang
+    # 25-40ms: não nghe thành "phản xạ/vang" riêng biệt → sân khấu
+    # > 40ms: nghe rõ echo riêng → doubling
+    predelay_ms = ms_per_beat / 16.0  # 1/64 note (1/16 of beat)
+    predelay_ms = max(15.0, min(25.0, predelay_ms))
+    predelay_norm = predelay_ms / 100.0  # ReaVerbate Delay param ~= ms/100
     
     return {
         "delay_length": delay_norm,
@@ -182,6 +190,8 @@ def calc_tempo_sync(bpm, genre=None):
         "reverb_wet_tempo": scaled_wet,
         "reverb_damp": damp,
         "reverb_width": width,
+        "reverb_predelay": predelay_norm,
+        "reverb_predelay_ms": predelay_ms,
     }
 
 
@@ -403,9 +413,9 @@ def generate_eq_adjustments(band_data, rms_db, sensitivity=1.0):
     # Giữ cố định ở mức ngọt tối ưu để giọng hát có động lực học (dynamics) tự nhiên, hát nhẹ nhàng, không tốn sức
     vocal_adj["comp_ratio"] = 0.025  # ~3.5:1 ratio (nén nhẹ nhàng, mềm mại, dẻo dai)
     vocal_adj["comp_thresh"] = 0.030 # -24.4dB threshold (unity)
-    vocal_adj["eq_band_2_gain_db"] = -0.8 # Giữ nguyên mud cut -0.8dB từ setup_karaoke.lua để lấy lại độ dày ấm
-    vocal_adj["eq_band_3_gain_db"] = -1.5 # Dìm nhẹ dải chói 3.2kHz xuống -1.5dB để làm mềm dải trung
-    vocal_adj["eq_band_4_gain_db"] = 1.5  # Boost nhẹ dải siêu cao 12kHz (+1.5dB Air) tạo hơi thở mềm mại xốp mịn
+    vocal_adj["eq_band_2_gain_db"] = -1.5 # Cắt mud 350Hz -1.5dB (giảm bùn đục)
+    vocal_adj["eq_band_3_gain_db"] = 2.0  # BOOST presence 3.2kHz +2dB (nịnh giọng, sáng)
+    vocal_adj["eq_band_4_gain_db"] = 3.0  # BOOST air 12kHz +3dB (bay bổng, ninh tai)
     vocal_adj["comp_note"] = "Compressor & EQ khóa cứng ở điểm ngọt mềm xốp tối ưu"
 
     # ── REVERB: body-based override (Giữ cực kỳ ổn định) ──

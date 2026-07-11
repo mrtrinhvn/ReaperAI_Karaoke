@@ -294,11 +294,11 @@ function setup()
     set_p(voc, veq, "Freq-Low Shelf", 0.21)     -- ~200Hz
     set_p(voc, veq, "Gain-Low Shelf", 0.531)    -- +1.5dB (bồi ấm body vocal)
     -- Band 2: Bell (Mud Cut ở 250Hz, giảm bớt độ cắt về -0.8dB để bồi lại dải thân ấm "độ cốt" cho giọng)
-    set_p(voc, veq, "Freq-Band 2", 0.26)        -- ~250Hz
-    set_p(voc, veq, "Gain-Band 2", 0.484)       -- -0.8dB (nhẹ nhàng)
+    set_p(voc, veq, "Freq-Band 2", 0.17)        -- ~350Hz
+    set_p(voc, veq, "Gain-Band 2", 0.46875)     -- -1.5dB (sạch tiếng)
     -- Band 3: Bell (BOOST nhẹ dải Presence 3.2kHz → vocal "phủ" lên beat, nghe rõ nét)
     set_p(voc, veq, "Freq-Band 3", 0.62)        -- ~3.2kHz
-    set_p(voc, veq, "Gain-Band 3", 0.531)       -- +1.5dB (tôn vinh vocal, nổi trên nhạc)
+    set_p(voc, veq, "Gain-Band 3", 0.5416)      -- +2.0dB (nịnh giọng, nổi trên nhạc)
     -- Band 4: High Shelf (Air mạnh — tham chiếu Air 9.7% rất rõ ràng)
     set_p(voc, veq, "Freq-High Shelf 4", 0.82)  -- ~10.0kHz (hạ freq để phủ rộng hơn)
     set_p(voc, veq, "Gain-High Shelf 4", 0.563) -- +3.0dB Air (tăng gấp đôi từ +1.5dB)
@@ -380,7 +380,7 @@ function setup()
     set_p(voc_rev, vrev, "Dry", 0.0)
     set_p(voc_rev, vrev, "Room Size", 0.50)             -- Decay ≈ 1s (sân khấu, headphone cần lớn hơn)
     set_p(voc_rev, vrev, "Dampening", 0.20)             -- Treble vang LÂU = nịnh giọng, sáng, bay bổng
-    set_p(voc_rev, vrev, "Delay", 0.13)                 -- Pre-delay 13ms (khớp reference)
+    set_p(voc_rev, vrev, "Delay", 0.20)                 -- Pre-delay 20ms (tách rõ "vang" khỏi "giọng gốc", bớt chói)
     set_p(voc_rev, vrev, "Width", 1.0)
     set_p(voc_rev, vrev, "Stereo", 1.0)
 
