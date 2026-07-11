@@ -41,7 +41,7 @@ PRESETS = {
         "reverb_wet": 0.32,         # Nhiều reverb
         "reverb_damp": 0.45,        # Ít hấp thụ → vang dài
         "reverb_width": 0.80,
-        "chorus_mix": 0.25,         # Chorus dày
+        "chorus_mix": 0.05,         # Chorus siêu mỏng
         "duck_intensity": 0.8,      # Ducking vừa (nhạc nền quan trọng)
     },
     "dan_ca": {
@@ -63,7 +63,7 @@ PRESETS = {
         "reverb_wet": 0.20,
         "reverb_damp": 0.60,        # Hấp thụ nhiều → gọn
         "reverb_width": 0.65,
-        "chorus_mix": 0.10,
+        "chorus_mix": 0.04,
         "duck_intensity": 0.6,
     },
     "nhac_tre": {
@@ -85,7 +85,7 @@ PRESETS = {
         "reverb_wet": 0.22,
         "reverb_damp": 0.55,
         "reverb_width": 0.75,
-        "chorus_mix": 0.15,
+        "chorus_mix": 0.06,
         "duck_intensity": 1.0,
     },
     "ballad": {
@@ -107,7 +107,7 @@ PRESETS = {
         "reverb_wet": 0.35,         # Nhiều reverb
         "reverb_damp": 0.40,
         "reverb_width": 0.85,
-        "chorus_mix": 0.30,         # Chorus đậm
+        "chorus_mix": 0.07,         # Chorus mượt
         "duck_intensity": 0.7,
     },
     "rap": {
@@ -129,7 +129,7 @@ PRESETS = {
         "reverb_wet": 0.12,         # Gần khô
         "reverb_damp": 0.70,
         "reverb_width": 0.50,
-        "chorus_mix": 0.05,         # Gần không chorus
+        "chorus_mix": 0.03,         # Gần không chorus
         "duck_intensity": 1.2,      # Ducking mạnh (rap cần nghe rõ)
     },
     "dance": {
@@ -151,7 +151,7 @@ PRESETS = {
         "reverb_wet": 0.18,
         "reverb_damp": 0.65,
         "reverb_width": 0.70,
-        "chorus_mix": 0.20,
+        "chorus_mix": 0.06,
         "duck_intensity": 1.0,
     },
 }

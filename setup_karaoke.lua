@@ -153,7 +153,7 @@ function setup()
     -- ══════════════════════════════════════════════════════════════
     local voc, is_new_voc = get_or_create_track("VOCAL", false)
     set_color(voc, 230, 55, 55)
-    reaper.SetMediaTrackInfo_Value(voc, "D_VOL", 0.65) -- Giảm từ 0.80 xuống 0.65 (-3.7dB) để tránh clipping tuyệt đối
+    reaper.SetMediaTrackInfo_Value(voc, "D_VOL", 0.80) -- ~-1.9dB (tham chiếu Laiganhonanh: vocal phủ lên trên nhạc, center mạnh)
     reaper.SetMediaTrackInfo_Value(voc, "D_PAN", 0.0)
 
     local voc_par, is_new_voc_par = get_or_create_track("VOCAL PARALLEL", false)
@@ -294,11 +294,11 @@ function setup()
     set_p(voc, veq, "Freq-Low Shelf", 0.21)     -- ~200Hz
     set_p(voc, veq, "Gain-Low Shelf", 0.531)    -- +1.5dB (bồi ấm body vocal)
     -- Band 2: Bell (Mud Cut ở 250Hz, giảm bớt độ cắt về -0.8dB để bồi lại dải thân ấm "độ cốt" cho giọng)
-    set_p(voc, veq, "Freq-Band 2", 0.26)        -- ~250Hz
-    set_p(voc, veq, "Gain-Band 2", 0.484)       -- -0.8dB (nhẹ nhàng)
-    -- Band 3: Bell (BOOST nhẹ dải Presence 3.2kHz → vocal "phủ" lên beat, nghe rõ nét)
-    set_p(voc, veq, "Freq-Band 3", 0.62)        -- ~3.2kHz
-    set_p(voc, veq, "Gain-Band 3", 0.531)       -- +1.5dB (tôn vinh vocal, nổi trên nhạc)
+    set_p(voc, veq, "Freq-Band 2", 0.26)          -- ~350Hz (mud)
+    set_p(voc, veq, "Gain-Band 2", 0.469)         -- -1.5dB (giảm bùn đục rõ hơn)
+    
+    set_p(voc, veq, "Freq-Band 3", 0.62)          -- ~3.2kHz (presence)
+    set_p(voc, veq, "Gain-Band 3", 0.542)         -- +2.0dB (tôn vinh vocal sáng, nịnh tai)
     -- Band 4: High Shelf (Air mạnh — tham chiếu Air 9.7% rất rõ ràng)
     set_p(voc, veq, "Freq-High Shelf 4", 0.82)  -- ~10.0kHz (hạ freq để phủ rộng hơn)
     set_p(voc, veq, "Gain-High Shelf 4", 0.563) -- +3.0dB Air (tăng gấp đôi từ +1.5dB)
@@ -454,14 +454,11 @@ function setup()
 
 
     -- ══════════════════════════════════════════════════════════════
-    -- MASTER BUS (GLUE, EQ, LIMITER TỐI ƯU CỰC ĐẠI)
+    -- CẤU HÌNH VST MASTER BUS (Sân khấu mastering)
     -- ══════════════════════════════════════════════════════════════
     local master = reaper.GetMasterTrack(0)
-    reaper.SetMediaTrackInfo_Value(master, "D_VOL", 0.85) -- Giảm -1.4dB để có headroom an toàn, chống clipping
-    
-    -- Xóa FX cũ
-    for fx = reaper.TrackFX_GetCount(master) - 1, 0, -1 do
-        reaper.TrackFX_Delete(master, fx)
+    for i = reaper.TrackFX_GetCount(master) - 1, 0, -1 do
+        reaper.TrackFX_Delete(master, i)
     end
 
     -- 1. Master EQ (Smile curve & IEM Bass Leakage Compensation)
