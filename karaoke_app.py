@@ -46,11 +46,11 @@ PRESETS = {
         "color": "#e74c3c", 
         "delay_fraction": 0.5, "delay_volume": 0.12, "delay_feedback": 0.20, 
         "reverb_room": 0.42, "reverb_wet": 0.52, "reverb_damp": 0.25, "reverb_width": 1.00, 
-        "chorus_mix": 0.20, "comp_ratio": 0.025, "comp_thresh": 0.030, "duck_intensity": 0.8, "saturation_amount": 0.15,
+        "chorus_mix": 0.05, "comp_ratio": 0.025, "comp_thresh": 0.030, "duck_intensity": 0.8, "saturation_amount": 0.15,
         "desc": (
             "<b>🌹 BOLERO (Trữ Tình - Sâu Lắng - Vang Sáng Mịn)</b>\n"
             "• <b>Vang Reverb:</b> Cực sâu &amp; Đuôi sáng mịn (82% Room, 52% Wet, Damp 15%) giúp nâng đỡ giọng hát ngân ngọt ngào.\n"
-            "• <b>Màu sắc:</b> Chorus 20% mượt mà, Saturation 15% cho chất giọng trữ tình mộc mạc."
+            "• <b>Màu sắc:</b> Chorus 5% mượt mà, Saturation 15% cho chất giọng trữ tình mộc mạc."
         )
     },
     "dan_ca": {
@@ -60,7 +60,7 @@ PRESETS = {
         "color": "#27ae60", 
         "delay_fraction": 0.5, "delay_volume": 0.10, "delay_feedback": 0.15, 
         "reverb_room": 0.38, "reverb_wet": 0.46, "reverb_damp": 0.30, "reverb_width": 0.95, 
-        "chorus_mix": 0.12, "comp_ratio": 0.025, "comp_thresh": 0.030, "duck_intensity": 0.6, "saturation_amount": 0.15,
+        "chorus_mix": 0.04, "comp_ratio": 0.025, "comp_thresh": 0.030, "duck_intensity": 0.6, "saturation_amount": 0.15,
         "desc": (
             "<b>🎋 DÂN CA / CA CỔ (Ngọt Ngào - Mộc Mạc - Bay Bổng)</b>\n"
             "• <b>Vang Reverb:</b> Không gian rộng mở tự nhiên (75% Room, 46% Wet, Damp 20%) tạo độ bay mà vẫn mộc mạc.\n"
@@ -74,7 +74,7 @@ PRESETS = {
         "color": "#9b59b6", 
         "delay_fraction": 0.5, "delay_volume": 0.12, "delay_feedback": 0.20, 
         "reverb_room": 0.40, "reverb_wet": 0.48, "reverb_damp": 0.28, "reverb_width": 0.95, 
-        "chorus_mix": 0.15, "comp_ratio": 0.025, "comp_thresh": 0.030, "duck_intensity": 1.0, "saturation_amount": 0.20,
+        "chorus_mix": 0.06, "comp_ratio": 0.025, "comp_thresh": 0.030, "duck_intensity": 1.0, "saturation_amount": 0.20,
         "desc": (
             "<b>🎤 NHẠC TRẺ (Pop/Ballad Hiện Đại - Lung Linh)</b>\n"
             "• <b>Vang Reverb:</b> Hiện đại, đuôi vang lấp lánh (78% Room, 48% Wet, Damp 15%) cho giọng hát bắt tai, cuốn hút.\n"
@@ -88,11 +88,11 @@ PRESETS = {
         "color": "#2980b9", 
         "delay_fraction": 0.5, "delay_volume": 0.18, "delay_feedback": 0.30, 
         "reverb_room": 0.45, "reverb_wet": 0.55, "reverb_damp": 0.22, "reverb_width": 1.00, 
-        "chorus_mix": 0.26, "comp_ratio": 0.025, "comp_thresh": 0.030, "duck_intensity": 0.9, "saturation_amount": 0.32,
+        "chorus_mix": 0.07, "comp_ratio": 0.025, "comp_thresh": 0.030, "duck_intensity": 0.9, "saturation_amount": 0.32,
         "desc": (
             "<b>💫 BALLAD (Bay Bổng - Siêu Mượt Mà - Màu Sắc Pro)</b>\n"
             "• <b>Vang Reverb:</b> Không gian siêu rộng, ẩm mịn quyện giọng (85% Room, 58% Wet, Damp 10%) giúp hát nhẹ nhõm không tốn sức.\n"
-            "• <b>Màu sắc:</b> Chorus 26% lộng lẫy pha lê, Saturation 32% dày dặn âm sắc analog."
+            "• <b>Màu sắc:</b> Chorus 7% shimmer nhẹ, Saturation 32% dày dặn âm sắc analog."
         )
     },
     "rap": {
@@ -102,7 +102,7 @@ PRESETS = {
         "color": "#e67e22", 
         "delay_fraction": 0.25, "delay_volume": 0.08, "delay_feedback": 0.08, 
         "reverb_room": 0.30, "reverb_wet": 0.30, "reverb_damp": 0.35, "reverb_width": 0.85, 
-        "chorus_mix": 0.12, "comp_ratio": 0.025, "comp_thresh": 0.030, "duck_intensity": 1.2, "saturation_amount": 0.35,
+        "chorus_mix": 0.03, "comp_ratio": 0.025, "comp_thresh": 0.030, "duck_intensity": 1.2, "saturation_amount": 0.35,
         "desc": (
             "<b>🎧 RAP (Hiện Đại - Rõ Lời - Độ Sâu Tốt)</b>\n"
             "• <b>Vang Reverb:</b> Không gian phòng vừa phải, rất trong trẻo (58% Room, 30% Wet, Damp 25%) giữ độ nét ca từ.\n"
@@ -116,7 +116,7 @@ PRESETS = {
         "color": "#1abc9c", 
         "delay_fraction": 0.5, "delay_volume": 0.12, "delay_feedback": 0.15, 
         "reverb_room": 0.35, "reverb_wet": 0.40, "reverb_damp": 0.30, "reverb_width": 0.90, 
-        "chorus_mix": 0.18, "comp_ratio": 0.025, "comp_thresh": 0.030, "duck_intensity": 1.0, "saturation_amount": 0.30,
+        "chorus_mix": 0.06, "comp_ratio": 0.025, "comp_thresh": 0.030, "duck_intensity": 1.0, "saturation_amount": 0.30,
         "desc": (
             "<b>🪩 DANCE (Sôi Động - Điện Tử - Bay Bổng)</b>\n"
             "• <b>Vang Reverb:</b> Vang năng động sáng rõ (65% Room, 40% Wet, Damp 20%) tránh đục tiếng trên beat nhanh.\n"
@@ -130,11 +130,11 @@ PRESETS = {
         "color": "#16a085", 
         "delay_fraction": 0.5, "delay_volume": 0.22, "delay_feedback": 0.25, 
         "reverb_room": 0.40, "reverb_wet": 0.50, "reverb_damp": 0.28, "reverb_width": 1.00, 
-        "chorus_mix": 0.25, "comp_ratio": 0.025, "comp_thresh": 0.030, "duck_intensity": 0.9, "saturation_amount": 0.15,
+        "chorus_mix": 0.06, "comp_ratio": 0.025, "comp_thresh": 0.030, "duck_intensity": 0.9, "saturation_amount": 0.15,
         "desc": (
             "<b>🌊 KHÔNG GIAN OK (Mượt Mà - Long Lanh - Màu Sắc Pro)</b>\n"
             "• <b>Vang Reverb:</b> Vang rộng &amp; Ẩm mượt (Room 80%, Wet 55%, Damp 20%) tạo độ mịn màng nâng đỡ hơi hát cực tốt.\n"
-            "• <b>Màu sắc:</b> Chorus rộng 25% phủ bóng pha lê, Saturation 15% sạch sẽ, trong trẻo."
+            "• <b>Màu sắc:</b> Chorus 6% shimmer nhẹ, Saturation 15% sạch sẽ, trong trẻo."
         )
     },
 }
