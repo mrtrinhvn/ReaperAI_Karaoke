@@ -153,12 +153,12 @@ function setup()
     -- ══════════════════════════════════════════════════════════════
     local voc, is_new_voc = get_or_create_track("VOCAL", false)
     set_color(voc, 230, 55, 55)
-    reaper.SetMediaTrackInfo_Value(voc, "D_VOL", 0.0) -- Khởi đầu câm lặng (mute) để diệt tận gốc tiếng rú rít trước khi Python app kết nối và đẩy volume lên
+    reaper.SetMediaTrackInfo_Value(voc, "D_VOL", 0.80) -- ~-1.9dB (tham chiếu Laiganhonanh: vocal phủ lên trên nhạc, center mạnh)
     reaper.SetMediaTrackInfo_Value(voc, "D_PAN", 0.0)
 
     local voc_par, is_new_voc_par = get_or_create_track("VOCAL PARALLEL", false)
     set_color(voc_par, 255, 92, 138)
-    reaper.SetMediaTrackInfo_Value(voc_par, "D_VOL", 0.28) -- Trộn song song dày dặn hơn nữa để bồi thêm "độ cốt" cho giọng
+    reaper.SetMediaTrackInfo_Value(voc_par, "D_VOL", 0.42) -- ~-7.5dB: body đầy đặn, vocal xốp có lực
     reaper.SetMediaTrackInfo_Value(voc_par, "D_PAN", 0.0)
     reaper.SetMediaTrackInfo_Value(voc_par, "I_RECARM", 0)
     reaper.SetMediaTrackInfo_Value(voc_par, "I_RECMON", 0)
@@ -166,7 +166,7 @@ function setup()
  
     local voc_rev, is_new_voc_rev = get_or_create_track("VOCAL REVERB", false)
     set_color(voc_rev, 56, 189, 248)
-    reaper.SetMediaTrackInfo_Value(voc_rev, "D_VOL", 0.80) -- Tăng Reverb level lên -2.0dB để âm xốp dày dạt dào nịnh giọng
+    reaper.SetMediaTrackInfo_Value(voc_rev, "D_VOL", 0.60) -- ~-4.4dB: reverb sân khấu xốp phủ lên beat
     reaper.SetMediaTrackInfo_Value(voc_rev, "D_PAN", 0.0)
     reaper.SetMediaTrackInfo_Value(voc_rev, "I_RECARM", 0)
     reaper.SetMediaTrackInfo_Value(voc_rev, "I_RECMON", 0)
@@ -174,7 +174,7 @@ function setup()
  
     local voc_del, is_new_voc_del = get_or_create_track("VOCAL DELAY", false)
     set_color(voc_del, 234, 179, 8)
-    reaper.SetMediaTrackInfo_Value(voc_del, "D_VOL", 0.70) -- Tăng nhẹ Delay level lên -3.1dB
+    reaper.SetMediaTrackInfo_Value(voc_del, "D_VOL", 0.40) -- ~-8dB: echo sân khấu tự nhiên
     reaper.SetMediaTrackInfo_Value(voc_del, "D_PAN", 0.0)
     reaper.SetMediaTrackInfo_Value(voc_del, "I_RECARM", 0)
     reaper.SetMediaTrackInfo_Value(voc_del, "I_RECMON", 0)
@@ -182,7 +182,7 @@ function setup()
 
     local mus, is_new_mus = get_or_create_track("NHẠC", true)
     set_color(mus, 40, 120, 220)
-    reaper.SetMediaTrackInfo_Value(mus, "D_VOL", 0.0) -- Mute lúc khởi động để bảo vệ loa, Python app sẽ tự động phục hồi volume theo slide giao diện
+    reaper.SetMediaTrackInfo_Value(mus, "D_VOL", 0.56) -- ~-5.0dB (mức mặc định, AI bridge sẽ đồng bộ với slider UI)
     reaper.SetMediaTrackInfo_Value(mus, "D_PAN", 0.0)
     
     -- Dọn dẹp Stereo Width cũ trên track NHẠC
@@ -259,14 +259,19 @@ function setup()
     -- FX1: Auto-Tune (Thiết lập cố định dải điểm ngọt để giữ nốt cực kỳ ổn định, không bị cụt nốt)
     local at = add_fx(voc, "MAutoPitch")
     if at >= 0 then
-        set_p(voc, at, "Depth", 0.90)       -- 90% Depth
-        set_p(voc, at, "Speed", 0.45)       -- ~45ms Speed (tốc độ bám nốt cực kỳ mượt mà)
+        set_p(voc, at, "Depth", 0.85)       -- 85% Depth (cho phép vibrato nhẹ)
+        set_p(voc, at, "Speed", 0.50)       -- ~50ms Speed (mượt mà, không giật)
         set_p(voc, at, "Detune", 0.50)      -- 0 cents
     else
         at = add_fx(voc, "Graillon")
         if at >= 0 then
-            set_p(voc, at, "Correction", 0.50) -- 50% Correction depth
-            set_p(voc, at, "Smooth", 0.25)     -- ~25ms Smoothness
+            -- KARAOKE TUNING: mượt, nịnh giọng, không méo
+            set_p(voc, at, "Corr. Amount", 0.85)   -- 85% correction (cho vibrato tự nhiên 15%)
+            set_p(voc, at, "Smooth", 0.25)          -- 25% smooth (chuyển nốt MƯỢT MÀ, không giật)
+            set_p(voc, at, "Inertia", 0.35)         -- 35% inertia (giữ nốt ổn định, không chạy)
+            set_p(voc, at, "Wet Mix", 1.0)           -- 100% wet (toàn bộ tín hiệu đã tune)
+            set_p(voc, at, "Dry Mix", 0.0)           -- 0% dry
+            set_p(voc, at, "Output Gain", 0.7079)   -- -3dB output
         else
             at = add_fx(voc, "Fat1")
             if at >= 0 then
@@ -275,29 +280,29 @@ function setup()
             else
                 at = add_fx(voc, "ReaTune")
                 if at >= 0 then
-                    set_p(voc, at, "Correction rate (ms)", 0.040) -- ~40ms (bám nốt vững chắc, mượt mà)
+                    set_p(voc, at, "Correction rate (ms)", 0.040)
                 end
             end
         end
     end
 
-    -- FX2: ReaEQ (Vocal shaping - Khớp trung âm ấm áp của khonggianhatok.wav)
+    -- FX2: ReaEQ (Tham chiếu Laiganhonanh.mp3: Bass 21%, Low-Mid 17.5%, Air 9.7%)
     local veq = add_fx(voc, "ReaEQ")
-    -- Band 5: High Pass (Low Cut ở 120Hz)
-    set_p(voc, veq, "Freq-High Pass 5", 0.16)   -- ~120Hz
-    -- Band 1: Low Shelf (giữ phẳng ở 0dB)
-    set_p(voc, veq, "Freq-Low Shelf", 0.085)
-    set_p(voc, veq, "Gain-Low Shelf", 0.5)      -- 0dB
+    -- Band 5: High Pass (Hạ xuống 80Hz giữ bass body vocal — tham chiếu Sub 10.8%)
+    set_p(voc, veq, "Freq-High Pass 5", 0.07)   -- ~80Hz (hạ từ 120Hz → giữ ấm hơn)
+    -- Band 1: Low Shelf (Boost nhẹ +1.5dB tại 200Hz — tham chiếu Low-Mid 17.5% rất dày)
+    set_p(voc, veq, "Freq-Low Shelf", 0.21)     -- ~200Hz
+    set_p(voc, veq, "Gain-Low Shelf", 0.531)    -- +1.5dB (bồi ấm body vocal)
     -- Band 2: Bell (Mud Cut ở 250Hz, giảm bớt độ cắt về -0.8dB để bồi lại dải thân ấm "độ cốt" cho giọng)
     set_p(voc, veq, "Freq-Band 2", 0.26)        -- ~250Hz
     set_p(voc, veq, "Gain-Band 2", 0.484)       -- -0.8dB (nhẹ nhàng)
-    -- Band 3: Bell (Dìm nhẹ dải chói 3.2kHz xuống -1.5dB để làm mềm dải trung cốt cứng)
+    -- Band 3: Bell (BOOST nhẹ dải Presence 3.2kHz → vocal "phủ" lên beat, nghe rõ nét)
     set_p(voc, veq, "Freq-Band 3", 0.62)        -- ~3.2kHz
-    set_p(voc, veq, "Gain-Band 3", 0.47)        -- -1.5dB (cut)
-    -- Band 4: High Shelf (Dịch hẳn lên dải siêu cao 12kHz tạo hơi thở xốp mịn, giảm gain nhẹ để êm tai)
-    set_p(voc, veq, "Freq-High Shelf 4", 0.89)  -- ~12.0kHz
-    set_p(voc, veq, "Gain-High Shelf 4", 0.531) -- +1.5dB (Air)
-    set_p(voc, veq, "BW-High Shelf 4", 0.20)
+    set_p(voc, veq, "Gain-Band 3", 0.531)       -- +1.5dB (tôn vinh vocal, nổi trên nhạc)
+    -- Band 4: High Shelf (Air mạnh — tham chiếu Air 9.7% rất rõ ràng)
+    set_p(voc, veq, "Freq-High Shelf 4", 0.82)  -- ~10.0kHz (hạ freq để phủ rộng hơn)
+    set_p(voc, veq, "Gain-High Shelf 4", 0.563) -- +3.0dB Air (tăng gấp đôi từ +1.5dB)
+    set_p(voc, veq, "BW-High Shelf 4", 0.25)    -- Rộng hơn cho Air phủ mềm mại
 
     -- FX3: ReaComp (Vocal Compressor mềm xốp, giảm nén gắt)
     local vcomp = add_fx(voc, "ReaComp")
@@ -308,18 +313,18 @@ function setup()
     set_p(voc, vcomp, "Knee", 0.50)            -- Soft-knee (đường cong nén cực mịn)
     set_p(voc, vcomp, "Auto make", 1.0)
 
-    -- FX4: JS Saturation (Hài âm tạo độ ấm đắt tiền)
+    -- FX4: JS Saturation (Hài âm tạo độ ấm xốp như mic tube vintage)
     local vsat = add_fx(voc, "Saturation")
     if vsat >= 0 then
-        set_p(voc, vsat, "Amount (%)", 0.12)   -- Tăng lên 12% Saturation để bồi thêm hài âm ấm áp, đầm giọng
+        set_p(voc, vsat, "Amount (%)", 0.20)   -- 20% Saturation: hài âm đầy đặn, giọng xốp như mic ống
     end
 
-    -- FX5: Chorus (Tắt bỏ trên track Vocal mộc để giữ giọng ca sắc nét ở trung tâm, tránh tiếng bị lảo đảo rẻ tiền)
+    -- FX5: Chorus (Tạo độ xốp stereo, giọng phủ rộng)
     local chorus = add_fx(voc, "Chorus")
     if chorus >= 0 then
-        set_p(voc, chorus, "Rate", 0.10)        -- Tần số cực chậm tránh hiệu ứng rung lẩy bẩy
-        set_p(voc, chorus, "Depth", 0.15)       -- Độ trễ nông tinh tế
-        set_p(voc, chorus, "Mix", 0.08)          -- Boost 8% Mix để tạo hiệu ứng phủ rộng stereo sang hai bên tai cực kỳ sang trọng
+        set_p(voc, chorus, "Rate", 0.08)        -- Chậm hơn: modulation mượt mà
+        set_p(voc, chorus, "Depth", 0.12)       -- Độ sâu vừa: xốp nhưng không loản
+        set_p(voc, chorus, "Mix", 0.12)          -- 12% Mix: giọng hát có chiều rộng, phủ lên beat
     end
 
     -- ══════════════════════════════════════════════════════════════
@@ -338,9 +343,9 @@ function setup()
     set_p(voc_par, vpeq, "Freq-Low Shelf", 0.23)         -- ~200Hz
     set_p(voc_par, vpeq, "Gain-Low Shelf", 0.0)          -- -inf dB (cắt trầm sạch sẽ)
     set_p(voc_par, vpeq, "Freq-Band 2", 0.45)            -- ~3kHz
-    set_p(voc_par, vpeq, "Gain-Band 2", 0.50)            -- 0dB (Giữ phẳng để tránh chói gắt dải trung trên track song song)
+    set_p(voc_par, vpeq, "Gain-Band 2", 0.54)            -- +2dB Presence boost (thêm lực cho vocal)
     set_p(voc_par, vpeq, "Freq-Band 3", 0.75)            -- ~10kHz
-    set_p(voc_par, vpeq, "Gain-Band 3", 0.50)            -- 0dB (Giữ phẳng để tránh chói gắt dải cao trên track song song)
+    set_p(voc_par, vpeq, "Gain-Band 3", 0.52)            -- +1dB Air (sáng lên)
 
     -- ══════════════════════════════════════════════════════════════
     -- CẤU HÌNH VST TRACK 3: 🌊 VOCAL REVERB (Aux Reverb)
@@ -352,40 +357,37 @@ function setup()
     set_p(voc_rev, vreveq, "Freq-High Pass 5", 0.18)     -- ~130Hz (HPF)
     
     set_p(voc_rev, vreveq, "Freq-Band 2", 0.30)          -- ~350Hz
-    set_p(voc_rev, vreveq, "Gain-Band 2", 0.50)          -- 0dB (giữ phẳng để Reverb ấm dày, lấp đầy khoảng trống)
+    set_p(voc_rev, vreveq, "Gain-Band 2", 0.54)          -- +2dB (độ đầy ấm của reverb lấp khoảng nhạc bị cắt)
     
-    set_p(voc_rev, vreveq, "Gain-Band 3", 0.50)          -- 0dB (flat)
+    set_p(voc_rev, vreveq, "Freq-Band 3", 0.55)          -- ~2kHz
+    set_p(voc_rev, vreveq, "Gain-Band 3", 0.52)          -- +1dB (reverb presence bổ trợ vocal)
     
-    -- Mở rộng dải cao của Reverb (Vang cao) để tiếng vang siêu bay bổng, lấp lánh dải Air
-    set_p(voc_rev, vreveq, "Freq-High Shelf 4", 0.89)    -- ~12.0kHz
-    set_p(voc_rev, vreveq, "Gain-High Shelf 4", 0.583)   -- +4.0dB (Vang Air cực kỳ mềm xốp)
+    -- Mở rộng dải cao của Reverb (Vang Air phủ lên beat)
+    set_p(voc_rev, vreveq, "Freq-High Shelf 4", 0.85)    -- ~10kHz (hạ xuống để phủ rộng hơn)
+    set_p(voc_rev, vreveq, "Gain-High Shelf 4", 0.60)    -- +5dB (Vang Air xốp phủ lên beat)
 
-    -- Chorus làm rộng và tạo độ bóng (modulate) cho đuôi Reverb
+    -- Chorus trên Reverb: tạo độ xốp bao bọc, reverb "phủ" xung quanh vocal
     local rev_chorus = add_fx(voc_rev, "Chorus")
     if rev_chorus >= 0 then
-        set_p(voc_rev, rev_chorus, "Rate", 0.20)
-        set_p(voc_rev, rev_chorus, "Depth", 0.25)
-        set_p(voc_rev, rev_chorus, "Mix", 0.40)        -- 40% Chorus tạo độ xốp mượt, bóng bẩy bao quanh đầu
+        set_p(voc_rev, rev_chorus, "Rate", 0.10)
+        set_p(voc_rev, rev_chorus, "Depth", 0.22)       -- Sâu hơn: reverb 3D bao quanh
+        set_p(voc_rev, rev_chorus, "Mix", 0.40)         -- 40%: reverb xốp phủ lên beat
     end
 
-    -- Reverb 100% Wet (Không gian rộng lớn, xốp mịn, nâng đỡ giọng ca)
+    -- Reverb 100% Wet — Sân khấu PRO: lớn hơn reference vì headphone không có âm phòng tự nhiên
     local vrev = add_fx(voc_rev, "ReaVerbate")
     set_p(voc_rev, vrev, "Wet", 1.0)
     set_p(voc_rev, vrev, "Dry", 0.0)
-    set_p(voc_rev, vrev, "Room Size", 0.35)             -- Tăng lên 35% cho không gian rộng mở và mịn hơn
-    set_p(voc_rev, vrev, "Dampening", 0.20)             -- Giảm về 20% Dampening để giữ đuôi vang tơ lụa, xốp bay bổng
-    set_p(voc_rev, vrev, "Delay", 0.20)                 -- Pre-delay = 20ms
+    set_p(voc_rev, vrev, "Room Size", 0.50)             -- Decay ≈ 1s (sân khấu, headphone cần lớn hơn)
+    set_p(voc_rev, vrev, "Dampening", 0.20)             -- Treble vang LÂU = nịnh giọng, sáng, bay bổng
+    set_p(voc_rev, vrev, "Delay", 0.13)                 -- Pre-delay 13ms (khớp reference)
     set_p(voc_rev, vrev, "Width", 1.0)
-    set_p(voc_rev, vrev, "Stereo", 1.0)                 -- Mở rộng tối đa 100% stereo width cho Reverb
+    set_p(voc_rev, vrev, "Stereo", 1.0)
 
-    -- Sidechain Ducker (Reverb né giọng thật)
+    -- Sân khấu PRO: TẮT ducker — reverb HÒA CÙNG vocal, không bị nén cắt
+    -- (Sân khấu chuyên nghiệp không dùng ducker trên reverb monitor)
     local vrev_comp = add_fx(voc_rev, "ReaComp")
-    reaper.TrackFX_SetParam(voc_rev, vrev_comp, 8, 1.0) -- Auxiliary Input L+R
-    set_p(voc_rev, vrev_comp, "Thresh", 0.06)   -- ~-18.8dB (ngưỡng nhạy bén để dìm vang khi đang hát)
-    set_p(voc_rev, vrev_comp, "Ratio", 0.015)   -- ~2.5:1 ratio (né nhẹ nhàng tự nhiên)
-    set_p(voc_rev, vrev_comp, "Attack", 0.20)   -- 15ms
-    set_p(voc_rev, vrev_comp, "Release", 0.55)  -- 300ms
-    reaper.TrackFX_SetEnabled(voc_rev, vrev_comp, false) -- Tắt Ducker để vang quyện liên tục ảo diệu dạt dào khi hát live
+    reaper.TrackFX_SetEnabled(voc_rev, vrev_comp, false) -- TẮT: reverb luôn chảy tự do
 
     -- ══════════════════════════════════════════════════════════════
     -- CẤU HÌNH VST TRACK 4: ✨ VOCAL DELAY (Aux Delay)
@@ -400,23 +402,18 @@ function setup()
     set_p(voc_del, vdeleq, "Freq-High Shelf 4", 0.70)    -- Hạ tần số cắt cao về ~3.5kHz phù hợp trung âm ấm của WAV mẫu
     set_p(voc_del, vdeleq, "Gain-High Shelf 4", 0.0)     -- -inf dB (cắt hoàn toàn dải cao)
 
-    -- Delay 100% Wet (Khớp khonggianhatok.wav: Echo chính ~63ms, feedback 60%, Semi-Rhythmic)
+    -- Delay (Echo sân khấu: 3-4 echo rõ, giảm dần tự nhiên)
     local vdel = add_fx(voc_del, "ReaDelay")
     set_p(voc_del, vdel, "Dry", 0.0)
     set_p(voc_del, vdel, "1: Volume", 1.0)
-    set_p(voc_del, vdel, "1: Feedback", 0.60)            -- Feedback 60% tạo chuỗi 6 echo tự nhiên (khớp WAV: 75% raw, cap 60% an toàn)
+    set_p(voc_del, vdel, "1: Feedback", 0.25)            -- 3-4 echo nghe được (sân khấu tự nhiên)
     set_p(voc_del, vdel, "1: Length (time)", 0.0127)     -- Đặt delay = 63ms (0.0127 trên thang 5s, khớp echo interval phân tích)
     set_p(voc_del, vdel, "1: Length (musical)", 0.0)     -- Tắt đồng bộ hóa nốt nhạc của VST để dùng mili-giây từ Python
     set_p(voc_del, vdel, "1: Lowpass", 0.60)             -- Lọc bớt dải cao của delay để tiếng echo ấm hơn
 
-    -- Sidechain Ducker (Delay né giọng thật)
+    -- Sân khấu PRO: TẮT ducker delay — echo chảy tự do
     local vdel_comp = add_fx(voc_del, "ReaComp")
-    reaper.TrackFX_SetParam(voc_del, vdel_comp, 8, 1.0) -- Auxiliary Input L+R
-    set_p(voc_del, vdel_comp, "Thresh", 0.06)   -- ~-18.8dB (dìm mạnh delay khi đang hát)
-    set_p(voc_del, vdel_comp, "Ratio", 0.02)    -- ~3:1 ratio
-    set_p(voc_del, vdel_comp, "Attack", 0.10)   -- 5ms (phản hồi cực nhanh để nén ngay)
-    set_p(voc_del, vdel_comp, "Release", 0.45)  -- 150ms (nhả nhanh để vang lên khi nghỉ lấy hơi)
-    reaper.TrackFX_SetEnabled(voc_del, vdel_comp, false) -- Tắt Ducker để echo bay bổng ảo diệu dạt dào khi hát live
+    reaper.TrackFX_SetEnabled(voc_del, vdel_comp, false) -- TẮT: echo luôn hòa cùng vocal
 
     -- ══════════════════════════════════════════════════════════════
     -- CẤU HÌNH VST TRACK 5: 🎵 NHẠC NỀN
@@ -431,8 +428,8 @@ function setup()
     set_p(mus, meq, "Bandwidth-Band 1", 0.5)
     
     set_p(mus, meq, "Freq-Band 2", 0.40)       -- ~2.5kHz (Dải trung dọn chỗ cho giọng hát chính)
-    set_p(mus, meq, "Gain-Band 2", 0.41)       -- -4.5dB cut (tạo vocal pocket cực rộng để hát nhẹ hơi)
-    set_p(mus, meq, "Bandwidth-Band 2", 0.45)
+    set_p(mus, meq, "Gain-Band 2", 0.39)       -- ★ -5.5dB cut (sâu hơn từ -4.5dB — tham chiếu: vocal 20.1% center)
+    set_p(mus, meq, "Bandwidth-Band 2", 0.50)  -- ★ Rộng hơn: dọn pocket rộng hơn cho vocal center
     
     set_p(mus, meq, "Freq-Band 3", 0.52)       -- ~5.0kHz (Dải sáng dọn chỗ cho độ bóng bẩy vocal)
     set_p(mus, meq, "Gain-Band 3", 0.43)       -- -3.5dB cut
@@ -447,6 +444,13 @@ function setup()
     set_p(mus, mcomp, "Ratio", 0.08)
     set_p(mus, mcomp, "Attack", 0.25)
     set_p(mus, mcomp, "Release", 0.40)
+
+    -- "Nhạc Tách Mở" (Mid/Side Widening)
+    local mwiden = add_fx(mus, "JS: Stereo Enhancer")
+    if mwiden >= 0 then
+        set_p(mus, mwiden, "Width", 2.0)    -- Kéo dài width (200%) — tham chiếu Low-Mid Side ratio 0.80 (rất rộng)
+        set_p(mus, mwiden, "Center", 0.40)  -- ★ GIẢM 50%→40%: Khoét center sâu hơn — vocal phủ lên giữa rõ ràng hơn
+    end
 
 
     -- ══════════════════════════════════════════════════════════════

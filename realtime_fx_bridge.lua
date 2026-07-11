@@ -148,6 +148,28 @@ function apply(data)
 
     -- ═══ VOCAL TRACK ═══
     if vocal then
+        -- ★ PHỤC HỒI VOLUME VOCAL (tham chiếu Laiganhonanh.mp3: vocal phủ center mạnh)
+        -- Khi bridge nhận lệnh đầu tiên, đẩy fader lên mức hoạt động 0.80 (~-1.9dB)
+        local cur_vol = reaper.GetMediaTrackInfo_Value(vocal, "D_VOL")
+        if cur_vol < 0.01 then
+            reaper.SetMediaTrackInfo_Value(vocal, "D_VOL", 0.80)
+        end
+
+        -- ★ ĐẢM BẢO VOCAL MONITORING LUÔN BẬT (nếu tắt → 3 track phụ mất tín hiệu!)
+        local recmon = reaper.GetMediaTrackInfo_Value(vocal, "I_RECMON")
+        if recmon ~= 1 then
+            reaper.SetMediaTrackInfo_Value(vocal, "I_RECMON", 1)
+            reaper.SetMediaTrackInfo_Value(vocal, "I_RECARM", 1)
+        end
+
+        -- ★ ĐẢM BẢO VOCAL DELAY KHÔNG BỊ MUTE (có thể bị mute bởi thao tác tay hoặc lỗi)
+        if voc_del then
+            local del_mute = reaper.GetMediaTrackInfo_Value(voc_del, "B_MUTE")
+            if del_mute == 1 then
+                reaper.SetMediaTrackInfo_Value(voc_del, "B_MUTE", 0)
+            end
+        end
+
         local eq = find_fx(vocal, "ReaEQ")
         local comp = find_fx(vocal, "ReaComp")
         local verb = find_fx(voc_rev, "ReaVerbate")
@@ -328,6 +350,13 @@ function apply(data)
         if meq >= 0 and data.music_eq_band_3_gain_db then
             local p = find_p(music, meq, "Gain-Band 3")
             if p >= 0 then smooth(music, meq, p, db_to_norm(data.music_eq_band_3_gain_db), 0.2) end
+        end
+
+        -- Nhạc Tách Mở (Mid/Side Widening)
+        local mwiden = find_fx(music, "Stereo Enhancer")
+        if mwiden >= 0 and data.music_stereo_width then
+            local p = find_p(music, mwiden, "Width")
+            if p >= 0 then smooth(music, mwiden, p, data.music_stereo_width, 0.2) end
         end
 
         -- Pitch Shifting cho Nhạc nền (ReaPitch) - Tự động bypass khi offset = 0 để diệt tận gốc latency PDC!

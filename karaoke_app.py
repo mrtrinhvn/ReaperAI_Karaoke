@@ -44,8 +44,8 @@ PRESETS = {
         "emoji": "🌹", 
         "bpm_suggest": 85, 
         "color": "#e74c3c", 
-        "delay_fraction": 0.5, "delay_volume": 0.12, "delay_feedback": 0.10, 
-        "reverb_room": 0.82, "reverb_wet": 0.52, "reverb_damp": 0.15, "reverb_width": 1.00, 
+        "delay_fraction": 0.5, "delay_volume": 0.12, "delay_feedback": 0.20, 
+        "reverb_room": 0.42, "reverb_wet": 0.52, "reverb_damp": 0.25, "reverb_width": 1.00, 
         "chorus_mix": 0.20, "comp_ratio": 0.025, "comp_thresh": 0.030, "duck_intensity": 0.8, "saturation_amount": 0.15,
         "desc": (
             "<b>🌹 BOLERO (Trữ Tình - Sâu Lắng - Vang Sáng Mịn)</b>\n"
@@ -58,9 +58,9 @@ PRESETS = {
         "emoji": "🎋", 
         "bpm_suggest": 100, 
         "color": "#27ae60", 
-        "delay_fraction": 0.5, "delay_volume": 0.10, "delay_feedback": 0.08, 
-        "reverb_room": 0.75, "reverb_wet": 0.46, "reverb_damp": 0.20, "reverb_width": 0.95, 
-        "chorus_mix": 0.12, "comp_ratio": 0.025, "comp_thresh": 0.030, "duck_intensity": 0.6, "saturation_amount": 0.08,
+        "delay_fraction": 0.5, "delay_volume": 0.10, "delay_feedback": 0.15, 
+        "reverb_room": 0.38, "reverb_wet": 0.46, "reverb_damp": 0.30, "reverb_width": 0.95, 
+        "chorus_mix": 0.12, "comp_ratio": 0.025, "comp_thresh": 0.030, "duck_intensity": 0.6, "saturation_amount": 0.15,
         "desc": (
             "<b>🎋 DÂN CA / CA CỔ (Ngọt Ngào - Mộc Mạc - Bay Bổng)</b>\n"
             "• <b>Vang Reverb:</b> Không gian rộng mở tự nhiên (75% Room, 46% Wet, Damp 20%) tạo độ bay mà vẫn mộc mạc.\n"
@@ -72,8 +72,8 @@ PRESETS = {
         "emoji": "🎤", 
         "bpm_suggest": 120, 
         "color": "#9b59b6", 
-        "delay_fraction": 0.5, "delay_volume": 0.10, "delay_feedback": 0.08, 
-        "reverb_room": 0.78, "reverb_wet": 0.48, "reverb_damp": 0.15, "reverb_width": 0.95, 
+        "delay_fraction": 0.5, "delay_volume": 0.12, "delay_feedback": 0.20, 
+        "reverb_room": 0.40, "reverb_wet": 0.48, "reverb_damp": 0.28, "reverb_width": 0.95, 
         "chorus_mix": 0.15, "comp_ratio": 0.025, "comp_thresh": 0.030, "duck_intensity": 1.0, "saturation_amount": 0.20,
         "desc": (
             "<b>🎤 NHẠC TRẺ (Pop/Ballad Hiện Đại - Lung Linh)</b>\n"
@@ -86,8 +86,8 @@ PRESETS = {
         "emoji": "💫", 
         "bpm_suggest": 75, 
         "color": "#2980b9", 
-        "delay_fraction": 0.5, "delay_volume": 0.18, "delay_feedback": 0.25, 
-        "reverb_room": 0.85, "reverb_wet": 0.58, "reverb_damp": 0.10, "reverb_width": 1.00, 
+        "delay_fraction": 0.5, "delay_volume": 0.18, "delay_feedback": 0.30, 
+        "reverb_room": 0.45, "reverb_wet": 0.55, "reverb_damp": 0.22, "reverb_width": 1.00, 
         "chorus_mix": 0.26, "comp_ratio": 0.025, "comp_thresh": 0.030, "duck_intensity": 0.9, "saturation_amount": 0.32,
         "desc": (
             "<b>💫 BALLAD (Bay Bổng - Siêu Mượt Mà - Màu Sắc Pro)</b>\n"
@@ -100,9 +100,9 @@ PRESETS = {
         "emoji": "🎧", 
         "bpm_suggest": 95, 
         "color": "#e67e22", 
-        "delay_fraction": 0.25, "delay_volume": 0.08, "delay_feedback": 0.04, 
-        "reverb_room": 0.58, "reverb_wet": 0.30, "reverb_damp": 0.25, "reverb_width": 0.85, 
-        "chorus_mix": 0.05, "comp_ratio": 0.025, "comp_thresh": 0.030, "duck_intensity": 1.2, "saturation_amount": 0.35,
+        "delay_fraction": 0.25, "delay_volume": 0.08, "delay_feedback": 0.08, 
+        "reverb_room": 0.30, "reverb_wet": 0.30, "reverb_damp": 0.35, "reverb_width": 0.85, 
+        "chorus_mix": 0.12, "comp_ratio": 0.025, "comp_thresh": 0.030, "duck_intensity": 1.2, "saturation_amount": 0.35,
         "desc": (
             "<b>🎧 RAP (Hiện Đại - Rõ Lời - Độ Sâu Tốt)</b>\n"
             "• <b>Vang Reverb:</b> Không gian phòng vừa phải, rất trong trẻo (58% Room, 30% Wet, Damp 25%) giữ độ nét ca từ.\n"
@@ -114,8 +114,8 @@ PRESETS = {
         "emoji": "🪩", 
         "bpm_suggest": 128, 
         "color": "#1abc9c", 
-        "delay_fraction": 0.5, "delay_volume": 0.12, "delay_feedback": 0.05, 
-        "reverb_room": 0.65, "reverb_wet": 0.40, "reverb_damp": 0.20, "reverb_width": 0.90, 
+        "delay_fraction": 0.5, "delay_volume": 0.12, "delay_feedback": 0.15, 
+        "reverb_room": 0.35, "reverb_wet": 0.40, "reverb_damp": 0.30, "reverb_width": 0.90, 
         "chorus_mix": 0.18, "comp_ratio": 0.025, "comp_thresh": 0.030, "duck_intensity": 1.0, "saturation_amount": 0.30,
         "desc": (
             "<b>🪩 DANCE (Sôi Động - Điện Tử - Bay Bổng)</b>\n"
@@ -128,8 +128,8 @@ PRESETS = {
         "emoji": "🌊", 
         "bpm_suggest": 87, 
         "color": "#16a085", 
-        "delay_fraction": 0.5, "delay_volume": 0.22, "delay_feedback": 0.52, 
-        "reverb_room": 0.80, "reverb_wet": 0.55, "reverb_damp": 0.20, "reverb_width": 1.00, 
+        "delay_fraction": 0.5, "delay_volume": 0.22, "delay_feedback": 0.25, 
+        "reverb_room": 0.40, "reverb_wet": 0.50, "reverb_damp": 0.28, "reverb_width": 1.00, 
         "chorus_mix": 0.25, "comp_ratio": 0.025, "comp_thresh": 0.030, "duck_intensity": 0.9, "saturation_amount": 0.15,
         "desc": (
             "<b>🌊 KHÔNG GIAN OK (Mượt Mà - Long Lanh - Màu Sắc Pro)</b>\n"

@@ -344,6 +344,10 @@ def generate_eq_adjustments(band_data, rms_db, sensitivity=1.0):
     if "chorus_mix" in current_genre:
         vocal_adj["chorus_mix"] = current_genre["chorus_mix"]
 
+    # ── GENRE STEREO WIDENING (Nhạc Tách Mở) ──
+    if "music_stereo_width" in current_genre:
+        vocal_adj["music_stereo_width"] = current_genre["music_stereo_width"]
+
     # ── VOCAL TRACK EQ ──
     if is_singing:
         for band_name, info in EQ_MAP.items():
