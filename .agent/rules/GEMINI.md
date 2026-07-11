@@ -51,3 +51,16 @@
 - Rely on VFS for real-time code layout, `.agent/knowledge/` for intent/rules/history.
 - Log durable decisions: `bash .agent/decisions/decision-log.sh log "..." "..."`
 - Record **failed approaches** in session context — prevent repeating mistakes.
+
+---
+
+## 🔄 CONTEXT CONTINUITY & MODEL SWITCH PROTOCOL
+
+**CRITICAL: When resuming a conversation (especially after a model switch), you MUST:**
+1. **FOCUS ON THE TAIL:** Strictly read the **VERY LAST** messages in the chat history to understand the CURRENT active task. If another model just did something, you MUST continue from *their* exact last step.
+2. **IGNORE PAST HALLUCINATIONS:** Do NOT blindly continue your own past messages from earlier in the chat history if the recent context has changed.
+3. **Verify Git State:** Run `git status` and `git log -n 5 --oneline` to check the actual workspace status.
+4. **Restore Session Context:** Read `.agent/session.md`.
+   - If `.agent/session.md` exists and is not expired, resume the task detailed inside.
+   - If it doesn't exist, rely ONLY on the very last chat message and the Git state. Do NOT revert to older topics.
+

@@ -153,12 +153,12 @@ function setup()
     -- ══════════════════════════════════════════════════════════════
     local voc, is_new_voc = get_or_create_track("VOCAL", false)
     set_color(voc, 230, 55, 55)
-    reaper.SetMediaTrackInfo_Value(voc, "D_VOL", 0.80) -- ~-1.9dB (tham chiếu Laiganhonanh: vocal phủ lên trên nhạc, center mạnh)
+    reaper.SetMediaTrackInfo_Value(voc, "D_VOL", 0.65) -- Giảm từ 0.80 xuống 0.65 (-3.7dB) để tránh clipping tuyệt đối
     reaper.SetMediaTrackInfo_Value(voc, "D_PAN", 0.0)
 
     local voc_par, is_new_voc_par = get_or_create_track("VOCAL PARALLEL", false)
     set_color(voc_par, 255, 92, 138)
-    reaper.SetMediaTrackInfo_Value(voc_par, "D_VOL", 0.42) -- ~-7.5dB: body đầy đặn, vocal xốp có lực
+    reaper.SetMediaTrackInfo_Value(voc_par, "D_VOL", 0.22) -- ~-13dB: body ấm nhẹ, hỗ trợ tầng trung-thấp
     reaper.SetMediaTrackInfo_Value(voc_par, "D_PAN", 0.0)
     reaper.SetMediaTrackInfo_Value(voc_par, "I_RECARM", 0)
     reaper.SetMediaTrackInfo_Value(voc_par, "I_RECMON", 0)
@@ -166,7 +166,7 @@ function setup()
  
     local voc_rev, is_new_voc_rev = get_or_create_track("VOCAL REVERB", false)
     set_color(voc_rev, 56, 189, 248)
-    reaper.SetMediaTrackInfo_Value(voc_rev, "D_VOL", 0.60) -- ~-4.4dB: reverb sân khấu xốp phủ lên beat
+    reaper.SetMediaTrackInfo_Value(voc_rev, "D_VOL", 0.50) -- ~-6dB: reverb rõ nhưng không dội gần
     reaper.SetMediaTrackInfo_Value(voc_rev, "D_PAN", 0.0)
     reaper.SetMediaTrackInfo_Value(voc_rev, "I_RECARM", 0)
     reaper.SetMediaTrackInfo_Value(voc_rev, "I_RECMON", 0)
@@ -294,11 +294,11 @@ function setup()
     set_p(voc, veq, "Freq-Low Shelf", 0.21)     -- ~200Hz
     set_p(voc, veq, "Gain-Low Shelf", 0.531)    -- +1.5dB (bồi ấm body vocal)
     -- Band 2: Bell (Mud Cut ở 250Hz, giảm bớt độ cắt về -0.8dB để bồi lại dải thân ấm "độ cốt" cho giọng)
-    set_p(voc, veq, "Freq-Band 2", 0.17)        -- ~350Hz
-    set_p(voc, veq, "Gain-Band 2", 0.46875)     -- -1.5dB (sạch tiếng)
+    set_p(voc, veq, "Freq-Band 2", 0.26)        -- ~250Hz
+    set_p(voc, veq, "Gain-Band 2", 0.484)       -- -0.8dB (nhẹ nhàng)
     -- Band 3: Bell (BOOST nhẹ dải Presence 3.2kHz → vocal "phủ" lên beat, nghe rõ nét)
     set_p(voc, veq, "Freq-Band 3", 0.62)        -- ~3.2kHz
-    set_p(voc, veq, "Gain-Band 3", 0.5416)      -- +2.0dB (nịnh giọng, nổi trên nhạc)
+    set_p(voc, veq, "Gain-Band 3", 0.531)       -- +1.5dB (tôn vinh vocal, nổi trên nhạc)
     -- Band 4: High Shelf (Air mạnh — tham chiếu Air 9.7% rất rõ ràng)
     set_p(voc, veq, "Freq-High Shelf 4", 0.82)  -- ~10.0kHz (hạ freq để phủ rộng hơn)
     set_p(voc, veq, "Gain-High Shelf 4", 0.563) -- +3.0dB Air (tăng gấp đôi từ +1.5dB)
@@ -319,12 +319,12 @@ function setup()
         set_p(voc, vsat, "Amount (%)", 0.20)   -- 20% Saturation: hài âm đầy đặn, giọng xốp như mic ống
     end
 
-    -- FX5: Chorus (Tạo độ xốp stereo, giọng phủ rộng)
+    -- FX5: Chorus (Shimmer nhẹ, KHÔNG tạo bản sao giọng)
     local chorus = add_fx(voc, "Chorus")
     if chorus >= 0 then
-        set_p(voc, chorus, "Rate", 0.08)        -- Chậm hơn: modulation mượt mà
-        set_p(voc, chorus, "Depth", 0.12)       -- Độ sâu vừa: xốp nhưng không loản
-        set_p(voc, chorus, "Mix", 0.12)          -- 12% Mix: giọng hát có chiều rộng, phủ lên beat
+        set_p(voc, chorus, "Rate", 0.08)        -- Chậm: modulation mượt
+        set_p(voc, chorus, "Depth", 0.06)       -- Rất nông: shimmer không doubling
+        set_p(voc, chorus, "Mix", 0.06)          -- 6%: chỉ thêm chút ánh sáng
     end
 
     -- ══════════════════════════════════════════════════════════════
@@ -350,21 +350,21 @@ function setup()
     -- ══════════════════════════════════════════════════════════════
     -- CẤU HÌNH VST TRACK 3: 🌊 VOCAL REVERB (Aux Reverb)
     -- ══════════════════════════════════════════════════════════════
-    -- Filter Abbey Road ấm áp (Cắt trầm hợp lý dưới 130Hz, giữ phẳng 350Hz để lấp đầy không gian đầy đặn)
+    -- Filter Abbey Road ấm áp (Hạ HPF 80Hz cho bass reverb ấm, boost 350Hz cho body)
     local vreveq = add_fx(voc_rev, "ReaEQ")
-    set_p(voc_rev, vreveq, "Freq-Low Shelf", 0.18)       -- ~130Hz
+    set_p(voc_rev, vreveq, "Freq-Low Shelf", 0.10)       -- ~80Hz (hạ từ 130Hz: giữ ấm hơn)
     set_p(voc_rev, vreveq, "Gain-Low Shelf", 0.0)        -- -inf dB (cắt trầm)
-    set_p(voc_rev, vreveq, "Freq-High Pass 5", 0.18)     -- ~130Hz (HPF)
+    set_p(voc_rev, vreveq, "Freq-High Pass 5", 0.10)     -- ~80Hz (HPF)
     
     set_p(voc_rev, vreveq, "Freq-Band 2", 0.30)          -- ~350Hz
-    set_p(voc_rev, vreveq, "Gain-Band 2", 0.54)          -- +2dB (độ đầy ấm của reverb lấp khoảng nhạc bị cắt)
+    set_p(voc_rev, vreveq, "Gain-Band 2", 0.563)         -- +3dB (độ đầy ấm của reverb, hỗ trợ tầng trung-thấp)
     
     set_p(voc_rev, vreveq, "Freq-Band 3", 0.55)          -- ~2kHz
     set_p(voc_rev, vreveq, "Gain-Band 3", 0.52)          -- +1dB (reverb presence bổ trợ vocal)
     
-    -- Mở rộng dải cao của Reverb (Vang Air phủ lên beat)
-    set_p(voc_rev, vreveq, "Freq-High Shelf 4", 0.85)    -- ~10kHz (hạ xuống để phủ rộng hơn)
-    set_p(voc_rev, vreveq, "Gain-High Shelf 4", 0.60)    -- +5dB (Vang Air xốp phủ lên beat)
+    -- Air shelf: +3dB (đủ sáng nhưng không chói)
+    set_p(voc_rev, vreveq, "Freq-High Shelf 4", 0.85)    -- ~10kHz
+    set_p(voc_rev, vreveq, "Gain-High Shelf 4", 0.56)    -- +3dB (bớt chói so với +5dB)
 
     -- Chorus trên Reverb: tạo độ xốp bao bọc, reverb "phủ" xung quanh vocal
     local rev_chorus = add_fx(voc_rev, "Chorus")
@@ -378,9 +378,9 @@ function setup()
     local vrev = add_fx(voc_rev, "ReaVerbate")
     set_p(voc_rev, vrev, "Wet", 1.0)
     set_p(voc_rev, vrev, "Dry", 0.0)
-    set_p(voc_rev, vrev, "Room Size", 0.50)             -- Decay ≈ 1s (sân khấu, headphone cần lớn hơn)
-    set_p(voc_rev, vrev, "Dampening", 0.20)             -- Treble vang LÂU = nịnh giọng, sáng, bay bổng
-    set_p(voc_rev, vrev, "Delay", 0.20)                 -- Pre-delay 20ms (tách rõ "vang" khỏi "giọng gốc", bớt chói)
+    set_p(voc_rev, vrev, "Room Size", 0.58)             -- Decay ≈ 1.3s (âm hưởng lưu lại lâu hơn)
+    set_p(voc_rev, vrev, "Dampening", 0.28)             -- Treble bớt chói, tầng ấm giữ lâu hơn
+    set_p(voc_rev, vrev, "Delay", 0.30)                 -- Pre-delay 30ms (tách rõ "vang" khỏi "giọng gốc")
     set_p(voc_rev, vrev, "Width", 1.0)
     set_p(voc_rev, vrev, "Stereo", 1.0)
 
@@ -454,11 +454,14 @@ function setup()
 
 
     -- ══════════════════════════════════════════════════════════════
-    -- CẤU HÌNH VST MASTER BUS (Sân khấu mastering)
+    -- MASTER BUS (GLUE, EQ, LIMITER TỐI ƯU CỰC ĐẠI)
     -- ══════════════════════════════════════════════════════════════
     local master = reaper.GetMasterTrack(0)
-    for i = reaper.TrackFX_GetCount(master) - 1, 0, -1 do
-        reaper.TrackFX_Delete(master, i)
+    reaper.SetMediaTrackInfo_Value(master, "D_VOL", 0.85) -- Giảm -1.4dB để có headroom an toàn, chống clipping
+    
+    -- Xóa FX cũ
+    for fx = reaper.TrackFX_GetCount(master) - 1, 0, -1 do
+        reaper.TrackFX_Delete(master, fx)
     end
 
     -- 1. Master EQ (Smile curve & IEM Bass Leakage Compensation)

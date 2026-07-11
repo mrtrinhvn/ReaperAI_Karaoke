@@ -10,14 +10,39 @@ priority: CRITICAL
 
 AI không có khả năng tự nhớ nếu không bị ép. Dưới đây là quy trình BẮT BUỘC KHÔNG THỂ BỎ QUA trong từng Task.
 
+## 0. NGUYÊN TẮC NỀN TẢNG (FOUNDATION PRINCIPLE)
+
+> **Skill là BẢN ĐỒ. Memory là CHI TIẾT. Đi theo bản đồ thì tự nhiên sẽ gặp chi tiết.**
+
+- **Skill** (`.agent/skills/`) = Khung xương cố định, không phụ thuộc phiên hội thoại. Nó chứa các tham chiếu tới file, hàm, pattern cụ thể trong dự án.
+- **Memory** (MCP `memory_search`) = Bối cảnh bổ sung, quyết định lịch sử, bài học rút ra.
+- **Quy trình đúng:** Nhận task → Tìm skill liên quan → Đọc skill → Skill dẫn tới file/hàm cụ thể → Dò theo file đó → Memory search bổ sung ngữ cảnh → Hành động.
+- **Quy trình SAI (CẤM):** Nhận task → Tự suy luận từ kiến thức cũ → Viết code mới → Quên mất dự án đã có sẵn giải pháp.
+
 ## 1. PRE-FLIGHT HOOK (Khởi Động / Đổi Model)
-Ngay khi bắt đầu task mới hoặc bị đổi Model/Workspace, 3 việc ĐẦU TIÊN phải làm:
+Ngay khi bắt đầu task mới hoặc bị đổi Model/Workspace, 4 việc ĐẦU TIÊN phải làm **THEO THỨ TỰ**:
+
+### Bước 1 — SKILL TRACE (Dò bản đồ kỹ năng — LAZY)
+- ✅ **BẮT BUỘC:** Khi Sếp nhắc tới một khái niệm/vấn đề, **match keywords với `skills_registry.json`** (mục lục ~3K tokens, đã nạp sẵn) để xác định 2-3 skill liên quan.
+- ✅ **BẮT BUỘC:** Chỉ đọc **đúng 2-3 SKILL.md** đã match. TUYỆT ĐỐI KHÔNG đọc toàn bộ thư mục `.agent/skills/`.
+- ✅ **BẮT BUỘC:** Dò theo các tham chiếu trong skill (file path, tên hàm, tên module) → Mở file đó ra xem → Hiểu toàn cảnh trước khi hành động.
+- 🚫 **CẤM:** Đọc hết mọi SKILL.md (tốn 60K+ tokens). Chỉ đọc cái liên quan.
+- 🚫 **CẤM:** Bỏ qua bước này rồi tự viết giải pháp mới. Rất có thể dự án ĐÃ CÓ SẴN cơ chế mà skill đã ghi nhận.
+
+### Bước 2 — MEMORY SEARCH (Tìm bối cảnh bổ sung)
 - ✅ **BẮT BUỘC:** Gọi tool `mcp_ag-kit-memory.memory_search(workspace_path=CWD)` để tìm context liên quan đến Task.
+- Kết hợp kết quả memory với những gì skill đã dẫn dắt → Có bức tranh toàn cảnh.
+
+### Bước 3 — KNOWLEDGE CHECK (Đọc kiến thức dự án)
 - ✅ **BẮT BUỘC:** Rà soát đọc file `Changelog.md` hoặc các KI (Knowledge Items) trong `.agent/knowledge/` (nếu có).
-- ✅ **BẮT BUỘC SESSION RESTORE:** Đọc `.agent/session.md` ngư đây:
-  1. Nếu `Expires:` đã qua hạn → thông báo: "⚠️ Session context đã expire từ [DATE]. Task context đã reset."
+
+### Bước 4 — SESSION RESTORE & MODEL SWITCH (Khôi phục phiên & Kiểm tra Git)
+- ✅ **BẮT BUỘC CHỐNG ATTENTION BIAS KHI ĐỔI MODEL:** Các LLM (đặc biệt là Gemini) rất dễ bị ám ảnh bởi những tin nhắn cũ mà chính nó đã sinh ra trước đó trong bối cảnh dài. Khi được gọi trở lại (switch model), **BẮT BUỘC phải bỏ qua các chủ đề cũ** và **chỉ tập trung vào tin nhắn cuối cùng (The Tail)** của Sếp hoặc Model trước đó để biết hiện tại đang làm việc gì! Cấm lải nhải lại chuyện cũ.
+- ✅ **BẮT BUỘC:** Chạy `git status` và `git log -n 5 --oneline` (nếu là git repo) để đối chiếu trạng thái thực tế của workspace. Nếu các file đang sửa đổi hoặc commit mới nhất khác với `.agent/brain/summary.md`, hãy ưu tiên dữ liệu thực tế từ Git.
+- ✅ **BẮT BUỘC SESSION RESTORE:** Đọc `.agent/session.md` hoặc file session gần nhất trong `.agent/state/session-*.md`:
+  1. Nếu `Expires:` đã qua hạn → thông báo: "⚠️ Session context đã expire từ [DATE]. Task context đã reset." và dùng Git log/status để định hướng tiếp.
   2. Nếu còn hạn → tóm tắt ngắn cho Sếp: "📌 Session trước đang làm [task]. Tiếp tục không?"
-  3. Nếu không có file → bỏ qua, tạo mới khi kết thúc task.
+  3. Nếu không có file → dùng Git log/status để tóm tắt và tiếp tục công việc đang dang dở.
 
 ## 2. EXECUTION HOOK (Thực Thi Lõi)
 Tránh loạn trí nhớ khi bối cảnh phình to:
@@ -29,6 +54,18 @@ Tránh loạn trí nhớ khi bối cảnh phình to:
 Cấm kết thúc Session mà quên dọn dẹp và cất trí nhớ:
 - ✅ **BẮT BUỘC:** Gọi tool `mcp_ag-kit-memory.memory_save(workspace_path=CWD)` lưu lại cách Fix Bug hoặc Kiến thức quyết định cốt lõi. Cấm lưu rác ngớ ngẩn hiển nhiên.
 - ✅ **BẮT BUỘC:** Nếu làm thay đổi Architecture, Schema DB, Core Logic (VD: Đổi API Payload): PHẢI cập nhật ngay bằng quyền ghi file vào `Changelog.md` hoặc một file `.md` trong `.agent/knowledge/`.
+- ✅ **BẮT BUỘC:** Nếu phát hiện cơ chế/kiến trúc quan trọng mà skill chưa ghi nhận → **CẬP NHẬT SKILL** tương ứng để bổ sung tham chiếu. Skill phải luôn là bản đồ đầy đủ nhất.
+- ✅ **BẮT BUỘC CẬP NHẬT SESSION:** Trước khi kết thúc turn hoặc task, ghi nhận trạng thái hiện tại vào `.agent/session.md` với định dạng:
+  ```markdown
+  # Active Session Checkpoint
+  - **Task**: [Mô tả ngắn gọn task đang làm]
+  - **Status**: [Đang làm | Đã xong | Đang bị block]
+  - **Completed**: [Liệt kê các việc đã làm]
+  - **Remaining**: [Liệt kê các việc còn lại]
+  - **Last Decisions**: [Quyết định kỹ thuật / API mới nhất]
+  - **Expires**: [Timestamp hiện tại + 24 giờ, định dạng ISO]
+  ```
+  Điều này đảm bảo khi chuyển đổi Model hoặc restart session, AI tiếp theo sẽ khôi phục được ngữ cảnh tức thì.
 - ✅ **CẤM:** "Dạ vâng Sếp, em nhớ rồi" nhưng không thực thi việc ghi nhớ. Trí nhớ ngôn từ = Xóa.
 
 ---

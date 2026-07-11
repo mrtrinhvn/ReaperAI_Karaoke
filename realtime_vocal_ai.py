@@ -177,7 +177,7 @@ def calc_tempo_sync(bpm, genre=None):
     # 25-40ms: não nghe thành "phản xạ/vang" riêng biệt → sân khấu
     # > 40ms: nghe rõ echo riêng → doubling
     predelay_ms = ms_per_beat / 16.0  # 1/64 note (1/16 of beat)
-    predelay_ms = max(15.0, min(25.0, predelay_ms))
+    predelay_ms = max(25.0, min(40.0, predelay_ms))
     predelay_norm = predelay_ms / 100.0  # ReaVerbate Delay param ~= ms/100
     
     return {

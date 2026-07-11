@@ -1,0 +1,12 @@
+{
+  "name": "ReaperAI_Karaoke",
+  "root": "/home/tao/Projects/ReaperAI_Karaoke",
+  "stack": [
+    "Unknown"
+  ],
+  "ports": {
+    "LSP_PORT": "3500"
+  },
+  "brain_path": "/home/tao/Projects/ReaperAI_Karaoke/.agent/brain/summary.md",
+  "updated_at": "2026-07-11 11:47"
+}
