@@ -480,6 +480,8 @@ function setup()
     -- CẤU HÌNH VST MASTER BUS (Sân khấu mastering)
     -- ══════════════════════════════════════════════════════════════
     local master = reaper.GetMasterTrack(0)
+    -- Giảm âm lượng Master xuống -2dB (tỉ lệ 0.794) để chống vỡ tiếng tuyệt đối (chặn Peak 0.4dB)
+    reaper.SetMediaTrackInfo_Value(master, "D_VOL", 0.794)
     for i = reaper.TrackFX_GetCount(master) - 1, 0, -1 do
         reaper.TrackFX_Delete(master, i)
     end
