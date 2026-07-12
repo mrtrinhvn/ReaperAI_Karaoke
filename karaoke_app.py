@@ -205,29 +205,49 @@ class KaraokeApp(Gtk.Window):
                 autotune_enabled = saved_data.get("autotune_enabled", True)
         except: pass
 
-        # New Header Box for Genre ComboBox & Analyze Button
+        # --- DÃY NÚT CHỌN THỂ LOẠI (THAY CHO COMBOBOX BỊ LỖI LÒI LÊN TRỜI) ---
         genre_row = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
         
         lbl = Gtk.Label(label="<span font='12' weight='bold' color='#a78bfa'>🎤 Thể Loại:</span>", use_markup=True)
-        genre_row.pack_start(lbl, False, False, 0)
+        lbl.set_valign(Gtk.Align.START)
+        genre_row.pack_start(lbl, False, False, 5)
         
-        self.genre_combo = Gtk.ComboBoxText()
-        for key, p in PRESETS.items():
-            self.genre_combo.append(key, f"{p['emoji']} {p['name']}")
+        self.genre_flow = Gtk.FlowBox()
+        self.genre_flow.set_valign(Gtk.Align.START)
+        self.genre_flow.set_max_children_per_line(3) # 3 cột
+        self.genre_flow.set_selection_mode(Gtk.SelectionMode.SINGLE)
+        self.genre_flow.set_row_spacing(5)
+        self.genre_flow.set_column_spacing(5)
         
-        active_idx = list(PRESETS.keys()).index(current_saved) if current_saved in PRESETS else 0
-        self.genre_combo.set_active(active_idx)
-        self.genre_combo.connect("changed", self.on_genre_combo_changed)
-        genre_row.pack_start(self.genre_combo, True, True, 0)
+        self.genre_keys = list(PRESETS.keys())
+        active_idx = self.genre_keys.index(current_saved) if current_saved in self.genre_keys else 0
         
-        # Nút Phân tích giọng (di chuyển lên đây)
+        for key in self.genre_keys:
+            p = PRESETS[key]
+            lbl_btn = Gtk.Label(label=f"<span font='9'>{p['emoji']} {p['name']}</span>", use_markup=True)
+            box = Gtk.Box()
+            box.set_border_width(3)
+            box.add(lbl_btn)
+            self.genre_flow.insert(box, -1)
+            
+        self.genre_flow.connect("child-activated", self.on_genre_flow_activated)
+        
+        # Chọn mục mặc định
+        child_to_select = self.genre_flow.get_child_at_index(active_idx)
+        if child_to_select:
+            self.genre_flow.select_child(child_to_select)
+            
+        genre_row.pack_start(self.genre_flow, True, True, 0)
+        
+        # Nút Phân tích giọng (bên phải)
+        tools_col = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=5)
         self.analyze_btn = Gtk.Button()
         self.analyze_btn.set_name("analyze-btn")
         self.analyze_btn.get_style_context().add_class("analyze-btn")
         self.analyze_lbl = Gtk.Label(label="<span font='10' weight='bold' color='#ffffff'>🎙️ Phân Tích</span>", use_markup=True)
         self.analyze_btn.add(self.analyze_lbl)
         self.analyze_btn.connect("clicked", self.on_analyze_clicked)
-        genre_row.pack_start(self.analyze_btn, False, False, 0)
+        tools_col.pack_start(self.analyze_btn, False, False, 0)
         
         settings_btn = Gtk.Button()
         settings_btn.get_style_context().add_class("settings-btn")
@@ -1740,11 +1760,9 @@ class KaraokeApp(Gtk.Window):
         else:
             return f"🔊 {name}{suffix}"
 
-    def on_genre_combo_changed(self, combo):
-        active_id = combo.get_active_id()
-        if not active_id:
-            idx = combo.get_active()
-            active_id = list(PRESETS.keys())[idx]
+    def on_genre_flow_activated(self, flowbox, child):
+        idx = child.get_index()
+        active_id = self.genre_keys[idx]
         
         try:
             with open(GENRE_FILE, "r") as f:
