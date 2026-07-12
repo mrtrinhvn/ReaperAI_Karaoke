@@ -369,34 +369,46 @@ def generate_eq_adjustments(band_data, rms_db, sensitivity=1.0):
             diff = energy - target
 
             if band_name == "Sub" and energy > target * 1.5:
+                pass
                 #vocal_adj["eq_band_1_type"] = "highpass"
                 #vocal_adj["eq_band_1_gain"] = min(diff * 5 * sensitivity, 2.0)
             elif band_name == "Mud":
                 if energy > target * 1.5: 
+                    pass
                     #vocal_adj["eq_band_2_gain_db"] = -min(diff * 5 * sensitivity, info["max_cut"])
                 elif energy < target * 0.7:
+                    pass
                     #vocal_adj["eq_band_2_gain_db"] = min((target - energy) * 12 * sensitivity, info["max_boost"])
             elif band_name == "Presence" and energy < target * 0.90:
+                pass
                 #vocal_adj["eq_band_3_gain_db"] = min((target - energy) * 6 * sensitivity, info["max_boost"])
             elif band_name == "Bright" and energy < target * 0.90:
+                pass
                 #vocal_adj["eq_band_4_gain_db"] = min((target - energy) * 5 * sensitivity, info["max_boost"])
 
         # CỘNG THÊM OFFSET TỪ BẢN CALIBRATION 5 GIÂY (nếu có)
         calib = read_calibration()
         if "eq_band_2_gain_db" in calib and "eq_band_2_gain_db" in vocal_adj:
+            pass
             #vocal_adj["eq_band_2_gain_db"] += calib["eq_band_2_gain_db"]
         elif "eq_band_2_gain_db" in calib:
+            pass
             #vocal_adj["eq_band_2_gain_db"] = calib["eq_band_2_gain_db"]
             
         if "eq_band_3_gain_db" in calib and "eq_band_3_gain_db" in vocal_adj:
+            pass
             #vocal_adj["eq_band_3_gain_db"] += calib["eq_band_3_gain_db"]
         elif "eq_band_3_gain_db" in calib:
+            pass
             #vocal_adj["eq_band_3_gain_db"] = calib["eq_band_3_gain_db"]
         if "eq_band_4_gain_db" in calib and "eq_band_4_gain_db" in vocal_adj:
+            pass
             #vocal_adj["eq_band_4_gain_db"] += calib["eq_band_4_gain_db"]
         elif "eq_band_4_gain_db" in calib:
+            pass
             #vocal_adj["eq_band_4_gain_db"] = calib["eq_band_4_gain_db"]
     else:
+        pass
         #vocal_adj["eq_band_1_gain"] = 0.0
         #vocal_adj["eq_band_2_gain_db"] = 0.0
         #vocal_adj["eq_band_3_gain_db"] = 0.0
@@ -430,9 +442,12 @@ def generate_eq_adjustments(band_data, rms_db, sensitivity=1.0):
             with open("/tmp/ai_karaoke_calib.json", "r") as f:
                 calib = json.load(f)
                 if time.time() - calib.get("timestamp", 0) < 3600:
-                    if "eq_band_2_gain_db" in calib: #vocal_adj["eq_band_2_gain_db"] = calib["eq_band_2_gain_db"]
-                    if "eq_band_3_gain_db" in calib: #vocal_adj["eq_band_3_gain_db"] = calib["eq_band_3_gain_db"]
-                    if "eq_band_4_gain_db" in calib: #vocal_adj["eq_band_4_gain_db"] = calib["eq_band_4_gain_db"]
+                    if "eq_band_2_gain_db" in calib: 
+                        pass #vocal_adj["eq_band_2_gain_db"] = calib["eq_band_2_gain_db"]
+                    if "eq_band_3_gain_db" in calib: 
+                        pass #vocal_adj["eq_band_3_gain_db"] = calib["eq_band_3_gain_db"]
+                    if "eq_band_4_gain_db" in calib: 
+                        pass #vocal_adj["eq_band_4_gain_db"] = calib["eq_band_4_gain_db"]
     except: pass
 
     return {"vocal": vocal_adj, "music": music_adj, "is_singing": is_singing}
