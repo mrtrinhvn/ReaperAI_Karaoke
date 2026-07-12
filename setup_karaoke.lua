@@ -153,7 +153,7 @@ function setup()
     -- ══════════════════════════════════════════════════════════════
     local voc, is_new_voc = get_or_create_track("VOCAL", false)
     set_color(voc, 230, 55, 55)
-    reaper.SetMediaTrackInfo_Value(voc, "D_VOL", 0.50) -- ~-6.0dB (giảm thêm để chống digital clipping khi gào to)
+    reaper.SetMediaTrackInfo_Value(voc, "D_VOL", 0.80) -- ~-1.9dB (Trả lại âm lượng lớn ban đầu)
     reaper.SetMediaTrackInfo_Value(voc, "D_PAN", 0.0)
 
     local voc_par, is_new_voc_par = get_or_create_track("VOCAL PARALLEL", false)
