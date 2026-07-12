@@ -318,7 +318,7 @@ function setup()
     set_p(voc, xcomp, "1-Band top frequency", 0.26) -- Dưới 250Hz: Bỏ qua không nén
     set_p(voc, xcomp, "2-Band top frequency", 0.65) -- 250Hz - 3kHz: Nén dải Mid/UMid
     set_p(voc, xcomp, "1-Threshold", 1.0) -- Band 1 không nén (Threshold max)
-    set_p(voc, xcomp, "2-Threshold", 0.3) -- Band 2 nén thông minh (chỉ kích hoạt khi hát to)
+    set_p(voc, xcomp, "2-Threshold", 0.018) -- Band 2 nén tại -27dB (kích hoạt đúng lúc hát to)
     set_p(voc, xcomp, "2-Ratio", 0.38)    -- Ratio 4:1 nén gắt dải chói
     set_p(voc, xcomp, "2-Attack", 0.1)    -- Attack 10ms
     set_p(voc, xcomp, "2-Release", 0.25)  -- Release vừa phải
