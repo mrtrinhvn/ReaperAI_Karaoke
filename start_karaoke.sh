@@ -41,6 +41,11 @@ pkill -f "karaoke_app.py"
 killall -9 pw-record pw-play 2>/dev/null || true
 sleep 0.5
 
+# Step 0: Ép hệ thống âm thanh PipeWire sử dụng Buffer Size an toàn (512 samples) để chống nổ loẹt xoẹt
+echo "⚙️ Tối ưu hóa bộ đệm âm thanh (Buffer Size: 512 samples) chống nổ tiếng..."
+pw-metadata -n settings 0 clock.force-quantum 512
+sleep 0.2
+
 # Step 1: Khởi động Connection Watchdog (chạy nền — không cần REAPER mở trước)
 echo ""
 echo "🔌 Connection Watchdog (Định tuyến kết nối tự động)..."
@@ -112,6 +117,8 @@ cleanup() {
     kill $MASTER_PID 2>/dev/null
     kill $LINK_PID 2>/dev/null
     killall -9 pw-record pw-play 2>/dev/null || true
+    # Reset PipeWire buffer size về tự động
+    pw-metadata -n settings 0 clock.force-quantum 0
     echo "   ✅ Ứng dụng nổi và AI đã dừng"
     echo "   ✅ Kết nối qpwgraph không bị ảnh hưởng"
 }

@@ -158,7 +158,7 @@ function setup()
 
     local voc_par, is_new_voc_par = get_or_create_track("VOCAL PARALLEL", false)
     set_color(voc_par, 255, 92, 138)
-    reaper.SetMediaTrackInfo_Value(voc_par, "D_VOL", 0.22) -- ~-13dB: body ấm nhẹ, hỗ trợ tầng trung-thấp
+    reaper.SetMediaTrackInfo_Value(voc_par, "D_VOL", 0.40) -- ~-8dB: Tăng body/ấm tương ứng với Vocal 0.8
     reaper.SetMediaTrackInfo_Value(voc_par, "D_PAN", 0.0)
     reaper.SetMediaTrackInfo_Value(voc_par, "I_RECARM", 0)
     reaper.SetMediaTrackInfo_Value(voc_par, "I_RECMON", 0)
@@ -166,7 +166,7 @@ function setup()
  
     local voc_rev, is_new_voc_rev = get_or_create_track("VOCAL REVERB", false)
     set_color(voc_rev, 56, 189, 248)
-    reaper.SetMediaTrackInfo_Value(voc_rev, "D_VOL", 0.50) -- ~-6dB: reverb rõ nhưng không dội gần
+    reaper.SetMediaTrackInfo_Value(voc_rev, "D_VOL", 0.85) -- ~-1.4dB: Kéo vang lên mạnh hơn chút nữa
     reaper.SetMediaTrackInfo_Value(voc_rev, "D_PAN", 0.0)
     reaper.SetMediaTrackInfo_Value(voc_rev, "I_RECARM", 0)
     reaper.SetMediaTrackInfo_Value(voc_rev, "I_RECMON", 0)
@@ -174,7 +174,7 @@ function setup()
  
     local voc_del, is_new_voc_del = get_or_create_track("VOCAL DELAY", false)
     set_color(voc_del, 234, 179, 8)
-    reaper.SetMediaTrackInfo_Value(voc_del, "D_VOL", 0.40) -- ~-8dB: echo sân khấu tự nhiên
+    reaper.SetMediaTrackInfo_Value(voc_del, "D_VOL", 0.72) -- ~-2.8dB: Kéo echo lên tương ứng
     reaper.SetMediaTrackInfo_Value(voc_del, "D_PAN", 0.0)
     reaper.SetMediaTrackInfo_Value(voc_del, "I_RECARM", 0)
     reaper.SetMediaTrackInfo_Value(voc_del, "I_RECMON", 0)
