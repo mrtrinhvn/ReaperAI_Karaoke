@@ -166,7 +166,7 @@ function setup()
  
     local voc_rev, is_new_voc_rev = get_or_create_track("VOCAL REVERB", false)
     set_color(voc_rev, 56, 189, 248)
-    reaper.SetMediaTrackInfo_Value(voc_rev, "D_VOL", 0.85) -- ~-1.4dB: Kéo vang lên mạnh hơn chút nữa
+    reaper.SetMediaTrackInfo_Value(voc_rev, "D_VOL", 0.65) -- ~-3.7dB: Giảm bớt vang theo yêu cầu
     reaper.SetMediaTrackInfo_Value(voc_rev, "D_PAN", 0.0)
     reaper.SetMediaTrackInfo_Value(voc_rev, "I_RECARM", 0)
     reaper.SetMediaTrackInfo_Value(voc_rev, "I_RECMON", 0)
@@ -174,7 +174,7 @@ function setup()
  
     local voc_del, is_new_voc_del = get_or_create_track("VOCAL DELAY", false)
     set_color(voc_del, 234, 179, 8)
-    reaper.SetMediaTrackInfo_Value(voc_del, "D_VOL", 0.72) -- ~-2.8dB: Kéo echo lên tương ứng
+    reaper.SetMediaTrackInfo_Value(voc_del, "D_VOL", 0.55) -- ~-5.2dB: Giảm echo tương ứng
     reaper.SetMediaTrackInfo_Value(voc_del, "D_PAN", 0.0)
     reaper.SetMediaTrackInfo_Value(voc_del, "I_RECARM", 0)
     reaper.SetMediaTrackInfo_Value(voc_del, "I_RECMON", 0)
@@ -288,21 +288,24 @@ function setup()
 
     -- FX2: ReaEQ (Tham chiếu Laiganhonanh.mp3: Bass 21%, Low-Mid 17.5%, Air 9.7%)
     local veq = add_fx(voc, "ReaEQ")
-    -- Band 5: High Pass (Hạ xuống 80Hz giữ bass body vocal — tham chiếu Sub 10.8%)
-    set_p(voc, veq, "Freq-High Pass 5", 0.07)   -- ~80Hz (hạ từ 120Hz → giữ ấm hơn)
-    -- Band 1: Low Shelf (Giữ nguyên Bass, nhường việc chống ù cho Dynamic EQ)
-    set_p(voc, veq, "Freq-Low Shelf", 0.21)     -- ~200Hz
-    set_p(voc, veq, "Gain-Low Shelf", 0.5)      -- 0.0dB (Trả lại độ ấm gốc)
-    -- Band 2: Bell (Dịch tâm cắt xuống 350Hz để dọn LMid đục)
+    -- Band 5: High Pass (Hạ hẳn xuống 30Hz)
+    set_p(voc, veq, "Freq-High Pass 5", 0.02)   -- ~30Hz
+    -- Band 1: Low Shelf (Giảm Boost xuống +1dB để Bass không bị DƯ 35.7%)
+    set_p(voc, veq, "Freq-Low Shelf", 0.19)     -- ~150Hz
+    set_p(voc, veq, "Gain-Low Shelf", 0.520)    -- +1.0dB
+    set_p(voc, veq, "BW-Low Shelf", 0.3)
+    -- Band 2: Bell (Mở RỘNG dải cắt và chém siêu sâu -12dB để dọn sạch LMid 49.1%)
     set_p(voc, veq, "Freq-Band 2", 0.312)       -- ~350Hz
-    set_p(voc, veq, "Gain-Band 2", 0.416)       -- -4.0dB (Hát nhẹ, bớt um)
-    -- Band 3: Bell (BOOST nhẹ dải Presence 3.2kHz → vocal "phủ" lên beat, nghe rõ nét)
-    set_p(voc, veq, "Freq-Band 3", 0.62)        -- ~3.2kHz
-    set_p(voc, veq, "Gain-Band 3", 0.531)       -- +1.5dB (tôn vinh vocal, nổi trên nhạc)
-    -- Band 4: High Shelf (Air mạnh — tham chiếu Air 9.7% rất rõ ràng)
-    set_p(voc, veq, "Freq-High Shelf 4", 0.82)  -- ~10.0kHz (hạ freq để phủ rộng hơn)
-    set_p(voc, veq, "Gain-High Shelf 4", 0.563) -- +3.0dB Air (tăng gấp đôi từ +1.5dB)
-    set_p(voc, veq, "BW-High Shelf 4", 0.25)    -- Rộng hơn cho Air phủ mềm mại
+    set_p(voc, veq, "Gain-Band 2", 0.250)       -- -12.0dB (Hát nhẹ, hết um hoàn toàn)
+    set_p(voc, veq, "BW-Band 2", 0.4)           -- Rộng ra để ăn từ 250Hz đến 500Hz
+    -- Band 3: Bell (KÉO dải Mid 500-1k lên để bù đắp THIẾU 8.1% vs 18.7%)
+    set_p(voc, veq, "Freq-Band 3", 0.450)       -- ~750Hz
+    set_p(voc, veq, "Gain-Band 3", 0.583)       -- +4.0dB
+    set_p(voc, veq, "BW-Band 3", 0.35)
+    -- Band 4: High Shelf (Air và Presence)
+    set_p(voc, veq, "Freq-High Shelf 4", 0.75)  -- ~6.0kHz
+    set_p(voc, veq, "Gain-High Shelf 4", 0.541) -- +2.0dB
+    set_p(voc, veq, "BW-High Shelf 4", 0.25)
 
     -- FX3: ReaComp (Vocal Compressor mềm xốp, giảm nén gắt)
     local vcomp = add_fx(voc, "ReaComp")
@@ -512,7 +515,7 @@ function setup()
     local mlim = add_fx(master, "ReaLimit")
     if mlim >= 0 then
         set_p(master, mlim, "Threshold", 0.7708)  -- -4.5dB threshold
-        set_p(master, mlim, "Ceiling", 0.9792)    -- -0.5dB ceiling
+        set_p(master, mlim, "Ceiling", 0.9166)    -- -2.0dB ceiling (Đảm bảo tuyệt đối không Peak > 0dB trên PipeWire)
     end
 
     -- ══════════════════════════════════════════════════════════════
