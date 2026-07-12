@@ -29,7 +29,7 @@ def main():
             rms = 20 * np.log10(np.sqrt(np.mean(s**2)) + 1e-10)
             
             if rms > args.threshold:
-                print(f"\n🎙️ BẮT ĐẦU THU (Phát hiện hát: {rms:.1f}dB) - Hãy hát liên tục {args.duration} giây nhé!")
+                start_level = rms
                 break
     except KeyboardInterrupt:
         print("\nĐã hủy.")
@@ -38,9 +38,29 @@ def main():
 
     p.terminate()
 
+    # Cố gắng lấy ID động của REAPER (nếu Reaper khởi động lại, ID sẽ thay đổi)
+    try:
+        reaper_id = subprocess.check_output(
+            "pw-dump | jq '.[] | select(.info.props[\"node.name\"] == \"REAPER\") | .id' | head -n 1", 
+            shell=True, text=True
+        ).strip()
+        if reaper_id:
+            default_target = reaper_id
+            print(f"🔗 Đã tự động kết nối với REAPER (Node ID: {default_target})")
+        else:
+            default_target = "528967"
+    except Exception:
+        default_target = "528967"
+
+    target = getattr(args, "target", None)
+    if not target:
+        target = default_target
+
+    print(f"\n🎙️ BẮT ĐẦU THU (Phát hiện hát: {start_level:.1f}dB) - Hãy hát liên tục {args.duration} giây nhé!")
+
     # Thu âm thanh Mix đầu ra
     out_file = "/tmp/karaoke_auto_final.wav"
-    subprocess.run(f"pw-record --target 528967 --format f32 --rate 48000 --channels 2 {out_file} & PID=$!; sleep {args.duration}; kill $PID 2>/dev/null", shell=True)
+    subprocess.run(f"pw-record --target {target} --format f32 --rate 48000 --channels 2 {out_file} & PID=$!; sleep {args.duration}; kill $PID 2>/dev/null", shell=True)
     print("✅ Đã thu xong! Đang phân tích Spectrum...")
 
     # Phân tích
