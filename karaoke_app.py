@@ -163,8 +163,21 @@ class KaraokeApp(Gtk.Window):
         # Tạo CSS tuỳ chỉnh (màu tối, bo góc)
         self.setup_css()
 
+        # Sử dụng Notebook để chia Tab
+        self.notebook = Gtk.Notebook()
+        self.add(self.notebook)
+        
+        # --- TAB 1: TRÌNH DIỄN ---
         vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=15)
-        self.add(vbox)
+        self.notebook.append_page(vbox, Gtk.Label(label="🎤 Trình Diễn"))
+        
+        # --- TAB 2: KỸ SƯ ÂM THANH ---
+        try:
+            from studio_tab import StudioTab
+            self.studio_tab = StudioTab(self)
+            self.notebook.append_page(self.studio_tab, Gtk.Label(label="🎓 Studio (Tutor)"))
+        except Exception as e:
+            print(f"Lỗi nạp Studio Tab: {e}")
 
         # Header
         header_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
@@ -340,15 +353,6 @@ class KaraokeApp(Gtk.Window):
             self.analyze_btn_css_provider,
             Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
         )
-
-        # Nút Mở Bàn Mixer (Live EQ Tuner)
-        self.mixer_btn = Gtk.Button()
-        self.mixer_btn.set_name("mixer-btn")
-        self.mixer_btn.get_style_context().add_class("analyze-btn") # Tạm dùng style của analyze-btn
-        self.mixer_lbl = Gtk.Label(label="<span font='10' weight='bold' color='#ffffff'>🎛️ Bàn Mixer (Live EQ)</span>", use_markup=True)
-        self.mixer_btn.add(self.mixer_lbl)
-        self.mixer_btn.connect("clicked", self.on_mixer_clicked)
-        tools_box.pack_start(self.mixer_btn, True, True, 0)
 
         vbox.pack_start(tools_box, False, False, 0)
         
