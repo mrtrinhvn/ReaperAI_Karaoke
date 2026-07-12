@@ -322,10 +322,10 @@ def generate_eq_adjustments(band_data, rms_db, sensitivity=1.0):
         vocal_adj["delay_volume"] = 0.0
         vocal_adj["comp_ratio"] = 0.35   # ~5:1 ratio (normalized)
         vocal_adj["comp_thresh"] = 0.43  # -24dB threshold (normalized)
-        vocal_adj["eq_band_1_gain"] = 0.0
-        vocal_adj["eq_band_2_gain_db"] = 2.5
-        vocal_adj["eq_band_3_gain_db"] = 0.0
-        vocal_adj["eq_band_4_gain_db"] = -2.0
+        #vocal_adj["eq_band_1_gain"] = 0.0
+        #vocal_adj["eq_band_2_gain_db"] = 2.5
+        #vocal_adj["eq_band_3_gain_db"] = 0.0
+        #vocal_adj["eq_band_4_gain_db"] = -2.0
         vocal_adj["chorus_mix"] = 0.0
         vocal_adj["reverb_note"] = "Chế độ Podcast cố định (Giọng ấm, Tắt Autotune & Vang)"
         
@@ -341,8 +341,8 @@ def generate_eq_adjustments(band_data, rms_db, sensitivity=1.0):
     #     vocal_adj["delay_volume"] = 0.0
     #     vocal_adj["comp_ratio"] = 0.35   # ~5:1 ratio (normalized)
     #     vocal_adj["comp_thresh"] = 0.43  # -24dB threshold (normalized)
-    #     vocal_adj["eq_band_2_gain_db"] = 2.0
-    #     vocal_adj["eq_band_4_gain_db"] = -1.5
+    #     #vocal_adj["eq_band_2_gain_db"] = 2.0
+    #     #vocal_adj["eq_band_4_gain_db"] = -1.5
     #     vocal_adj["reverb_note"] = "Nhạc tắt → Tự động chuyển chế độ Livestream"
     #     
     #     music_adj["music_eq_band_1_gain_db"] = 0.0
@@ -369,38 +369,38 @@ def generate_eq_adjustments(band_data, rms_db, sensitivity=1.0):
             diff = energy - target
 
             if band_name == "Sub" and energy > target * 1.5:
-                vocal_adj["eq_band_1_type"] = "highpass"
-                vocal_adj["eq_band_1_gain"] = min(diff * 5 * sensitivity, 2.0)
+                #vocal_adj["eq_band_1_type"] = "highpass"
+                #vocal_adj["eq_band_1_gain"] = min(diff * 5 * sensitivity, 2.0)
             elif band_name == "Mud":
                 if energy > target * 1.5: 
-                    vocal_adj["eq_band_2_gain_db"] = -min(diff * 5 * sensitivity, info["max_cut"])
+                    #vocal_adj["eq_band_2_gain_db"] = -min(diff * 5 * sensitivity, info["max_cut"])
                 elif energy < target * 0.7:
-                    vocal_adj["eq_band_2_gain_db"] = min((target - energy) * 12 * sensitivity, info["max_boost"])
+                    #vocal_adj["eq_band_2_gain_db"] = min((target - energy) * 12 * sensitivity, info["max_boost"])
             elif band_name == "Presence" and energy < target * 0.90:
-                vocal_adj["eq_band_3_gain_db"] = min((target - energy) * 6 * sensitivity, info["max_boost"])
+                #vocal_adj["eq_band_3_gain_db"] = min((target - energy) * 6 * sensitivity, info["max_boost"])
             elif band_name == "Bright" and energy < target * 0.90:
-                vocal_adj["eq_band_4_gain_db"] = min((target - energy) * 5 * sensitivity, info["max_boost"])
+                #vocal_adj["eq_band_4_gain_db"] = min((target - energy) * 5 * sensitivity, info["max_boost"])
 
         # CỘNG THÊM OFFSET TỪ BẢN CALIBRATION 5 GIÂY (nếu có)
         calib = read_calibration()
         if "eq_band_2_gain_db" in calib and "eq_band_2_gain_db" in vocal_adj:
-            vocal_adj["eq_band_2_gain_db"] += calib["eq_band_2_gain_db"]
+            #vocal_adj["eq_band_2_gain_db"] += calib["eq_band_2_gain_db"]
         elif "eq_band_2_gain_db" in calib:
-            vocal_adj["eq_band_2_gain_db"] = calib["eq_band_2_gain_db"]
+            #vocal_adj["eq_band_2_gain_db"] = calib["eq_band_2_gain_db"]
             
         if "eq_band_3_gain_db" in calib and "eq_band_3_gain_db" in vocal_adj:
-            vocal_adj["eq_band_3_gain_db"] += calib["eq_band_3_gain_db"]
+            #vocal_adj["eq_band_3_gain_db"] += calib["eq_band_3_gain_db"]
         elif "eq_band_3_gain_db" in calib:
-            vocal_adj["eq_band_3_gain_db"] = calib["eq_band_3_gain_db"]
+            #vocal_adj["eq_band_3_gain_db"] = calib["eq_band_3_gain_db"]
         if "eq_band_4_gain_db" in calib and "eq_band_4_gain_db" in vocal_adj:
-            vocal_adj["eq_band_4_gain_db"] += calib["eq_band_4_gain_db"]
+            #vocal_adj["eq_band_4_gain_db"] += calib["eq_band_4_gain_db"]
         elif "eq_band_4_gain_db" in calib:
-            vocal_adj["eq_band_4_gain_db"] = calib["eq_band_4_gain_db"]
+            #vocal_adj["eq_band_4_gain_db"] = calib["eq_band_4_gain_db"]
     else:
-        vocal_adj["eq_band_1_gain"] = 0.0
-        vocal_adj["eq_band_2_gain_db"] = 0.0
-        vocal_adj["eq_band_3_gain_db"] = 0.0
-        vocal_adj["eq_band_4_gain_db"] = 0.0
+        #vocal_adj["eq_band_1_gain"] = 0.0
+        #vocal_adj["eq_band_2_gain_db"] = 0.0
+        #vocal_adj["eq_band_3_gain_db"] = 0.0
+        #vocal_adj["eq_band_4_gain_db"] = 0.0
 
     # ── MUSIC TRACK SPECTRAL CARVING (Inverse EQ TĨNH) ──
     # User yêu cầu: "Không cần chỉnh trong thời gian thực".
@@ -413,9 +413,9 @@ def generate_eq_adjustments(band_data, rms_db, sensitivity=1.0):
     # Giữ cố định ở mức ngọt tối ưu để giọng hát có động lực học (dynamics) tự nhiên, hát nhẹ nhàng, không tốn sức
     vocal_adj["comp_ratio"] = 0.025  # ~3.5:1 ratio (nén nhẹ nhàng, mềm mại, dẻo dai)
     vocal_adj["comp_thresh"] = 0.030 # -24.4dB threshold (unity)
-    vocal_adj["eq_band_2_gain_db"] = -4.0 # Cắt nhẹ Mid/UMid 850Hz -4.0dB (Dễ hát, nén động sẽ lo phần còn lại)
-    vocal_adj["eq_band_3_gain_db"] = 6.0  # BOOST presence 3.2kHz +6dB (1.3% vs ref 9.6%)
-    vocal_adj["eq_band_4_gain_db"] = 8.0  # BOOST air 12kHz +8dB (0.4% vs ref 9.7%)
+    #vocal_adj["eq_band_2_gain_db"] = -4.0 # Cắt nhẹ Mid/UMid 850Hz -4.0dB (Dễ hát, nén động sẽ lo phần còn lại)
+    #vocal_adj["eq_band_3_gain_db"] = 6.0  # BOOST presence 3.2kHz +6dB (1.3% vs ref 9.6%)
+    #vocal_adj["eq_band_4_gain_db"] = 8.0  # BOOST air 12kHz +8dB (0.4% vs ref 9.7%)
     vocal_adj["comp_note"] = "Compressor & EQ khóa cứng ở điểm ngọt mềm xốp tối ưu"
 
     # ── REVERB: body-based override (Giữ cực kỳ ổn định) ──
@@ -430,9 +430,9 @@ def generate_eq_adjustments(band_data, rms_db, sensitivity=1.0):
             with open("/tmp/ai_karaoke_calib.json", "r") as f:
                 calib = json.load(f)
                 if time.time() - calib.get("timestamp", 0) < 3600:
-                    if "eq_band_2_gain_db" in calib: vocal_adj["eq_band_2_gain_db"] = calib["eq_band_2_gain_db"]
-                    if "eq_band_3_gain_db" in calib: vocal_adj["eq_band_3_gain_db"] = calib["eq_band_3_gain_db"]
-                    if "eq_band_4_gain_db" in calib: vocal_adj["eq_band_4_gain_db"] = calib["eq_band_4_gain_db"]
+                    if "eq_band_2_gain_db" in calib: #vocal_adj["eq_band_2_gain_db"] = calib["eq_band_2_gain_db"]
+                    if "eq_band_3_gain_db" in calib: #vocal_adj["eq_band_3_gain_db"] = calib["eq_band_3_gain_db"]
+                    if "eq_band_4_gain_db" in calib: #vocal_adj["eq_band_4_gain_db"] = calib["eq_band_4_gain_db"]
     except: pass
 
     return {"vocal": vocal_adj, "music": music_adj, "is_singing": is_singing}

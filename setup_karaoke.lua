@@ -166,7 +166,7 @@ function setup()
  
     local voc_rev, is_new_voc_rev = get_or_create_track("VOCAL REVERB", false)
     set_color(voc_rev, 56, 189, 248)
-    reaper.SetMediaTrackInfo_Value(voc_rev, "D_VOL", 0.65) -- ~-3.7dB: Giảm bớt vang theo yêu cầu
+    reaper.SetMediaTrackInfo_Value(voc_rev, "D_VOL", 0.80) -- ~-2.0dB: Tăng lại vang vì lúc nãy giảm quá tay
     reaper.SetMediaTrackInfo_Value(voc_rev, "D_PAN", 0.0)
     reaper.SetMediaTrackInfo_Value(voc_rev, "I_RECARM", 0)
     reaper.SetMediaTrackInfo_Value(voc_rev, "I_RECMON", 0)
@@ -174,7 +174,7 @@ function setup()
  
     local voc_del, is_new_voc_del = get_or_create_track("VOCAL DELAY", false)
     set_color(voc_del, 234, 179, 8)
-    reaper.SetMediaTrackInfo_Value(voc_del, "D_VOL", 0.55) -- ~-5.2dB: Giảm echo tương ứng
+    reaper.SetMediaTrackInfo_Value(voc_del, "D_VOL", 0.65) -- ~-3.7dB: Kéo echo lên tương ứng
     reaper.SetMediaTrackInfo_Value(voc_del, "D_PAN", 0.0)
     reaper.SetMediaTrackInfo_Value(voc_del, "I_RECARM", 0)
     reaper.SetMediaTrackInfo_Value(voc_del, "I_RECMON", 0)
