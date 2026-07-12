@@ -153,7 +153,7 @@ function setup()
     -- ══════════════════════════════════════════════════════════════
     local voc, is_new_voc = get_or_create_track("VOCAL", false)
     set_color(voc, 230, 55, 55)
-    reaper.SetMediaTrackInfo_Value(voc, "D_VOL", 0.80) -- ~-1.9dB (tham chiếu Laiganhonanh: vocal phủ lên trên nhạc, center mạnh)
+    reaper.SetMediaTrackInfo_Value(voc, "D_VOL", 0.63) -- ~-4.0dB (giảm để tránh clip lúc hát to)
     reaper.SetMediaTrackInfo_Value(voc, "D_PAN", 0.0)
 
     local voc_par, is_new_voc_par = get_or_create_track("VOCAL PARALLEL", false)
@@ -318,8 +318,8 @@ function setup()
     set_p(voc, xcomp, "1-Band top frequency", 0.367) -- Dưới 500Hz: Bỏ qua không nén (Giữ ấm LMid)
     set_p(voc, xcomp, "2-Band top frequency", 0.65) -- 500Hz - 3kHz: Nén dải Mid/UMid
     set_p(voc, xcomp, "1-Threshold", 1.0) -- Band 1 không nén (Threshold max)
-    set_p(voc, xcomp, "2-Threshold", 0.015) -- Band 2 nén tại -30.0dB (năng lượng vùng này thấp hơn)
-    set_p(voc, xcomp, "2-Ratio", 0.42)    -- Ratio 6:1 nén dứt khoát dải chói
+    set_p(voc, xcomp, "2-Threshold", 0.008) -- Band 2 nén tại ~-36.0dB (nhạy hơn để nén êm)
+    set_p(voc, xcomp, "2-Ratio", 0.36)    -- Ratio ~3:1 (nén mượt, không quá gắt)
     set_p(voc, xcomp, "2-Attack", 0.1)    -- Attack 10ms
     set_p(voc, xcomp, "2-Release", 0.25)  -- Release vừa phải
     set_p(voc, xcomp, "3-Active", 0.0) -- Tắt Band 3
