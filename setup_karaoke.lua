@@ -290,9 +290,9 @@ function setup()
     local veq = add_fx(voc, "ReaEQ")
     -- Band 5: High Pass (Hạ xuống 80Hz giữ bass body vocal — tham chiếu Sub 10.8%)
     set_p(voc, veq, "Freq-High Pass 5", 0.07)   -- ~80Hz (hạ từ 120Hz → giữ ấm hơn)
-    -- Band 1: Low Shelf (Boost nhẹ +2.0dB để bồi lại LMid/Bass bị thiếu, tạo độ ấm)
-    set_p(voc, veq, "Freq-Low Shelf", 0.21)     -- ~200Hz
-    set_p(voc, veq, "Gain-Low Shelf", 0.541)    -- +2.0dB (Bồi độ cốt)
+    -- Band 1: Low Shelf (CẮT giảm độ đục/ùm của LMid và Bass)
+    set_p(voc, veq, "Freq-Low Shelf", 0.25)     -- ~250Hz
+    set_p(voc, veq, "Gain-Low Shelf", 0.437)    -- -3.0dB (Gọt bớt bùn)
     -- Band 2: Bell (Mid Cut 850Hz, nới lỏng về -4.0dB để hát nhẹ nhàng, thoát giọng)
     set_p(voc, veq, "Freq-Band 2", 0.42)        -- ~850Hz
     set_p(voc, veq, "Gain-Band 2", 0.416)       -- -4.0dB (Dễ hát hơn)
@@ -315,11 +315,12 @@ function setup()
 
     -- FX3.5: ReaXcomp (Dynamic EQ Tamer - ĐỘNG LỰC HỌC THÔNG MINH)
     local xcomp = add_fx(voc, "ReaXcomp")
-    set_p(voc, xcomp, "1-Band top frequency", 0.367) -- Dưới 500Hz: Bỏ qua không nén (Giữ ấm LMid)
+    set_p(voc, xcomp, "1-Band top frequency", 0.367) -- Dưới 500Hz: Nén chống ù (De-mud)
     set_p(voc, xcomp, "2-Band top frequency", 0.65) -- 500Hz - 3kHz: Nén dải Mid/UMid
-    set_p(voc, xcomp, "1-Threshold", 1.0) -- Band 1 không nén (Threshold max)
-    set_p(voc, xcomp, "2-Threshold", 0.008) -- Band 2 nén tại ~-36.0dB (nhạy hơn để nén êm)
-    set_p(voc, xcomp, "2-Ratio", 0.36)    -- Ratio ~3:1 (nén mượt, không quá gắt)
+    set_p(voc, xcomp, "1-Threshold", 0.03) -- Threshold ~-26dB (Chỉ nén khi hát to gây ù)
+    set_p(voc, xcomp, "1-Ratio", 0.36) -- Ratio 3:1
+    set_p(voc, xcomp, "2-Threshold", 0.005) -- Threshold sâu hơn ~-40dB để bắt nhạy hơn dải Mid chói
+    set_p(voc, xcomp, "2-Ratio", 0.45)    -- Ratio gắt hơn ~6:1
     set_p(voc, xcomp, "2-Attack", 0.1)    -- Attack 10ms
     set_p(voc, xcomp, "2-Release", 0.25)  -- Release vừa phải
     set_p(voc, xcomp, "3-Active", 0.0) -- Tắt Band 3
