@@ -52,9 +52,7 @@ def main():
     except Exception:
         default_target = "528967"
 
-    target = getattr(args, "target", None)
-    if not target:
-        target = default_target
+    target = getattr(args, "target", None) if getattr(args, "target", None) else default_target
 
     print(f"\n🎙️ BẮT ĐẦU THU (Phát hiện hát: {start_level:.1f}dB) - Hãy hát liên tục {args.duration} giây nhé!")
 
