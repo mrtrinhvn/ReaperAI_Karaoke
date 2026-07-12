@@ -266,12 +266,12 @@ function setup()
         at = add_fx(voc, "Graillon")
         if at >= 0 then
             -- KARAOKE TUNING: mượt, nịnh giọng, không méo
-            set_p(voc, at, "Corr. Amount", 0.85)   -- 85% correction (cho vibrato tự nhiên 15%)
+            set_p(voc, at, "Corr. Amount", 0.60)   -- 60% correction (tự nhiên hơn, cho vibrato 40%)
             set_p(voc, at, "Smooth", 0.25)          -- 25% smooth (chuyển nốt MƯỢT MÀ, không giật)
             set_p(voc, at, "Inertia", 0.35)         -- 35% inertia (giữ nốt ổn định, không chạy)
-            set_p(voc, at, "Wet Mix", 1.0)           -- 100% wet (toàn bộ tín hiệu đã tune)
-            set_p(voc, at, "Dry Mix", 0.0)           -- 0% dry
-            set_p(voc, at, "Output Gain", 0.7079)   -- -3dB output
+            set_p(voc, at, "Wet Mix", 0.70)          -- 70% wet (giữ 30% dry để BẢO TỒN TREBLE)
+            set_p(voc, at, "Dry Mix", 0.30)          -- 30% dry (treble harmonics gốc)
+            set_p(voc, at, "Output Gain", 0.80)      -- -2dB output (bù volume)
         else
             at = add_fx(voc, "Fat1")
             if at >= 0 then
