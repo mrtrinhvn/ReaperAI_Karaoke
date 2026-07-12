@@ -163,48 +163,18 @@ class KaraokeApp(Gtk.Window):
         # Tạo CSS tuỳ chỉnh (màu tối, bo góc)
         self.setup_css()
 
-        # Sử dụng Notebook để chia Tab
-        self.notebook = Gtk.Notebook()
-        self.add(self.notebook)
+        # Giao diện Gộp
+        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+        self.add(vbox)
         
-        # --- TAB 1: TRÌNH DIỄN ---
-        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=15)
-        self.notebook.append_page(vbox, Gtk.Label(label="🎤 Trình Diễn"))
-        
-        # --- TAB 2: KỸ SƯ ÂM THANH ---
         try:
             from studio_tab import StudioTab
             self.studio_tab = StudioTab(self)
-            self.notebook.append_page(self.studio_tab, Gtk.Label(label="🎓 Studio (Tutor)"))
         except Exception as e:
             print(f"Lỗi nạp Studio Tab: {e}")
+            self.studio_tab = None
 
-        # Header
-        header_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
-        
-        lbl = Gtk.Label(label="<span font='16' weight='bold' color='#a78bfa'>🎤 Chọn Thể Loại</span>", use_markup=True)
-        lbl.set_hexpand(True)
-        lbl.set_halign(Gtk.Align.START)
-        header_box.pack_start(lbl, True, True, 0)
-        
-        settings_btn = Gtk.Button()
-        settings_btn.get_style_context().add_class("settings-btn")
-        settings_lbl = Gtk.Label(label="<span font='14'>⚙️</span>", use_markup=True)
-        settings_btn.add(settings_lbl)
-        settings_btn.connect("clicked", self.on_settings_clicked)
-        header_box.pack_start(settings_btn, False, False, 0)
-        
-        vbox.pack_start(header_box, False, False, 0)
-        
-        # Lưới các nút bấm
-        flowbox = Gtk.FlowBox()
-        flowbox.set_valign(Gtk.Align.START)
-        flowbox.set_max_children_per_line(2)
-        flowbox.set_selection_mode(Gtk.SelectionMode.NONE)
-        flowbox.set_row_spacing(10)
-        flowbox.set_column_spacing(10)
-        vbox.pack_start(flowbox, False, False, 0)
-
+        # (Header UI has been moved below after initialization of current_saved)
         self.buttons = {}
         
         # Init default genre file if missing
@@ -234,6 +204,46 @@ class KaraokeApp(Gtk.Window):
                 is_podcast = saved_data.get("force_podcast", False)
                 autotune_enabled = saved_data.get("autotune_enabled", True)
         except: pass
+
+        # New Header Box for Genre ComboBox & Analyze Button
+        genre_row = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        
+        lbl = Gtk.Label(label="<span font='12' weight='bold' color='#a78bfa'>🎤 Thể Loại:</span>", use_markup=True)
+        genre_row.pack_start(lbl, False, False, 0)
+        
+        self.genre_combo = Gtk.ComboBoxText()
+        for key, p in PRESETS.items():
+            self.genre_combo.append(key, f"{p['emoji']} {p['name']}")
+        
+        active_idx = list(PRESETS.keys()).index(current_saved) if current_saved in PRESETS else 0
+        self.genre_combo.set_active(active_idx)
+        self.genre_combo.connect("changed", self.on_genre_combo_changed)
+        genre_row.pack_start(self.genre_combo, True, True, 0)
+        
+        # Nút Phân tích giọng (di chuyển lên đây)
+        self.analyze_btn = Gtk.Button()
+        self.analyze_btn.set_name("analyze-btn")
+        self.analyze_btn.get_style_context().add_class("analyze-btn")
+        self.analyze_lbl = Gtk.Label(label="<span font='10' weight='bold' color='#ffffff'>🎙️ Phân Tích</span>", use_markup=True)
+        self.analyze_btn.add(self.analyze_lbl)
+        self.analyze_btn.connect("clicked", self.on_analyze_clicked)
+        genre_row.pack_start(self.analyze_btn, False, False, 0)
+        
+        settings_btn = Gtk.Button()
+        settings_btn.get_style_context().add_class("settings-btn")
+        settings_lbl = Gtk.Label(label="<span font='14'>⚙️</span>", use_markup=True)
+        settings_btn.add(settings_lbl)
+        settings_btn.connect("clicked", self.on_settings_clicked)
+        genre_row.pack_start(settings_btn, False, False, 0)
+        
+        vbox.pack_start(genre_row, False, False, 0)
+        
+        if getattr(self, "studio_tab", None):
+            vbox.pack_start(self.studio_tab, True, True, 0)
+
+        # Bỏ qua việc tạo nút to (flowbox), ta đè lên hàm on_genre_clicked cũ:
+        def dummy_on_genre_clicked(widget, key): pass
+        self.on_genre_clicked = dummy_on_genre_clicked
 
         for key, p in PRESETS.items():
             btn = Gtk.Button()
@@ -266,7 +276,7 @@ class KaraokeApp(Gtk.Window):
                 btn.get_style_context().add_class("active-btn")
                 
             self.buttons[key] = btn
-            flowbox.insert(btn, -1)
+            pass # flowbox removed
             
         # BPM Section
         bpm_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
@@ -338,15 +348,6 @@ class KaraokeApp(Gtk.Window):
         # Hàng chứa các nút Công cụ nâng cao
         tools_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
         tools_box.set_halign(Gtk.Align.CENTER)
-        
-        # Nút Phân tích giọng (Auto-Calibration)
-        self.analyze_btn = Gtk.Button()
-        self.analyze_btn.set_name("analyze-btn")
-        self.analyze_btn.get_style_context().add_class("analyze-btn")
-        self.analyze_lbl = Gtk.Label(label="<span font='10' weight='bold' color='#ffffff'>🎙️ Phân Tích Giọng</span>", use_markup=True)
-        self.analyze_btn.add(self.analyze_lbl)
-        self.analyze_btn.connect("clicked", self.on_analyze_clicked)
-        tools_box.pack_start(self.analyze_btn, True, True, 0)
         
         self.analyze_btn_css_provider = Gtk.CssProvider()
         self.analyze_btn.get_style_context().add_provider(
@@ -1738,6 +1739,29 @@ class KaraokeApp(Gtk.Window):
             return f"🎙️ {name}{suffix}"
         else:
             return f"🔊 {name}{suffix}"
+
+    def on_genre_combo_changed(self, combo):
+        active_id = combo.get_active_id()
+        if not active_id:
+            idx = combo.get_active()
+            active_id = list(PRESETS.keys())[idx]
+        
+        try:
+            with open(GENRE_FILE, "r") as f:
+                data = json.load(f)
+            data["genre"] = active_id
+            data["name"] = PRESETS[active_id]["name"]
+            data["bpm_suggest"] = PRESETS[active_id]["bpm_suggest"]
+            
+            for k, v in PRESETS[active_id].items():
+                data[k] = v
+                
+            with open(GENRE_FILE, "w") as f:
+                json.dump(data, f)
+                
+            self.bpm_scale.set_value(data["bpm_suggest"])
+        except Exception as e:
+            print("Error changing genre:", e)
 
     def on_settings_clicked(self, widget):
         dialog = Gtk.Dialog(
