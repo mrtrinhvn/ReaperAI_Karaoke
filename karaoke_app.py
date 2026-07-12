@@ -322,20 +322,35 @@ class KaraokeApp(Gtk.Window):
         self.autotune_toggle.set_active(autotune_enabled)
         self.autotune_toggle.connect("notify::active", self.on_autotune_toggle)
         
+        # Hàng chứa các nút Công cụ nâng cao
+        tools_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        tools_box.set_halign(Gtk.Align.CENTER)
+        
         # Nút Phân tích giọng (Auto-Calibration)
         self.analyze_btn = Gtk.Button()
         self.analyze_btn.set_name("analyze-btn")
         self.analyze_btn.get_style_context().add_class("analyze-btn")
-        self.analyze_lbl = Gtk.Label(label="<span font='11' weight='bold' color='#ffffff'>🎙️ Tự Động Phân Tích Giọng (5s)</span>", use_markup=True)
+        self.analyze_lbl = Gtk.Label(label="<span font='10' weight='bold' color='#ffffff'>🎙️ Phân Tích Giọng</span>", use_markup=True)
         self.analyze_btn.add(self.analyze_lbl)
         self.analyze_btn.connect("clicked", self.on_analyze_clicked)
-        vbox.pack_start(self.analyze_btn, False, False, 0)
+        tools_box.pack_start(self.analyze_btn, True, True, 0)
         
         self.analyze_btn_css_provider = Gtk.CssProvider()
         self.analyze_btn.get_style_context().add_provider(
             self.analyze_btn_css_provider,
             Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
         )
+
+        # Nút Mở Bàn Mixer (Live EQ Tuner)
+        self.mixer_btn = Gtk.Button()
+        self.mixer_btn.set_name("mixer-btn")
+        self.mixer_btn.get_style_context().add_class("analyze-btn") # Tạm dùng style của analyze-btn
+        self.mixer_lbl = Gtk.Label(label="<span font='10' weight='bold' color='#ffffff'>🎛️ Bàn Mixer (Live EQ)</span>", use_markup=True)
+        self.mixer_btn.add(self.mixer_lbl)
+        self.mixer_btn.connect("clicked", self.on_mixer_clicked)
+        tools_box.pack_start(self.mixer_btn, True, True, 0)
+
+        vbox.pack_start(tools_box, False, False, 0)
         
         # Nút gạt chế độ HÁT LIVE vs. PODCAST (Thiết kế Điện tử Chân không / Neon Glow)
         self.is_podcast = is_podcast
@@ -1339,7 +1354,7 @@ class KaraokeApp(Gtk.Window):
                         }
                         """
                         self.analyze_btn_css_provider.load_from_data(css_data.encode("utf-8"))
-                        self.analyze_lbl.set_markup("<span font='11' weight='bold' color='#ffffff'>🎙️ Tự Động Phân Tích Giọng (5s)</span>")
+                        self.analyze_lbl.set_markup("<span font='10' weight='bold' color='#ffffff'>🎙️ Phân Tích Giọng</span>")
                         self.is_analyzing = False
                         self.update_status("")
                         return False
@@ -1360,7 +1375,7 @@ class KaraokeApp(Gtk.Window):
                         }
                         """
                         self.analyze_btn_css_provider.load_from_data(css_data.encode("utf-8"))
-                        self.analyze_lbl.set_markup("<span font='11' weight='bold' color='#ffffff'>🎙️ Tự Động Phân Tích Giọng (5s)</span>")
+                        self.analyze_lbl.set_markup("<span font='10' weight='bold' color='#ffffff'>🎙️ Phân Tích Giọng</span>")
                         self.is_analyzing = False
                         self.update_status("")
                         return False
