@@ -176,20 +176,20 @@ function apply(data)
         local del = find_fx(voc_del, "ReaDelay")
         local chorus = find_fx(vocal, "Chorus")
 
-        -- Vocal EQ Band 2 (Mud)
+        -- Vocal EQ Band 2 (Mud) — rate 0.8: EQ phải đạt target nhanh
         if eq >= 0 and data.eq_band_2_gain_db then
             local p = find_p(vocal, eq, "Gain-Band 2")
-            if p >= 0 then smooth(vocal, eq, p, db_to_norm(data.eq_band_2_gain_db), 0.2) end
+            if p >= 0 then smooth(vocal, eq, p, db_to_norm(data.eq_band_2_gain_db), 0.8) end
         end
-        -- Vocal EQ Band 3 (Presence)
+        -- Vocal EQ Band 3 (Presence) — rate 0.8
         if eq >= 0 and data.eq_band_3_gain_db then
             local p = find_p(vocal, eq, "Gain-Band 3")
-            if p >= 0 then smooth(vocal, eq, p, db_to_norm(data.eq_band_3_gain_db), 0.2) end
+            if p >= 0 then smooth(vocal, eq, p, db_to_norm(data.eq_band_3_gain_db), 0.8) end
         end
-        -- Vocal EQ Band 4 (Air)
+        -- Vocal EQ Band 4 (Air) — rate 0.8
         if eq >= 0 and data.eq_band_4_gain_db then
             local p = find_p(vocal, eq, "Gain-High Shelf 4")
-            if p >= 0 then smooth(vocal, eq, p, db_to_norm(data.eq_band_4_gain_db), 0.2) end
+            if p >= 0 then smooth(vocal, eq, p, db_to_norm(data.eq_band_4_gain_db), 0.8) end
         end
         -- Compressor ratio
         if comp >= 0 and data.comp_ratio then

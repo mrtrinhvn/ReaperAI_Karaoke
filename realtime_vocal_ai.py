@@ -414,8 +414,8 @@ def generate_eq_adjustments(band_data, rms_db, sensitivity=1.0):
     vocal_adj["comp_ratio"] = 0.025  # ~3.5:1 ratio (nén nhẹ nhàng, mềm mại, dẻo dai)
     vocal_adj["comp_thresh"] = 0.030 # -24.4dB threshold (unity)
     vocal_adj["eq_band_2_gain_db"] = -1.5 # Cắt mud 350Hz -1.5dB (giảm bùn đục)
-    vocal_adj["eq_band_3_gain_db"] = 2.0  # BOOST presence 3.2kHz +2dB (nịnh giọng, sáng)
-    vocal_adj["eq_band_4_gain_db"] = 3.0  # BOOST air 12kHz +3dB (bay bổng, ninh tai)
+    vocal_adj["eq_band_3_gain_db"] = 5.0  # BOOST presence 3.2kHz +5dB (bù Graillon resynthesis mất treble)
+    vocal_adj["eq_band_4_gain_db"] = 6.0  # BOOST air 12kHz +6dB (bù treble, bay bổng, ninh tai)
     vocal_adj["comp_note"] = "Compressor & EQ khóa cứng ở điểm ngọt mềm xốp tối ưu"
 
     # ── REVERB: body-based override (Giữ cực kỳ ổn định) ──

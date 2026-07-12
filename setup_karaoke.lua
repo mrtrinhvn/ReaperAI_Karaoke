@@ -295,10 +295,10 @@ function setup()
     set_p(voc, veq, "Gain-Low Shelf", 0.531)    -- +1.5dB (bồi ấm body vocal)
     -- Band 2: Bell (Mud Cut ở 250Hz, giảm bớt độ cắt về -0.8dB để bồi lại dải thân ấm "độ cốt" cho giọng)
     set_p(voc, veq, "Freq-Band 2", 0.26)        -- ~250Hz
-    set_p(voc, veq, "Gain-Band 2", 0.469)       -- -1.5dB (cắt mud, đồng bộ với AI)
+    set_p(voc, veq, "Gain-Band 2", 0.484)       -- -0.8dB (nhẹ nhàng)
     -- Band 3: Bell (BOOST nhẹ dải Presence 3.2kHz → vocal "phủ" lên beat, nghe rõ nét)
     set_p(voc, veq, "Freq-Band 3", 0.62)        -- ~3.2kHz
-    set_p(voc, veq, "Gain-Band 3", 0.542)       -- +2.0dB (presence nịnh giọng, đồng bộ với AI)
+    set_p(voc, veq, "Gain-Band 3", 0.531)       -- +1.5dB (tôn vinh vocal, nổi trên nhạc)
     -- Band 4: High Shelf (Air mạnh — tham chiếu Air 9.7% rất rõ ràng)
     set_p(voc, veq, "Freq-High Shelf 4", 0.82)  -- ~10.0kHz (hạ freq để phủ rộng hơn)
     set_p(voc, veq, "Gain-High Shelf 4", 0.563) -- +3.0dB Air (tăng gấp đôi từ +1.5dB)
