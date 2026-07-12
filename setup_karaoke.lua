@@ -315,15 +315,22 @@ function setup()
 
     -- FX3.5: ReaXcomp (Dynamic EQ Tamer - ĐỘNG LỰC HỌC THÔNG MINH)
     local xcomp = add_fx(voc, "ReaXcomp")
-    set_p(voc, xcomp, "1-Band top frequency", 0.367) -- Dưới 500Hz: Nén chống ù (De-mud)
-    set_p(voc, xcomp, "2-Band top frequency", 0.65) -- 500Hz - 3kHz: Nén dải Mid/UMid
-    set_p(voc, xcomp, "1-Threshold", 0.03) -- Threshold ~-26dB (Chỉ nén khi hát to gây ù)
-    set_p(voc, xcomp, "1-Ratio", 0.36) -- Ratio ~3:1
-    set_p(voc, xcomp, "2-Threshold", 0.008) -- Threshold ~-36dB (Nới lỏng một chút)
-    set_p(voc, xcomp, "2-Ratio", 0.38)    -- Ratio ~4:1 (Đỡ bị bóp nghẹt Mid)
-    set_p(voc, xcomp, "2-Attack", 0.1)    -- Attack 10ms
-    set_p(voc, xcomp, "2-Release", 0.25)  -- Release vừa phải
-    set_p(voc, xcomp, "3-Active", 0.0) -- Tắt Band 3
+    -- Band 1: Bass (0 - 250Hz). Cấm nén để giữ nguyên vẹn độ ấm ngực
+    set_p(voc, xcomp, "1-Band top frequency", 0.263)
+    set_p(voc, xcomp, "1-Threshold", 1.0) -- Không nén
+    set_p(voc, xcomp, "1-Ratio", 0.0)
+    
+    -- Band 2: LMid (250 - 500Hz). Vùng ĐỤC/ÙM. Nén cực nặng khi hát gần/to để không bị vọt lên 66%
+    set_p(voc, xcomp, "2-Band top frequency", 0.367)
+    set_p(voc, xcomp, "2-Threshold", 0.01) -- Ngưỡng cực nhạy (~ -35dB)
+    set_p(voc, xcomp, "2-Ratio", 0.45)    -- Ratio cực gắt (~ 6:1)
+    
+    -- Band 3: Mid/UMid (500 - 3000Hz). Vùng CHÓI GẮT. Nén mượt khi cao trào
+    set_p(voc, xcomp, "3-Active", 1.0)    -- Bật Band 3
+    set_p(voc, xcomp, "3-Band top frequency", 0.65)
+    set_p(voc, xcomp, "3-Threshold", 0.008) -- ~-36dB
+    set_p(voc, xcomp, "3-Ratio", 0.38)    -- Ratio ~ 4:1
+    
     set_p(voc, xcomp, "4-Active", 0.0) -- Tắt Band 4
 
     -- FX4: JS Saturation (Hài âm tạo độ ấm xốp như mic tube vintage)

@@ -5,7 +5,7 @@ import argparse
 
 def main():
     parser = argparse.ArgumentParser(description="Tự động thu âm khi có tiếng hát (Voice Activity Detection)")
-    parser.add_argument("--threshold", type=float, default=-25.0, help="Ngưỡng âm lượng (dB) để kích hoạt thu âm")
+    parser.add_argument("--threshold", type=float, default=-32.0, help="Ngưỡng âm lượng (dB) để kích hoạt thu âm")
     parser.add_argument("--duration", type=int, default=15, help="Thời gian thu âm (giây)")
     args = parser.parse_args()
 
