@@ -290,12 +290,12 @@ function setup()
     local veq = add_fx(voc, "ReaEQ")
     -- Band 5: High Pass (Hạ xuống 80Hz giữ bass body vocal — tham chiếu Sub 10.8%)
     set_p(voc, veq, "Freq-High Pass 5", 0.07)   -- ~80Hz (hạ từ 120Hz → giữ ấm hơn)
-    -- Band 1: Low Shelf (Boost nhẹ +1.5dB tại 200Hz — tham chiếu Low-Mid 17.5% rất dày)
+    -- Band 1: Low Shelf (Flat, để tự nhiên không bị um LMid)
     set_p(voc, veq, "Freq-Low Shelf", 0.21)     -- ~200Hz
-    set_p(voc, veq, "Gain-Low Shelf", 0.531)    -- +1.5dB (bồi ấm body vocal)
-    -- Band 2: Bell (Mud Cut ở 250Hz, giảm bớt độ cắt về -0.8dB để bồi lại dải thân ấm "độ cốt" cho giọng)
-    set_p(voc, veq, "Freq-Band 2", 0.26)        -- ~250Hz
-    set_p(voc, veq, "Gain-Band 2", 0.484)       -- -0.8dB (nhẹ nhàng)
+    set_p(voc, veq, "Gain-Low Shelf", 0.500)    -- 0.0dB (Flat)
+    -- Band 2: Bell (Mid Cut ở 700-800Hz, gọt bỏ độ phô/oang oang của giọng)
+    set_p(voc, veq, "Freq-Band 2", 0.40)        -- ~700Hz
+    set_p(voc, veq, "Gain-Band 2", 0.375)       -- -6.0dB (Cắt mạnh dải phô)
     -- Band 3: Bell (BOOST nhẹ dải Presence 3.2kHz → vocal "phủ" lên beat, nghe rõ nét)
     set_p(voc, veq, "Freq-Band 3", 0.62)        -- ~3.2kHz
     set_p(voc, veq, "Gain-Band 3", 0.531)       -- +1.5dB (tôn vinh vocal, nổi trên nhạc)

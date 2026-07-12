@@ -413,7 +413,7 @@ def generate_eq_adjustments(band_data, rms_db, sensitivity=1.0):
     # Giữ cố định ở mức ngọt tối ưu để giọng hát có động lực học (dynamics) tự nhiên, hát nhẹ nhàng, không tốn sức
     vocal_adj["comp_ratio"] = 0.025  # ~3.5:1 ratio (nén nhẹ nhàng, mềm mại, dẻo dai)
     vocal_adj["comp_thresh"] = 0.030 # -24.4dB threshold (unity)
-    vocal_adj["eq_band_2_gain_db"] = -3.0 # Cắt mud 350Hz -3dB (LMid 26.5% vs ref 17.5%)
+    vocal_adj["eq_band_2_gain_db"] = -6.0 # Cắt gắt Mid 700Hz -6.0dB (gọt độ phô)
     vocal_adj["eq_band_3_gain_db"] = 6.0  # BOOST presence 3.2kHz +6dB (1.3% vs ref 9.6%)
     vocal_adj["eq_band_4_gain_db"] = 8.0  # BOOST air 12kHz +8dB (0.4% vs ref 9.7%)
     vocal_adj["comp_note"] = "Compressor & EQ khóa cứng ở điểm ngọt mềm xốp tối ưu"
