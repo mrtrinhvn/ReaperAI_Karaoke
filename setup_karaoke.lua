@@ -293,9 +293,9 @@ function setup()
     -- Band 1: Low Shelf (Boost nhẹ +2.0dB để bồi lại LMid/Bass bị thiếu, tạo độ ấm)
     set_p(voc, veq, "Freq-Low Shelf", 0.21)     -- ~200Hz
     set_p(voc, veq, "Gain-Low Shelf", 0.541)    -- +2.0dB (Bồi độ cốt)
-    -- Band 2: Bell (Mid Cut dời lên ~850Hz, khoét -7dB để kìm cả Mid lẫn UMid)
+    -- Band 2: Bell (Mid Cut 850Hz, nới lỏng về -4.0dB để hát nhẹ nhàng, thoát giọng)
     set_p(voc, veq, "Freq-Band 2", 0.42)        -- ~850Hz
-    set_p(voc, veq, "Gain-Band 2", 0.354)       -- -7.0dB (Dìm sự chói/phô)
+    set_p(voc, veq, "Gain-Band 2", 0.416)       -- -4.0dB (Dễ hát hơn)
     -- Band 3: Bell (BOOST nhẹ dải Presence 3.2kHz → vocal "phủ" lên beat, nghe rõ nét)
     set_p(voc, veq, "Freq-Band 3", 0.62)        -- ~3.2kHz
     set_p(voc, veq, "Gain-Band 3", 0.531)       -- +1.5dB (tôn vinh vocal, nổi trên nhạc)
@@ -312,6 +312,18 @@ function setup()
     set_p(voc, vcomp, "Release", 0.15)         -- 150ms
     set_p(voc, vcomp, "Knee", 0.50)            -- Soft-knee (đường cong nén cực mịn)
     set_p(voc, vcomp, "Auto make", 1.0)
+
+    -- FX3.5: ReaXcomp (Dynamic EQ Tamer - ĐỘNG LỰC HỌC THÔNG MINH)
+    local xcomp = add_fx(voc, "ReaXcomp")
+    set_p(voc, xcomp, "1-Band top frequency", 0.26) -- Dưới 250Hz: Bỏ qua không nén
+    set_p(voc, xcomp, "2-Band top frequency", 0.65) -- 250Hz - 3kHz: Nén dải Mid/UMid
+    set_p(voc, xcomp, "1-Threshold", 1.0) -- Band 1 không nén (Threshold max)
+    set_p(voc, xcomp, "2-Threshold", 0.3) -- Band 2 nén thông minh (chỉ kích hoạt khi hát to)
+    set_p(voc, xcomp, "2-Ratio", 0.38)    -- Ratio 4:1 nén gắt dải chói
+    set_p(voc, xcomp, "2-Attack", 0.1)    -- Attack 10ms
+    set_p(voc, xcomp, "2-Release", 0.25)  -- Release vừa phải
+    set_p(voc, xcomp, "3-Active", 0.0) -- Tắt Band 3
+    set_p(voc, xcomp, "4-Active", 0.0) -- Tắt Band 4
 
     -- FX4: JS Saturation (Hài âm tạo độ ấm xốp như mic tube vintage)
     local vsat = add_fx(voc, "Saturation")
