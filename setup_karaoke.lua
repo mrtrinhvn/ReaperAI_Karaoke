@@ -315,11 +315,11 @@ function setup()
 
     -- FX3.5: ReaXcomp (Dynamic EQ Tamer - ĐỘNG LỰC HỌC THÔNG MINH)
     local xcomp = add_fx(voc, "ReaXcomp")
-    set_p(voc, xcomp, "1-Band top frequency", 0.26) -- Dưới 250Hz: Bỏ qua không nén
-    set_p(voc, xcomp, "2-Band top frequency", 0.65) -- 250Hz - 3kHz: Nén dải Mid/UMid
+    set_p(voc, xcomp, "1-Band top frequency", 0.367) -- Dưới 500Hz: Bỏ qua không nén (Giữ ấm LMid)
+    set_p(voc, xcomp, "2-Band top frequency", 0.65) -- 500Hz - 3kHz: Nén dải Mid/UMid
     set_p(voc, xcomp, "1-Threshold", 1.0) -- Band 1 không nén (Threshold max)
-    set_p(voc, xcomp, "2-Threshold", 0.018) -- Band 2 nén tại -27dB (kích hoạt đúng lúc hát to)
-    set_p(voc, xcomp, "2-Ratio", 0.38)    -- Ratio 4:1 nén gắt dải chói
+    set_p(voc, xcomp, "2-Threshold", 0.015) -- Band 2 nén tại -30.0dB (năng lượng vùng này thấp hơn)
+    set_p(voc, xcomp, "2-Ratio", 0.42)    -- Ratio 6:1 nén dứt khoát dải chói
     set_p(voc, xcomp, "2-Attack", 0.1)    -- Attack 10ms
     set_p(voc, xcomp, "2-Release", 0.25)  -- Release vừa phải
     set_p(voc, xcomp, "3-Active", 0.0) -- Tắt Band 3
