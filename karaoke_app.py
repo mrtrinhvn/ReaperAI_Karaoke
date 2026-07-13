@@ -300,6 +300,9 @@ class KaraokeApp(Gtk.Window):
             self.buttons[key] = btn
             pass # flowbox removed
             
+        # Compact Controls Box
+        controls_vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=2)
+        
         # BPM Section
         bpm_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
 
@@ -323,7 +326,7 @@ class KaraokeApp(Gtk.Window):
         self.bpm_scale.connect("value-changed", self.on_bpm_changed)
         bpm_box.pack_start(self.bpm_scale, True, True, 0)
         
-        vbox.pack_start(bpm_box, False, False, 0)
+        controls_vbox.pack_start(bpm_box, False, False, 0)
         
         # Reverb Scale Section (Vang tăng thêm %)
         reverb_scale_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
@@ -341,7 +344,7 @@ class KaraokeApp(Gtk.Window):
         self.reverb_scale.connect("value-changed", self.on_reverb_scale_changed)
         reverb_scale_box.pack_start(self.reverb_scale, True, True, 0)
         
-        vbox.pack_start(reverb_scale_box, False, False, 0)
+        controls_vbox.pack_start(reverb_scale_box, False, False, 0)
 
         # Music Volume Section (Tăng/giảm Nhạc)
         music_vol_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
@@ -360,7 +363,9 @@ class KaraokeApp(Gtk.Window):
         self.music_vol_scale.connect("value-changed", self.on_music_volume_changed)
         music_vol_box.pack_start(self.music_vol_scale, True, True, 0)
         
-        vbox.pack_start(music_vol_box, False, False, 0)
+        controls_vbox.pack_start(music_vol_box, False, False, 0)
+        
+        vbox.pack_start(controls_vbox, False, False, 2)
         
         # AutoTune toggle — sẽ được gom vào tone_box bên dưới
         self.autotune_toggle = Gtk.Switch()
@@ -394,7 +399,7 @@ class KaraokeApp(Gtk.Window):
         
         mode_box.pack_start(self.btn_mode_singing, False, False, 0)
         mode_box.pack_start(self.btn_mode_podcast, False, False, 0)
-        vbox.pack_start(mode_box, False, False, 12)
+        vbox.pack_start(mode_box, False, False, 4)
         
         # Connect signals
         self.btn_mode_singing.connect("clicked", lambda w: self.set_app_mode(False))
