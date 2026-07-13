@@ -142,6 +142,8 @@ PRESETS = {
 class KaraokeApp(Gtk.Window):
     def __init__(self):
         super().__init__(title="Karaoke AI Panel")
+        settings = Gtk.Settings.get_default()
+        settings.set_property("gtk-application-prefer-dark-theme", True)
         self.set_border_width(10)
         self.set_default_size(360, 1)
         self.set_size_request(360, -1) # Khóa bề ngang tối thiểu để vừa 3 cột nút SFX

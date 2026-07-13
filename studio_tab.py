@@ -54,7 +54,7 @@ class TargetProgressBar(Gtk.DrawingArea):
         else:
             cr.set_source_rgba(1.0, 0.2, 0.2, 1.0) # Đỏ rực
             
-        cr.rectangle(0, height * 0.4, bar_width, height * 0.2) # Rất mỏng
+        cr.rectangle(0, height / 2 - 2, bar_width, 4) # Dày 4 pixel cố định
         cr.fill()
         
         return False
@@ -97,6 +97,7 @@ class StudioTab(Gtk.Box):
             grid.attach(name_btn, 0, i, 1, 1)
             
             pbar = TargetProgressBar()
+            pbar.set_valign(Gtk.Align.CENTER)
             grid.attach(pbar, 1, i, 1, 1)
             self.spectrum_bars.append(pbar)
             
@@ -127,6 +128,7 @@ class StudioTab(Gtk.Box):
             space_grid.attach(name_lbl, 0, i, 1, 1)
             
             pbar = TargetProgressBar()
+            pbar.set_valign(Gtk.Align.CENTER)
             space_grid.attach(pbar, 1, i, 1, 1)
             self.space_bars.append(pbar)
             
