@@ -370,7 +370,7 @@ class StudioTab(Gtk.Box):
         # Update Spatial bars based on current genre presets
         try:
             import json
-            with open(os.path.join(os.path.dirname(__file__), "genre_state.json"), "r") as f:
+            with open("/tmp/ai_karaoke_genre.json", "r") as f:
                 data = json.load(f)
                 
             targets = [
