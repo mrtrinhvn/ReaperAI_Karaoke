@@ -46,15 +46,15 @@ class TargetProgressBar(Gtk.DrawingArea):
         cr.line_to(self.target * width, height)
         cr.stroke()
 
-        # Vạch tín hiệu thực tế
+        # Vạch tín hiệu thực tế cực mỏng
         bar_width = self.value * width
         diff = abs(self.value - self.target)
         if diff <= self.tolerance:
-            cr.set_source_rgba(0.0, 0.8, 1.0, 0.9) # Xanh lơ (đạt)
+            cr.set_source_rgba(0.0, 0.9, 1.0, 1.0) # Xanh lơ rực
         else:
-            cr.set_source_rgba(1.0, 0.3, 0.3, 0.9) # Đỏ (lệch)
+            cr.set_source_rgba(1.0, 0.2, 0.2, 1.0) # Đỏ rực
             
-        cr.rectangle(0, height * 0.25, bar_width, height * 0.5) # Thanh mỏng ở giữa
+        cr.rectangle(0, height * 0.4, bar_width, height * 0.2) # Rất mỏng
         cr.fill()
         
         return False
@@ -106,6 +106,31 @@ class StudioTab(Gtk.Box):
             self.spectrum_labels.append(val_lbl)
             
         self.pack_start(grid, False, False, 5)
+        
+        # --- Khối Không Gian & Reverb ---
+        space_lbl = Gtk.Label(use_markup=True)
+        space_lbl.set_markup("<span font='10' weight='bold' color='#f38ba8'>🌌 Không gian & Độ Vang (Target)</span>")
+        space_lbl.set_halign(Gtk.Align.START)
+        self.pack_start(space_lbl, False, False, 0)
+        
+        space_grid = Gtk.Grid()
+        space_grid.set_column_spacing(10)
+        space_grid.set_row_spacing(5)
+        
+        self.space_bars = []
+        space_names = ["Kích thước phòng (Room)", "Độ ướt (Wet/Level)", "Độ nghẹt (Damp)", "Độ rộng (Width)"]
+        
+        for i, name in enumerate(space_names):
+            name_lbl = Gtk.Label(use_markup=True)
+            name_lbl.set_markup(f"<span font='9'>{name}</span>")
+            name_lbl.set_halign(Gtk.Align.START)
+            space_grid.attach(name_lbl, 0, i, 1, 1)
+            
+            pbar = TargetProgressBar()
+            space_grid.attach(pbar, 1, i, 1, 1)
+            self.space_bars.append(pbar)
+            
+        self.pack_start(space_grid, False, False, 5)
         
         # --- Mode Switch ---
         mode_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
@@ -316,6 +341,19 @@ class StudioTab(Gtk.Box):
             else:
                 status = "📈" if diff > 0 else "📉"
             self.spectrum_labels[i].set_markup(f"<span font='9'>{val:.1f}% ({status})</span>")
+            
+        # Update Spatial bars based on current genre presets
+        try:
+            import json
+            with open(os.path.join(os.path.dirname(__file__), "genre_state.json"), "r") as f:
+                data = json.load(f)
+                
+            self.space_bars[0].set_fraction_with_target(data.get("reverb_room", 0.5), data.get("reverb_room", 0.5), 0.05)
+            self.space_bars[1].set_fraction_with_target(data.get("reverb_wet", 0.3), data.get("reverb_wet", 0.3), 0.05)
+            self.space_bars[2].set_fraction_with_target(data.get("reverb_damp", 0.5), data.get("reverb_damp", 0.5), 0.05)
+            self.space_bars[3].set_fraction_with_target(data.get("reverb_width", 1.0), data.get("reverb_width", 1.0), 0.05)
+        except Exception:
+            pass
             
         buf = self.tutor_textview.get_buffer()
         is_tutor_mode = self.mode_combo.get_active_id() == "tutor"
