@@ -8,11 +8,10 @@ import numpy as np
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GLib
 
-
 class TargetProgressBar(Gtk.DrawingArea):
     def __init__(self):
         super().__init__()
-        self.set_size_request(150, 15)
+        self.set_size_request(150, 10) # 1) Làm thanh mỏng lại (từ 15 -> 10)
         self.value = 0.0
         self.target = 0.0
         self.tolerance = 0.0
@@ -28,34 +27,34 @@ class TargetProgressBar(Gtk.DrawingArea):
         width = self.get_allocated_width()
         height = self.get_allocated_height()
 
-        # Draw background (dark gray)
+        # Nền (xám tối)
         cr.set_source_rgb(0.15, 0.15, 0.2)
         cr.rectangle(0, 0, width, height)
         cr.fill()
 
-        # Draw target zone (green semi-transparent)
+        # 2) Vùng chuẩn (Màu xanh lá, đậm hơn một chút để dễ nhìn, alpha=0.4 thay vì 0.25)
         target_x = max(0, (self.target - self.tolerance) * width)
         target_w = (self.tolerance * 2) * width
-        cr.set_source_rgba(0.2, 0.8, 0.2, 0.25)
+        cr.set_source_rgba(0.2, 0.9, 0.2, 0.4)
         cr.rectangle(target_x, 0, target_w, height)
         cr.fill()
 
-        # Draw target center line (white, thin)
-        cr.set_source_rgba(1.0, 1.0, 1.0, 0.6)
-        cr.set_line_width(1.0)
+        # Vạch tâm chuẩn (trắng)
+        cr.set_source_rgba(1.0, 1.0, 1.0, 0.8)
+        cr.set_line_width(1.5)
         cr.move_to(self.target * width, 0)
         cr.line_to(self.target * width, height)
         cr.stroke()
 
-        # Draw value bar
+        # Vạch tín hiệu thực tế
         bar_width = self.value * width
         diff = abs(self.value - self.target)
         if diff <= self.tolerance:
-            cr.set_source_rgba(0.3, 0.8, 1.0, 0.8) # Cyan when inside target
+            cr.set_source_rgba(0.0, 0.8, 1.0, 0.9) # Xanh lơ (đạt)
         else:
-            cr.set_source_rgba(0.9, 0.3, 0.3, 0.8) # Red when outside target
+            cr.set_source_rgba(1.0, 0.3, 0.3, 0.9) # Đỏ (lệch)
             
-        cr.rectangle(0, height * 0.25, bar_width, height * 0.5) # Thinner bar in the middle
+        cr.rectangle(0, height * 0.25, bar_width, height * 0.5) # Thanh mỏng ở giữa
         cr.fill()
         
         return False
@@ -66,17 +65,17 @@ class StudioTab(Gtk.Box):
         self.set_border_width(10)
         self.parent_window = parent_window
         
-        # 1. Header
+        # --- UI Header ---
         lbl = Gtk.Label(use_markup=True)
         lbl.set_markup("<span font='14' weight='bold' color='#38bdf8'>🎓 Kỹ Sư Âm Thanh (AI Tutor)</span>")
         lbl.set_halign(Gtk.Align.START)
         self.pack_start(lbl, False, False, 5)
         
-        desc_lbl = Gtk.Label(label="Phân tích giọng thật và hướng dẫn vặn FX trong REAPER.")
+        desc_lbl = Gtk.Label(label="Phân tích phổ tần thật và hướng dẫn vặn FX trong REAPER.")
         desc_lbl.set_halign(Gtk.Align.START)
         self.pack_start(desc_lbl, False, False, 0)
         
-        # 2. Spectrum Visualizer (8 Bands)
+        # --- Grid phổ tần ---
         self.spectrum_bars = []
         self.spectrum_labels = []
         bands_names = ["Sub (20-80)", "Bass (80-250)", "LMid (250-500)", "Mid (500-1k)", 
@@ -98,7 +97,6 @@ class StudioTab(Gtk.Box):
             grid.attach(name_btn, 0, i, 1, 1)
             
             pbar = TargetProgressBar()
-            pbar.set_size_request(150, 15)
             grid.attach(pbar, 1, i, 1, 1)
             self.spectrum_bars.append(pbar)
             
@@ -109,32 +107,21 @@ class StudioTab(Gtk.Box):
             
         self.pack_start(grid, False, False, 5)
         
-        # 3. Mode Switch
+        # --- Mode Switch ---
         mode_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
         mode_box.pack_start(Gtk.Label(label="Chế độ:"), False, False, 0)
         
-        self.band_advice_db = {
-            0: ("Sub (20-80Hz)", "Low Shelf", "ùng ùng, ù nền", "mỏng, thiếu lực đáy"),
-            1: ("Bass (80-250Hz)", "Low Shelf (Band 1)", "đục, ồm ồm", "mỏng tang, thiếu ấm"),
-            2: ("LMid (250-500Hz)", "Band (Band 2)", "um, như bị nghẹt mũi", "rỗng, thiếu độ dày"),
-            3: ("Mid (500-1kHz)", "Band (Band 3)", "vọng ống bơ, oang oang", "chìm sâu, không rõ lời"),
-            4: ("UMid (1k-2.5kHz)", "Band (Band 3)", "gắt, điếc tai", "thiếu sức sống, mờ nhạt"),
-            5: ("Pres (2.5k-5kHz)", "Band (Band 4)", "đanh, rát tai", "kém hiện diện"),
-            6: ("Bright (5k-8kHz)", "High Shelf (Band 4)", "xé tiếng, gắt gỏng", "tối, đục tiếng"),
-            7: ("Air (8k-16kHz)", "High Shelf (Band 4)", "xì chói tai (Sibilance)", "bí bách, kém bay bổng")
-        }
-
-    def on_band_clicked(self, widget, band_idx):
-        self.selected_tutor_band = band_idx
-
-        self.tutor_switch = Gtk.Switch()
-        self.tutor_switch.set_active(True)
-        mode_box.pack_start(self.tutor_switch, False, False, 0)
-        mode_box.pack_start(Gtk.Label(label="Hướng dẫn bằng chữ (Tutor Mode)"), False, False, 0)
+        # Combo box chuyển đổi chế độ
+        self.mode_combo = Gtk.ComboBoxText()
+        self.mode_combo.append("auto", "🤖 Tự động (AI tự chỉnh REAPER)")
+        self.mode_combo.append("tutor", "🎓 Hướng dẫn (Thủ công)")
+        self.mode_combo.set_active_id("tutor") # Mặc định là hướng dẫn để user học
+        self.mode_combo.connect("changed", self.on_mode_changed)
+        mode_box.pack_start(self.mode_combo, False, False, 0)
         
         self.pack_start(mode_box, False, False, 10)
         
-        # 4. Tutor Feedback Text Box
+        # --- Tutor Text Box ---
         scrolled = Gtk.ScrolledWindow()
         scrolled.set_min_content_height(100)
         self.tutor_textview = Gtk.TextView()
@@ -142,7 +129,6 @@ class StudioTab(Gtk.Box):
         self.tutor_textview.set_editable(False)
         self.tutor_textview.set_cursor_visible(False)
         
-        # Thêm màu nền tối và chữ sáng cho textview
         css_provider = Gtk.CssProvider()
         css_provider.load_from_data(b"textview { background-color: #1e1e2e; color: #cdd6f4; font-size: 10pt; }")
         context = self.tutor_textview.get_style_context()
@@ -151,25 +137,51 @@ class StudioTab(Gtk.Box):
         scrolled.add(self.tutor_textview)
         self.pack_start(scrolled, True, True, 5)
         
-        # 5. Buttons
+        # --- Buttons ---
         btn_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=5)
-        ref_btn = Gtk.Button(label="📁 Nạp File Mẫu (Match EQ)")
+        ref_btn = Gtk.Button(label="📁 Lấy File Mẫu (Match EQ)")
         ref_btn.connect("clicked", self.on_ref_file_clicked)
         btn_box.pack_start(ref_btn, True, True, 0)
         
         self.pack_start(btn_box, False, False, 5)
         
-        # Variables
+        # --- Data & Threading ---
+        self.band_advice_db = {
+            0: ("Sub (20-80Hz)", "Low Shelf (Band 1)", "ùng ùng, ù nền", "mỏng, thiếu lực đáy"),
+            1: ("Bass (80-250Hz)", "Low Shelf (Band 1)", "đục, ồm ồm", "mỏng tang, thiếu ấm"),
+            2: ("LMid (250-500Hz)", "Band (Band 2)", "um, như bị nghẹt mũi", "rỗng, thiếu độ dày"),
+            3: ("Mid (500-1kHz)", "Band (Band 3)", "vọng ống bơ, oang oang", "chìm sâu, không rõ lời"),
+            4: ("UMid (1k-2.5kHz)", "Band (Band 3)", "gắt, điếc tai", "thiếu sức sống, mờ nhạt"),
+            5: ("Pres (2.5k-5kHz)", "Band (Band 4)", "đanh, rát tai", "kém hiện diện"),
+            6: ("Bright (5k-8kHz)", "High Shelf (Band 4)", "xé tiếng, gắt gỏng", "tối, đục tiếng"),
+            7: ("Air (8k-16kHz)", "High Shelf (Band 4)", "xì chói tai (Sibilance)", "bí bách, kém bay bổng")
+        }
+        
         self.audio_spectrum = [0.0] * 8
         self.ref_spectrum = [14.2, 24.8, 36.0, 18.7, 4.8, 0.9, 0.2, 0.3] # Default reference
         self.is_listening = True
         
-        # Bắt đầu luồng nghe âm thanh
         t = threading.Thread(target=self.audio_listener_thread, daemon=True)
         t.start()
         
-        # Hẹn giờ cập nhật UI
         GLib.timeout_add(500, self.update_studio_ui)
+
+    def on_band_clicked(self, widget, band_idx):
+        self.selected_tutor_band = band_idx
+
+    def on_mode_changed(self, combo):
+        # Lưu chế độ vào file để AI core biết đường chỉnh (hoặc không chỉnh) EQ
+        mode = combo.get_active_id()
+        try:
+            with open(os.path.join(os.path.dirname(__file__), "tutor_mode.json"), "w") as f:
+                json.dump({"mode": mode}, f)
+        except Exception:
+            pass
+
+    def update_reference_spectrum(self, new_ref):
+        # Được gọi từ ngoài khi đổi thể loại
+        if new_ref and len(new_ref) == 8:
+            self.ref_spectrum = new_ref
 
     def on_ref_file_clicked(self, widget):
         dialog = Gtk.FileChooserDialog(
@@ -248,28 +260,30 @@ class StudioTab(Gtk.Box):
                 try:
                     reaper_id = subprocess.check_output(
                         "pw-dump | jq '.[] | select(.info.props[\"node.name\"] == \"REAPER\") | .id' | head -n 1", 
-                        shell=True, text=True
-                    ).strip()
-                    target = reaper_id if reaper_id else "528967"
+                        shell=True, text=True).strip()
+                    if reaper_id:
+                        target = reaper_id
+                    else:
+                        target = "528967"
                 except Exception:
                     target = "528967"
                     
                 cmd = ['pw-record', '--target', target, '--format', 'f32', '--rate', '48000', '--channels', '2', '-']
                 p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
                 
-                chunk_size = 48000 * 2 * 4 # 1 second chunk
+                chunk_size = 48000 * 2 * 4
                 
                 while self.is_listening:
                     data = p.stdout.read(chunk_size)
                     if not data:
                         time.sleep(0.1)
-                        break # Trở lại vòng lặp ngoài để khởi động lại tiến trình
+                        break 
                         
                     s = np.frombuffer(data, np.float32).reshape(-1, 2)
                     mono = (s[:, 0] + s[:, 1]) / 2
                     
                     rms = 20 * np.log10(np.sqrt(np.mean(mono**2)) + 1e-10)
-                    if rms > -45: # Chỉ phân tích khi có tiếng (để biểu đồ không chạy loạn khi im lặng)
+                    if rms > -45:
                         from numpy.fft import rfft, rfftfreq
                         freqs = rfftfreq(len(mono), 1.0/48000)
                         fft = np.abs(rfft(mono)) / len(mono)
@@ -285,15 +299,14 @@ class StudioTab(Gtk.Box):
                 time.sleep(1)
 
     def update_studio_ui(self):
-        # 1. Update Progress bars
         for i, val in enumerate(self.audio_spectrum):
             ref = self.ref_spectrum[i]
             
-            # Tính toán tỷ lệ dựa trên max_scale
+            # Tính toán tỷ lệ
             max_scale = max(30.0, ref + 10.0)
             val_frac = val / max_scale
             ref_frac = ref / max_scale
-            tol_frac = 4.0 / max_scale # Khoảng chuẩn (dung sai 4%)
+            tol_frac = 4.0 / max_scale # Khoảng dung sai chuẩn 4%
             
             self.spectrum_bars[i].set_fraction_with_target(val_frac, ref_frac, tol_frac)
             
@@ -304,10 +317,11 @@ class StudioTab(Gtk.Box):
                 status = "📈" if diff > 0 else "📉"
             self.spectrum_labels[i].set_markup(f"<span font='9'>{val:.1f}% ({status})</span>")
             
-        # 2. Update Tutor Text
         buf = self.tutor_textview.get_buffer()
-        if not self.tutor_switch.get_active():
-            buf.set_text("Đang ẩn hướng dẫn (Chế độ chuyên gia). Bật 'Hướng dẫn bằng chữ' để xem AI Tutor.")
+        is_tutor_mode = self.mode_combo.get_active_id() == "tutor"
+        
+        if not is_tutor_mode:
+            buf.set_text("🤖 Đang ở chế độ TỰ ĐỘNG. AI đang tự vặn EQ trong REAPER.\n(Chọn 'Hướng dẫn (Thủ công)' nếu bạn muốn tự học cách vặn).")
         else:
             if self.selected_tutor_band is None:
                 buf.set_text("🎓 HƯỚNG DẪN CĂN CHỈNH:\n\n👆 Bấm vào tên một dải tần số (Ví dụ: 👉 Bass, 👉 Mid...) ở bảng trên để xem phân tích và hướng dẫn vặn REAPER cho dải tần đó.")
@@ -323,15 +337,15 @@ class StudioTab(Gtk.Box):
                 feedback += f"▶ Tín hiệu hiện tại: {val:.1f}% | Vùng chuẩn: {ref:.1f}%\n\n"
                 
                 if abs(diff) <= 4.0:
-                    feedback += "✅ TUYỆT VỜI! Dải tần này đang nằm gọn trong vùng an toàn (xanh lơ). Hãy giữ nguyên thiết lập hiện tại."
+                    feedback += "✅ TUYỆT VỜI! Dải tần này đang nằm gọn trong vùng an toàn (xanh lơ).\n👉 KHÔNG CẦN CHỈNH, hãy giữ nguyên thiết lập hiện tại."
                 elif diff > 4.0:
                     feedback += f"🔴 CẢNH BÁO: Đang DƯ thừa (+{diff:.1f}%)\n"
                     feedback += f"- Biểu hiện: Giọng sẽ bị {b_high}. Thanh tín hiệu văng khỏi vùng chuẩn.\n"
-                    feedback += f"- Cách chỉnh: 👉 Mở FX > ReaEQ > Chọn {b_eq}: GIẢM nút Gain xuống từ từ cho đến khi thanh tín hiệu tụt vào vùng xanh lơ."
+                    feedback += f"- Cách chỉnh: 👉 Mở FX > ReaEQ > Chọn vòng {b_eq}\n  GIẢM nút Gain xuống từ từ cho đến khi thanh tín hiệu tụt vào vùng xanh."
                 else:
                     feedback += f"🔴 CẢNH BÁO: Đang THIẾU hụt ({diff:.1f}%)\n"
                     feedback += f"- Biểu hiện: Giọng sẽ bị {b_low}. Thanh tín hiệu tụt ra khỏi vùng chuẩn.\n"
-                    feedback += f"- Cách chỉnh: 👉 Mở FX > ReaEQ > Chọn {b_eq}: TĂNG nút Gain lên từ từ cho đến khi thanh tín hiệu lọt vào vùng xanh lơ."
+                    feedback += f"- Cách chỉnh: 👉 Mở FX > ReaEQ > Chọn vòng {b_eq}\n  TĂNG nút Gain lên từ từ cho đến khi thanh tín hiệu lọt vào vùng xanh."
                     
                 buf.set_text(feedback)
                 
