@@ -86,6 +86,7 @@ class StudioTab(Gtk.Box):
         grid.set_row_spacing(5)
         
         self.selected_tutor_band = None
+        self.selected_space_idx = None
         for i, name in enumerate(bands_names):
             name_btn = Gtk.Button()
             name_btn.set_relief(Gtk.ReliefStyle.NONE)
@@ -119,18 +120,33 @@ class StudioTab(Gtk.Box):
         space_grid.set_row_spacing(5)
         
         self.space_bars = []
-        space_names = ["Kích thước phòng (Room)", "Độ ướt (Wet/Level)", "Độ nghẹt (Damp)", "Độ rộng (Width)"]
+        self.space_labels = []
+        self.space_details = [
+            ("Kích thước phòng (Room)", "ReaVerbate", "Room size", "Kéo thanh 'Room size' để làm không gian âm vang rộng ra hoặc hẹp lại."),
+            ("Độ ướt (Wet/Level)", "ReaVerbate", "Wet", "Kéo thanh 'Wet' để tăng giảm lượng tiếng vang hòa trộn với giọng mộc (Dry)."),
+            ("Độ nghẹt (Damp)", "ReaVerbate", "Dampening", "Kéo thanh 'Dampening' để gọt bớt đuôi xì chói của tiếng vang, làm vang đục/ấm hơn."),
+            ("Độ rộng (Width)", "ReaVerbate", "Stereo Width", "Kéo thanh 'Stereo Width' để dàn đều tiếng vang sang 2 bên tai nghe.")
+        ]
         
-        for i, name in enumerate(space_names):
-            name_lbl = Gtk.Label(use_markup=True)
-            name_lbl.set_markup(f"<span font='9'>{name}</span>")
-            name_lbl.set_halign(Gtk.Align.START)
-            space_grid.attach(name_lbl, 0, i, 1, 1)
+        for i, (name, fx, knob, desc) in enumerate(self.space_details):
+            btn = Gtk.Button()
+            btn.set_relief(Gtk.ReliefStyle.NONE)
+            lbl = Gtk.Label(use_markup=True)
+            lbl.set_markup(f"<span font='9' color='#a6e3a1'>👉 {name}</span>")
+            btn.add(lbl)
+            btn.set_halign(Gtk.Align.START)
+            btn.connect("clicked", self.on_space_clicked, i)
+            space_grid.attach(btn, 0, i, 1, 1)
             
             pbar = TargetProgressBar()
             pbar.set_valign(Gtk.Align.CENTER)
             space_grid.attach(pbar, 1, i, 1, 1)
             self.space_bars.append(pbar)
+            
+            val_lbl = Gtk.Label(use_markup=True)
+            val_lbl.set_markup("<span font='9'>0.0%</span>")
+            space_grid.attach(val_lbl, 2, i, 1, 1)
+            self.space_labels.append(val_lbl)
             
         self.pack_start(space_grid, False, False, 5)
         
@@ -195,6 +211,13 @@ class StudioTab(Gtk.Box):
 
     def on_band_clicked(self, widget, band_idx):
         self.selected_tutor_band = band_idx
+        self.selected_space_idx = None
+        self.update_studio_ui()
+        
+    def on_space_clicked(self, widget, idx):
+        self.selected_tutor_band = None
+        self.selected_space_idx = idx
+        self.update_studio_ui()
 
     def on_mode_changed(self, combo):
         # Lưu chế độ vào file để AI core biết đường chỉnh (hoặc không chỉnh) EQ
@@ -350,10 +373,15 @@ class StudioTab(Gtk.Box):
             with open(os.path.join(os.path.dirname(__file__), "genre_state.json"), "r") as f:
                 data = json.load(f)
                 
-            self.space_bars[0].set_fraction_with_target(data.get("reverb_room", 0.5), data.get("reverb_room", 0.5), 0.05)
-            self.space_bars[1].set_fraction_with_target(data.get("reverb_wet", 0.3), data.get("reverb_wet", 0.3), 0.05)
-            self.space_bars[2].set_fraction_with_target(data.get("reverb_damp", 0.5), data.get("reverb_damp", 0.5), 0.05)
-            self.space_bars[3].set_fraction_with_target(data.get("reverb_width", 1.0), data.get("reverb_width", 1.0), 0.05)
+            targets = [
+                data.get("reverb_room", 0.5),
+                data.get("reverb_wet", 0.3),
+                data.get("reverb_damp", 0.5),
+                data.get("reverb_width", 1.0)
+            ]
+            for i, target in enumerate(targets):
+                self.space_bars[i].set_fraction_with_target(target, target, 0.05)
+                self.space_labels[i].set_markup(f"<span font='9'>{target*100:.1f}%</span>")
         except Exception:
             pass
             
@@ -363,9 +391,7 @@ class StudioTab(Gtk.Box):
         if not is_tutor_mode:
             buf.set_text("🤖 Đang ở chế độ TỰ ĐỘNG. AI đang tự vặn EQ trong REAPER.\n(Chọn 'Hướng dẫn (Thủ công)' nếu bạn muốn tự học cách vặn).")
         else:
-            if self.selected_tutor_band is None:
-                buf.set_text("🎓 HƯỚNG DẪN CĂN CHỈNH:\n\n👆 Bấm vào tên một dải tần số (Ví dụ: 👉 Bass, 👉 Mid...) ở bảng trên để xem phân tích và hướng dẫn vặn REAPER cho dải tần đó.")
-            else:
+            if self.selected_tutor_band is not None:
                 idx = self.selected_tutor_band
                 val = self.audio_spectrum[idx]
                 ref = self.ref_spectrum[idx]
@@ -388,5 +414,23 @@ class StudioTab(Gtk.Box):
                     feedback += f"- Cách chỉnh: 👉 Mở FX > ReaEQ > Chọn vòng {b_eq}\n  TĂNG nút Gain lên từ từ cho đến khi thanh tín hiệu lọt vào vùng xanh."
                     
                 buf.set_text(feedback)
+            elif self.selected_space_idx is not None:
+                idx = self.selected_space_idx
+                name, fx, knob, desc = self.space_details[idx]
+                target_val = self.space_bars[idx].target * 100
+                
+                feedback = f"🎓 HƯỚNG DẪN KHÔNG GIAN: {name}\n"
+                feedback += f"▶ Mức chuẩn (Target) cần đạt: {target_val:.1f}%\n\n"
+                feedback += f"💡 Lưu ý: Các thông số Không Gian (Reverb) không thể đo trực tiếp từ Micro (vì Micro chỉ thu giọng mộc). Bạn cần vặn theo hướng dẫn và cảm nhận tai nghe để đạt mức chuẩn.\n\n"
+                feedback += f"🛠️ CÁCH CHỈNH:\n"
+                feedback += f"1. Mở cửa sổ FX của track Vocal\n"
+                feedback += f"2. Mở Plugin: '{fx}'\n"
+                feedback += f"3. Tìm thanh trượt: '{knob}'\n"
+                feedback += f"4. {desc}\n\n"
+                feedback += f"🎯 Mục tiêu: Vặn sao cho thông số '{knob}' trong REAPER sát với mức {target_val:.0f}%."
+                
+                buf.set_text(feedback)
+            else:
+                buf.set_text("🎓 HƯỚNG DẪN CĂN CHỈNH:\n\n👆 Bấm vào tên một dải tần số (👉 Bass...) hoặc một chỉ số Không gian (👉 Room...) ở bảng trên để xem phân tích và hướng dẫn vặn REAPER chi tiết.")
                 
         return True
