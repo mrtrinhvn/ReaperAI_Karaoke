@@ -11,7 +11,7 @@ from gi.repository import Gtk, Gdk, GLib
 class TargetProgressBar(Gtk.DrawingArea):
     def __init__(self):
         super().__init__()
-        self.set_size_request(150, 10) # 1) Làm thanh mỏng lại (từ 15 -> 10)
+        self.set_size_request(150, 6) # Làm thanh mỏng hơn nữa
         self.value = 0.0
         self.target = 0.0
         self.tolerance = 0.0
@@ -54,7 +54,7 @@ class TargetProgressBar(Gtk.DrawingArea):
         else:
             cr.set_source_rgba(1.0, 0.2, 0.2, 1.0) # Đỏ rực
             
-        cr.rectangle(0, height / 2 - 2, bar_width, 4) # Dày 4 pixel cố định
+        cr.rectangle(0, height / 2 - 1, bar_width, 2) # Dày 2 pixel cố định
         cr.fill()
         
         return False
@@ -83,7 +83,7 @@ class StudioTab(Gtk.Box):
         
         grid = Gtk.Grid()
         grid.set_column_spacing(10)
-        grid.set_row_spacing(1)
+        grid.set_row_spacing(0)
         
         # Add CSS for compact buttons
         style_provider = Gtk.CssProvider()
@@ -117,7 +117,7 @@ class StudioTab(Gtk.Box):
             grid.attach(val_lbl, 2, i, 1, 1)
             self.spectrum_labels.append(val_lbl)
             
-        self.pack_start(grid, False, False, 5)
+        self.pack_start(grid, False, False, 0)
         
         # --- Khối Không Gian & Reverb ---
         space_lbl = Gtk.Label(use_markup=True)
@@ -127,7 +127,7 @@ class StudioTab(Gtk.Box):
         
         space_grid = Gtk.Grid()
         space_grid.set_column_spacing(10)
-        space_grid.set_row_spacing(1)
+        space_grid.set_row_spacing(0)
         
         self.space_bars = []
         self.space_labels = []
@@ -159,7 +159,7 @@ class StudioTab(Gtk.Box):
             space_grid.attach(val_lbl, 2, i, 1, 1)
             self.space_labels.append(val_lbl)
             
-        self.pack_start(space_grid, False, False, 5)
+        self.pack_start(space_grid, False, False, 0)
         
         # --- Bottom Controls (Match EQ + Mode) ---
         bottom_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
