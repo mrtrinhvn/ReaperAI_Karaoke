@@ -6,7 +6,7 @@ import json
 import os
 import numpy as np
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, GLib
+from gi.repository import Gtk, Gdk, GLib
 
 class TargetProgressBar(Gtk.DrawingArea):
     def __init__(self):
@@ -83,12 +83,22 @@ class StudioTab(Gtk.Box):
         
         grid = Gtk.Grid()
         grid.set_column_spacing(10)
-        grid.set_row_spacing(5)
+        grid.set_row_spacing(1)
+        
+        # Add CSS for compact buttons
+        style_provider = Gtk.CssProvider()
+        style_provider.load_from_data(b".compact-btn { min-height: 0px; padding: 1px 4px; border: none; margin: 0px; }")
+        Gtk.StyleContext.add_provider_for_screen(
+            Gdk.Screen.get_default(),
+            style_provider,
+            Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+        )
         
         self.selected_tutor_band = None
         self.selected_space_idx = None
         for i, name in enumerate(bands_names):
             name_btn = Gtk.Button()
+            name_btn.get_style_context().add_class("compact-btn")
             name_btn.set_relief(Gtk.ReliefStyle.NONE)
             name_btn_lbl = Gtk.Label(use_markup=True)
             name_btn_lbl.set_markup(f"<span font='9' color='#8caaee'>👉 {name}</span>")
@@ -117,7 +127,7 @@ class StudioTab(Gtk.Box):
         
         space_grid = Gtk.Grid()
         space_grid.set_column_spacing(10)
-        space_grid.set_row_spacing(5)
+        space_grid.set_row_spacing(1)
         
         self.space_bars = []
         self.space_labels = []
@@ -130,6 +140,7 @@ class StudioTab(Gtk.Box):
         
         for i, (name, fx, knob, desc) in enumerate(self.space_details):
             btn = Gtk.Button()
+            btn.get_style_context().add_class("compact-btn")
             btn.set_relief(Gtk.ReliefStyle.NONE)
             lbl = Gtk.Label(use_markup=True)
             lbl.set_markup(f"<span font='9' color='#a6e3a1'>👉 {name}</span>")
