@@ -161,23 +161,31 @@ class StudioTab(Gtk.Box):
             
         self.pack_start(space_grid, False, False, 5)
         
-        # --- Mode Switch ---
-        mode_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        # --- Bottom Controls (Match EQ + Mode) ---
+        bottom_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        
+        ref_btn = Gtk.Button(label="📁 Lấy Mẫu (Match EQ)")
+        ref_btn.connect("clicked", self.on_ref_file_clicked)
+        bottom_box.pack_start(ref_btn, False, False, 0)
+        
+        spacer = Gtk.Label()
+        bottom_box.pack_start(spacer, True, True, 0)
+        
+        mode_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=5)
         mode_box.pack_start(Gtk.Label(label="Chế độ:"), False, False, 0)
         
-        # Combo box chuyển đổi chế độ
         self.mode_combo = Gtk.ComboBoxText()
-        self.mode_combo.append("auto", "🤖 Tự động (AI tự chỉnh REAPER)")
-        self.mode_combo.append("tutor", "🎓 Hướng dẫn (Thủ công)")
-        self.mode_combo.set_active_id("tutor") # Mặc định là hướng dẫn để user học
+        self.mode_combo.append("auto", "🤖 Tự động")
+        self.mode_combo.append("tutor", "🎓 Hướng dẫn")
+        self.mode_combo.set_active_id("tutor")
         self.mode_combo.connect("changed", self.on_mode_changed)
         mode_box.pack_start(self.mode_combo, False, False, 0)
         
-        self.pack_start(mode_box, False, False, 10)
+        bottom_box.pack_start(mode_box, False, False, 0)
         
         # --- Tutor Text Box ---
         scrolled = Gtk.ScrolledWindow()
-        scrolled.set_min_content_height(100)
+        scrolled.set_min_content_height(75)
         self.tutor_textview = Gtk.TextView()
         self.tutor_textview.set_wrap_mode(Gtk.WrapMode.WORD)
         self.tutor_textview.set_editable(False)
@@ -189,15 +197,9 @@ class StudioTab(Gtk.Box):
         context.add_provider(css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
         
         scrolled.add(self.tutor_textview)
-        self.pack_start(scrolled, True, True, 5)
         
-        # --- Buttons ---
-        btn_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=5)
-        ref_btn = Gtk.Button(label="📁 Lấy File Mẫu (Match EQ)")
-        ref_btn.connect("clicked", self.on_ref_file_clicked)
-        btn_box.pack_start(ref_btn, True, True, 0)
-        
-        self.pack_start(btn_box, False, False, 5)
+        self.pack_start(scrolled, True, True, 2)
+        self.pack_start(bottom_box, False, False, 2)
         
         # --- Data & Threading ---
         self.band_advice_db = {
